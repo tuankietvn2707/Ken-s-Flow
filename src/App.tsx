@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Student, ClassSession } from './types';
-import { Users, BookOpen, LayoutDashboard, LogOut } from 'lucide-react';
+import { Users, BookOpen, LayoutDashboard, LogOut, Wallet } from 'lucide-react';
 import { auth, db } from './firebase';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { collection, getDocs, doc, setDoc, deleteDoc, writeBatch, deleteField } from 'firebase/firestore';
@@ -262,8 +262,8 @@ export default function App() {
                 <TabButton 
                   active={activeTab === 'personal_finance'} 
                   onClick={() => setActiveTab('personal_finance')}
-                  icon={<DongSign className="w-4 h-4 mr-2" />}
-                  label="Thu - Chi Cá Nhân"
+                  icon={<Wallet className="w-4 h-4 mr-2" />}
+                  label="Thu - Chi"
                   colorClass="bg-cyan-100/70 text-cyan-800 border-cyan-200"
                   hoverClass="hover:bg-cyan-50 hover:text-cyan-700 hover:border-cyan-100"
                 />

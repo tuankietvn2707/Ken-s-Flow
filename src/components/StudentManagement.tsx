@@ -328,13 +328,11 @@ export default function StudentManagement({ students, addStudent, updateStudent,
   );
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }} 
-      animate={{ opacity: 1, y: 0 }} 
-      transition={{ duration: 0.5 }}
-      className="space-y-6"
-    >
-      <div className="flex justify-between items-center">
+    <div className="space-y-6">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+        className="flex justify-between items-center"
+      >
         <h1 className="text-2xl font-bold text-slate-900">Quản lý Học viên</h1>
         <button
           onClick={() => setIsFormOpen(true)}
@@ -343,10 +341,13 @@ export default function StudentManagement({ students, addStudent, updateStudent,
           <Plus className="w-4 h-4 mr-2" />
           Thêm Học viên
         </button>
-      </div>
+      </motion.div>
 
       {isFormOpen && (
-        <div className="bg-white shadow-[0_10px_30px_rgba(0,0,0,0.04)] rounded-[20px] border border-slate-100 p-6 mb-6 relative">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+          className="bg-white shadow-[0_10px_30px_rgba(0,0,0,0.04)] rounded-[20px] border border-slate-100 p-6 mb-6 relative"
+        >
           <button 
             onClick={closeForm}
             className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"
@@ -557,10 +558,13 @@ export default function StudentManagement({ students, addStudent, updateStudent,
               </button>
             </div>
           </form>
-        </div>
+        </motion.div>
       )}
 
-      <div className="bg-white shadow-[0_10px_30px_rgba(0,0,0,0.04)] rounded-[20px] border border-slate-100 overflow-hidden mb-8">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+        className="bg-white shadow-[0_10px_30px_rgba(0,0,0,0.04)] rounded-[20px] border border-slate-100 overflow-hidden mb-8"
+      >
         <div className="px-6 py-4 border-b border-slate-100 bg-emerald-50/50">
           <h2 className="text-lg font-semibold text-emerald-800 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
@@ -604,10 +608,13 @@ export default function StudentManagement({ students, addStudent, updateStudent,
             </DragDropContext>
           </table>
         </div>
-      </div>
+      </motion.div>
 
       {inactiveStudents.length > 0 && (
-        <div className="bg-white shadow-[0_10px_30px_rgba(0,0,0,0.04)] rounded-[20px] border border-slate-100 overflow-hidden opacity-80">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+          className="bg-white shadow-[0_10px_30px_rgba(0,0,0,0.04)] rounded-[20px] border border-slate-100 overflow-hidden opacity-80"
+        >
           <div className="px-6 py-4 border-b border-slate-100 bg-slate-100">
             <h2 className="text-lg font-semibold text-slate-600 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-slate-400"></span>
@@ -643,7 +650,7 @@ export default function StudentManagement({ students, addStudent, updateStudent,
               </DragDropContext>
             </table>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* Modal Chi tiết Học viên */}
@@ -839,6 +846,6 @@ export default function StudentManagement({ students, addStudent, updateStudent,
           </div>
         </div>
       )}
-    </motion.div>
+    </div>
   );
 }

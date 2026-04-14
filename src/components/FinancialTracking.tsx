@@ -106,13 +106,11 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
   const totalPotentialRevenue = allFinancials.reduce((sum, f) => sum + f.potentialRevenue, 0);
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }} 
-      animate={{ opacity: 1, y: 0 }} 
-      transition={{ duration: 0.5 }}
-      className="space-y-6"
-    >
-      <div className="flex justify-between items-center">
+    <div className="space-y-6">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+        className="flex justify-between items-center"
+      >
         <h1 className="text-2xl font-bold text-slate-900">Quản lý Tài chính</h1>
         <div className="flex gap-4">
           <div className="bg-white px-4 py-2 rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.04)] border border-slate-100">
@@ -124,9 +122,12 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
             <span className="text-lg font-bold text-rose-600">{formatVND(totalOutstanding)}</span>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="bg-white shadow-[0_10px_30px_rgba(0,0,0,0.04)] rounded-[20px] border border-slate-100 overflow-hidden">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+        className="bg-white shadow-[0_10px_30px_rgba(0,0,0,0.04)] rounded-[20px] border border-slate-100 overflow-hidden"
+      >
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-200">
             <thead className="bg-slate-50">
@@ -206,7 +207,7 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
             </tbody>
           </table>
         </div>
-      </div>
+      </motion.div>
 
       {/* Receipt Modal */}
       {isReceiptModalOpen && receiptData && (
@@ -330,6 +331,6 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
           </div>
         </div>
       )}
-    </motion.div>
+    </div>
   );
 }

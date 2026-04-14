@@ -218,15 +218,18 @@ export default function Dashboard({ students, classes, setActiveTab }: Dashboard
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }} 
-      animate={{ opacity: 1, y: 0 }} 
-      transition={{ duration: 0.5 }}
-      className="space-y-6"
-    >
-      <h1 className="text-2xl font-bold text-[#1E293B]">{getGreeting()}</h1>
+    <div className="space-y-6">
+      <motion.h1 
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+        className="text-2xl font-bold text-[#1E293B]"
+      >
+        {getGreeting()}
+      </motion.h1>
       
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+        className="grid grid-cols-1 gap-5 sm:grid-cols-3"
+      >
         <div 
           onClick={() => setActiveTab && setActiveTab('students')}
           className="bg-white overflow-hidden rounded-[20px] shadow-[0_10px_30px_rgba(0,0,0,0.04)] cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(0,0,0,0.08)] hover:ring-2 hover:ring-indigo-100"
@@ -283,9 +286,12 @@ export default function Dashboard({ students, classes, setActiveTab }: Dashboard
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+        className="grid grid-cols-1 gap-5 lg:grid-cols-2"
+      >
         {/* Revenue Trend Chart (50%) */}
         <div className="bg-white rounded-[20px] shadow-[0_10px_30px_rgba(0,0,0,0.04)] lg:col-span-1 flex flex-col">
           <div className="p-6 border-b border-slate-50">
@@ -417,7 +423,7 @@ export default function Dashboard({ students, classes, setActiveTab }: Dashboard
             </div>
           </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }

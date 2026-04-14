@@ -187,13 +187,11 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
   }
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }} 
-      animate={{ opacity: 1, y: 0 }} 
-      transition={{ duration: 0.5 }}
-      className="space-y-6"
-    >
-      <div className="flex justify-between items-center">
+    <div className="space-y-6">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+        className="flex justify-between items-center"
+      >
         <h1 className="text-2xl font-bold text-slate-900">Theo dõi Lớp học</h1>
         <button
           onClick={() => setIsFormOpen(true)}
@@ -202,10 +200,13 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
           <Plus className="w-4 h-4 mr-2" />
           Ghi nhận Lớp học
         </button>
-      </div>
+      </motion.div>
 
       {isFormOpen && (
-        <div className="bg-white shadow-[0_10px_30px_rgba(0,0,0,0.04)] rounded-[20px] border border-slate-100 p-6 mb-6 relative">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+          className="bg-white shadow-[0_10px_30px_rgba(0,0,0,0.04)] rounded-[20px] border border-slate-100 p-6 mb-6 relative"
+        >
           <button 
             onClick={closeForm}
             className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"
@@ -349,10 +350,13 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
               </button>
             </div>
           </form>
-        </div>
+        </motion.div>
       )}
 
-      <div className="bg-white shadow-[0_10px_30px_rgba(0,0,0,0.04)] rounded-2xl overflow-hidden">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+        className="bg-white shadow-[0_10px_30px_rgba(0,0,0,0.04)] rounded-2xl overflow-hidden"
+      >
         <div className="px-6 py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <h3 className="text-lg leading-6 font-medium text-slate-900">Các buổi học gần đây</h3>
           <div className="flex items-center gap-3">
@@ -448,7 +452,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
             </tbody>
           </table>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }
