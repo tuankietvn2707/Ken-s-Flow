@@ -33,7 +33,17 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
         }
       });
       return () => {
-        fp.destroy();
+        if (fp) {
+          if (typeof (fp as any).destroy === 'function') {
+            (fp as any).destroy();
+          } else if (Array.isArray(fp)) {
+            fp.forEach(instance => {
+              if (instance && typeof instance.destroy === 'function') {
+                instance.destroy();
+              }
+            });
+          }
+        }
       };
     }
   }, [isFormOpen]);
