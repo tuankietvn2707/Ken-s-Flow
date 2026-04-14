@@ -138,10 +138,20 @@ NHIỆM VỤ CỦA BẠN:
 
     } catch (error: any) {
       console.error('Chat error:', error);
+      
+      let errorMessage = 'Xin lỗi, có lỗi xảy ra khi xử lý yêu cầu của bạn.';
+      const errorString = error?.message || String(error);
+      
+      if (errorString.includes('429') || errorString.includes('Quota exceeded') || errorString.includes('RESOURCE_EXHAUSTED')) {
+        errorMessage = 'Hệ thống AI đang nhận quá nhiều yêu cầu (vượt giới hạn gói miễn phí). Vui lòng đợi khoảng 15-30 giây rồi thử lại nhé!';
+      } else {
+        errorMessage = `Xin lỗi, có lỗi xảy ra khi xử lý yêu cầu của bạn. Chi tiết: ${errorString}`;
+      }
+
       setMessages(prev => [...prev, { 
         id: Date.now().toString(), 
         sender: 'ai', 
-        text: `Xin lỗi, có lỗi xảy ra khi xử lý yêu cầu của bạn. Chi tiết: ${error?.message || 'Lỗi không xác định'}` 
+        text: errorMessage
       }]);
     } finally {
       setIsLoading(false);
