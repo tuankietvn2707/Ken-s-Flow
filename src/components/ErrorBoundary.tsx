@@ -10,6 +10,13 @@ interface State {
 }
 
 export default class ErrorBoundary extends Component<Props, State> {
+  public props: Props;
+  
+  constructor(props: Props) {
+    super(props);
+    this.props = props;
+  }
+
   public state: State = {
     hasError: false,
     error: null
@@ -46,6 +53,6 @@ export default class ErrorBoundary extends Component<Props, State> {
       );
     }
 
-    return this.props.children;
+    return (this.props as any).children;
   }
 }
