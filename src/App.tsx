@@ -1,0 +1,380 @@
+import React, { useState, useEffect } from 'react';
+import { Student, ClassSession } from './types';
+import { Users, BookOpen, LayoutDashboard, LogOut } from 'lucide-react';
+import { auth, db } from './firebase';
+import { onAuthStateChanged, signOut, User } from 'firebase/auth';
+import { collection, getDocs, doc, setDoc, deleteDoc, writeBatch, deleteField } from 'firebase/firestore';
+
+// Components
+import Dashboard from './components/Dashboard';
+import StudentManagement from './components/StudentManagement';
+import ClassTracker from './components/ClassTracker';
+import FinancialTracking from './components/FinancialTracking';
+import PersonalFinance from './components/PersonalFinance';
+import Login from './components/Login';
+import FloatingActionButton from './components/FloatingActionButton';
+
+const DongSign = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M15 4v12" />
+    <circle cx="11" cy="12" r="4" />
+    <path d="M11 8h8" />
+    <path d="M7 20h12" />
+  </svg>
+);
+
+export default function App() {
+  const [user, setUser] = useState<User | null>(null);
+  const [loadingAuth, setLoadingAuth] = useState(true);
+  
+  const [students, setStudents] = useState<Student[]>([]);
+  const [classes, setClasses] = useState<ClassSession[]>([]);
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [loadingData, setLoadingData] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const showLoading = () => setIsProcessing(true);
+  const hideLoading = () => setIsProcessing(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoadingAuth(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      fetchData(user.uid);
+    } else {
+      setStudents([]);
+      setClasses([]);
+    }
+  }, [user]);
+
+  const fetchData = async (uid: string) => {
+    setLoadingData(true);
+    try {
+      const studentsSnap = await getDocs(collection(db, `users/${uid}/students`));
+      const classesSnap = await getDocs(collection(db, `users/${uid}/classes`));
+      
+      const studentsData = studentsSnap.docs.map(doc => doc.data() as Student);
+      const classesData = classesSnap.docs.map(doc => doc.data() as ClassSession);
+      
+      setStudents(studentsData);
+      setClasses(classesData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoadingData(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
+  // CRUD for Students
+  const addStudent = async (student: Student) => {
+    if (!user) return;
+    try {
+      await setDoc(doc(db, `users/${user.uid}/students`, student.id), student);
+      setStudents(prev => [...prev, student]);
+    } catch (error) {
+      console.error("Error adding student:", error);
+    }
+  };
+
+  const updateStudent = async (student: Student) => {
+    if (!user) return;
+    try {
+      await setDoc(doc(db, `users/${user.uid}/students`, student.id), student);
+      setStudents(prev => prev.map(s => s.id === student.id ? student : s));
+    } catch (error) {
+      console.error("Error updating student:", error);
+    }
+  };
+
+  const deleteStudent = async (id: string) => {
+    if (!user) return;
+    try {
+      await deleteDoc(doc(db, `users/${user.uid}/students`, id));
+      setStudents(prev => prev.filter(s => s.id !== id));
+    } catch (error) {
+      console.error("Error deleting student:", error);
+    }
+  };
+
+  // CRUD for Classes
+  const addClass = async (cls: ClassSession) => {
+    if (!user) return;
+    try {
+      await setDoc(doc(db, `users/${user.uid}/classes`, cls.id), cls);
+      setClasses(prev => [cls, ...prev]);
+    } catch (error) {
+      console.error("Error adding class:", error);
+      throw error;
+    }
+  };
+
+  const updateClass = async (cls: ClassSession) => {
+    if (!user) return;
+    try {
+      await setDoc(doc(db, `users/${user.uid}/classes`, cls.id), cls);
+      setClasses(prev => prev.map(c => c.id === cls.id ? cls : c));
+    } catch (error) {
+      console.error("Error updating class:", error);
+      throw error;
+    }
+  };
+
+  const deleteClass = async (id: string) => {
+    if (!user) return;
+    try {
+      await deleteDoc(doc(db, `users/${user.uid}/classes`, id));
+      setClasses(prev => prev.filter(c => c.id !== id));
+    } catch (error) {
+      console.error("Error deleting class:", error);
+    }
+  };
+
+  // Financial
+  const markClassesAsPaid = async (studentId: string, classIds: string[]) => {
+    if (!user || classIds.length === 0) return;
+    const batchId = Date.now();
+    try {
+      const batch = writeBatch(db);
+      classIds.forEach(id => {
+        const classRef = doc(db, `users/${user.uid}/classes`, id);
+        batch.update(classRef, { isPaid: true, paymentBatchId: batchId });
+      });
+      await batch.commit();
+      setClasses(prev => prev.map(c => classIds.includes(c.id) ? { ...c, isPaid: true, paymentBatchId: batchId } : c));
+    } catch (error) {
+      console.error("Error marking classes as paid:", error);
+    }
+  };
+
+  const undoLastPayment = async (studentId: string) => {
+    if (!user) return;
+    showLoading();
+    try {
+      const studentClasses = classes.filter(c => c.studentId === studentId && c.isPaid && c.paymentBatchId);
+      if (studentClasses.length === 0) return;
+
+      const latestBatchId = Math.max(...studentClasses.map(c => c.paymentBatchId!));
+      const classesToUndo = studentClasses.filter(c => c.paymentBatchId === latestBatchId);
+
+      const batch = writeBatch(db);
+      classesToUndo.forEach(c => {
+        const classRef = doc(db, `users/${user.uid}/classes`, c.id);
+        batch.update(classRef, { isPaid: false, paymentBatchId: deleteField() });
+      });
+      await batch.commit();
+
+      setClasses(prev => prev.map(c =>
+        c.paymentBatchId === latestBatchId ? { ...c, isPaid: false, paymentBatchId: undefined } : c
+      ));
+    } catch (error) {
+      console.error("Error undoing payment:", error);
+    } finally {
+      hideLoading();
+    }
+  };
+
+  if (loadingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Login />;
+  }
+
+  return (
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans">
+      <nav className="bg-white border-b border-slate-200 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex">
+              <div className="flex-shrink-0 flex items-center">
+                <div className="animated-border-box">
+                  <div className="animated-border-inner">
+                    <BookOpen className="w-6 h-6 text-indigo-600" />
+                    <span className="text-xl font-bold text-indigo-600">
+                      TutorFlow
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="hidden sm:ml-6 sm:flex sm:space-x-2">
+                <TabButton 
+                  active={activeTab === 'dashboard'} 
+                  onClick={() => setActiveTab('dashboard')}
+                  icon={<LayoutDashboard className="w-4 h-4 mr-2" />}
+                  label="Tổng quan"
+                  colorClass="bg-blue-900/10 text-blue-900 border-blue-900/20"
+                  hoverClass="hover:bg-blue-900/5 hover:text-blue-800 hover:border-blue-900/10"
+                />
+                <TabButton 
+                  active={activeTab === 'students'} 
+                  onClick={() => setActiveTab('students')}
+                  icon={<Users className="w-4 h-4 mr-2" />}
+                  label="Học viên"
+                  colorClass="bg-blue-100/70 text-blue-800 border-blue-200"
+                  hoverClass="hover:bg-blue-50 hover:text-blue-700 hover:border-blue-100"
+                />
+                <TabButton 
+                  active={activeTab === 'classes'} 
+                  onClick={() => setActiveTab('classes')}
+                  icon={<BookOpen className="w-4 h-4 mr-2" />}
+                  label="Lớp học"
+                  colorClass="bg-green-100/70 text-green-800 border-green-200"
+                  hoverClass="hover:bg-green-50 hover:text-green-700 hover:border-green-100"
+                />
+                <TabButton 
+                  active={activeTab === 'finances'} 
+                  onClick={() => setActiveTab('finances')}
+                  icon={<DongSign className="w-4 h-4 mr-2" />}
+                  label="Tài chính"
+                  colorClass="bg-orange-100/70 text-orange-800 border-orange-200"
+                  hoverClass="hover:bg-orange-50 hover:text-orange-700 hover:border-orange-100"
+                />
+                <TabButton 
+                  active={activeTab === 'personal_finance'} 
+                  onClick={() => setActiveTab('personal_finance')}
+                  icon={<DongSign className="w-4 h-4 mr-2" />}
+                  label="Thu - Chi Cá Nhân"
+                  colorClass="bg-cyan-100/70 text-cyan-800 border-cyan-200"
+                  hoverClass="hover:bg-cyan-50 hover:text-cyan-700 hover:border-cyan-100"
+                />
+              </div>
+            </div>
+            <div className="flex items-center">
+              <span className="text-sm text-slate-500 mr-4 hidden sm:block">{user.email}</span>
+              <button
+                onClick={handleLogout}
+                className="inline-flex items-center px-3 py-1.5 border border-slate-300 shadow-sm text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                <LogOut className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Đăng xuất</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        {/* Mobile menu */}
+        <div className="sm:hidden border-t border-slate-200 flex overflow-x-auto p-2 gap-2">
+           <MobileTabButton 
+              active={activeTab === 'dashboard'} 
+              onClick={() => setActiveTab('dashboard')}
+              label="Tổng quan"
+              colorClass="bg-blue-900/10 text-blue-900 border-blue-900/20"
+            />
+            <MobileTabButton 
+              active={activeTab === 'students'} 
+              onClick={() => setActiveTab('students')}
+              label="Học viên"
+              colorClass="bg-blue-100/70 text-blue-800 border-blue-200"
+            />
+            <MobileTabButton 
+              active={activeTab === 'classes'} 
+              onClick={() => setActiveTab('classes')}
+              label="Lớp học"
+              colorClass="bg-green-100/70 text-green-800 border-green-200"
+            />
+            <MobileTabButton 
+              active={activeTab === 'finances'} 
+              onClick={() => setActiveTab('finances')}
+              label="Tài chính"
+              colorClass="bg-orange-100/70 text-orange-800 border-orange-200"
+            />
+            <MobileTabButton 
+              active={activeTab === 'personal_finance'} 
+              onClick={() => setActiveTab('personal_finance')}
+              label="Thu - Chi"
+              colorClass="bg-cyan-100/70 text-cyan-800 border-cyan-200"
+            />
+        </div>
+      </nav>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {loadingData ? (
+          <div className="flex justify-center py-20">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+          </div>
+        ) : (
+          <>
+            {activeTab === 'dashboard' && <Dashboard students={students} classes={classes} setActiveTab={setActiveTab} />}
+            {activeTab === 'students' && <StudentManagement students={students} addStudent={addStudent} updateStudent={updateStudent} deleteStudent={deleteStudent} classes={classes} markClassesAsPaid={markClassesAsPaid} />}
+            {activeTab === 'classes' && <ClassTracker students={students} classes={classes} addClass={addClass} updateClass={updateClass} deleteClass={deleteClass} />}
+            {activeTab === 'finances' && <FinancialTracking students={students} classes={classes} markClassesAsPaid={markClassesAsPaid} undoLastPayment={undoLastPayment} />}
+            {activeTab === 'personal_finance' && <PersonalFinance />}
+          </>
+        )}
+      </main>
+
+      {activeTab !== 'personal_finance' && <FloatingActionButton setActiveTab={setActiveTab} />}
+
+      {/* Global Loading Overlay */}
+      {isProcessing && (
+        <div id="loading-overlay" className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50 backdrop-blur-sm">
+          <div className="flex flex-col items-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mb-4"></div>
+            <span className="text-white font-medium">Đang xử lý...</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TabButton({ active, onClick, icon, label, colorClass, hoverClass }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string, colorClass: string, hoverClass: string }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`inline-flex items-center px-4 py-2 my-2 rounded-xl text-sm font-medium transition-all duration-300 border ${
+        active 
+          ? `${colorClass} shadow-md transform -translate-y-0.5` 
+          : `border-transparent text-slate-500 ${hoverClass} hover:shadow-md hover:-translate-y-0.5`
+      }`}
+    >
+      {icon}
+      {label}
+    </button>
+  );
+}
+
+function MobileTabButton({ active, onClick, label, colorClass }: { active: boolean, onClick: () => void, label: string, colorClass: string }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`whitespace-nowrap py-2 px-4 rounded-lg text-sm font-medium flex-1 text-center transition-all duration-300 border ${
+        active 
+          ? `${colorClass} shadow-sm` 
+          : 'border-transparent text-slate-500 hover:bg-slate-50 hover:text-slate-700 hover:shadow-sm'
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
