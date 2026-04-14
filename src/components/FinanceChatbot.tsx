@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MessageCircle, X, Send, Bot, User, FileText, Download } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
@@ -15,7 +15,33 @@ interface Message {
   sender: 'user' | 'ai';
   text: string;
   isAction?: boolean;
+  isTyping?: boolean;
 }
+
+const TypingMessage = ({ text, onComplete, onUpdate }: { text: string, onComplete: () => void, onUpdate: () => void }) => {
+  const [displayedText, setDisplayedText] = useState('');
+
+  useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      setDisplayedText(text.slice(0, i + 1));
+      i++;
+      if (i % 2 === 0) onUpdate();
+      if (i >= text.length) {
+        clearInterval(interval);
+        onUpdate();
+        onComplete();
+      }
+    }, 15);
+    return () => clearInterval(interval);
+  }, [text, onComplete, onUpdate]);
+
+  const formatText = (str: string) => {
+    return str.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>');
+  };
+
+  return <span dangerouslySetInnerHTML={{ __html: formatText(displayedText) }} />;
+};
 
 export default function FinanceChatbot({ transactions, goals, setTransactions }: Props) {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,10 +52,14 @@ export default function FinanceChatbot({ transactions, goals, setTransactions }:
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
+
   // Auto scroll to bottom
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    scrollToBottom();
+  }, [messages, scrollToBottom]);
 
   // 20:00 Auto Summary
   useEffect(() => {
@@ -44,7 +74,8 @@ export default function FinanceChatbot({ transactions, goals, setTransactions }:
         setMessages(prev => [...prev, {
           id: Date.now().toString(),
           sender: 'ai',
-          text: `🔔 Tổng kết ngày: Hôm nay bạn đã chi ${formatNumber(todayExpense)}đ, và có khoản thu ${formatNumber(todayIncome)}đ. Bạn có muốn cập nhật thêm gì không?`
+          text: `🔔 Tổng kết ngày: Hôm nay bạn đã chi ${formatNumber(todayExpense)}đ, và có khoản thu ${formatNumber(todayIncome)}đ. Bạn có muốn cập nhật thêm gì không?`,
+          isTyping: true
         }]);
         setIsOpen(true);
       }
@@ -68,7 +99,8 @@ export default function FinanceChatbot({ transactions, goals, setTransactions }:
         setMessages(prev => [...prev, {
           id: Date.now().toString(),
           sender: 'ai',
-          text: 'Lỗi: Chưa cấu hình GEMINI_API_KEY. Vui lòng thêm biến môi trường này trên Vercel.'
+          text: 'Lỗi: Chưa cấu hình GEMINI_API_KEY. Vui lòng thêm biến môi trường này trên Vercel.',
+          isTyping: true
         }]);
         setIsLoading(false);
         return;
@@ -126,7 +158,8 @@ NHIỆM VỤ CỦA BẠN:
           setMessages(prev => [...prev, {
             id: Date.now().toString(),
             sender: 'ai',
-            text: `Đã tự động thêm giao dịch: ${parsed.data.type === 'income' ? 'Thu' : 'Chi'} ${formatNumber(parsed.data.amount)}đ cho "${parsed.data.description}" (${parsed.data.category}).`
+            text: `Đã tự động thêm giao dịch: ${parsed.data.type === 'income' ? 'Thu' : 'Chi'} ${formatNumber(parsed.data.amount)}đ cho "${parsed.data.description}" (${parsed.data.category}).`,
+            isTyping: true
           }]);
           return;
         }
@@ -134,7 +167,7 @@ NHIỆM VỤ CỦA BẠN:
         // Not JSON, just normal text. This is expected for conversational queries.
       }
 
-      setMessages(prev => [...prev, { id: Date.now().toString(), sender: 'ai', text: reply }]);
+      setMessages(prev => [...prev, { id: Date.now().toString(), sender: 'ai', text: reply, isTyping: true }]);
 
     } catch (error: any) {
       console.error('Chat error:', error);
@@ -153,7 +186,8 @@ NHIỆM VỤ CỦA BẠN:
       setMessages(prev => [...prev, { 
         id: Date.now().toString(), 
         sender: 'ai', 
-        text: errorMessage
+        text: errorMessage,
+        isTyping: true
       }]);
     } finally {
       setIsLoading(false);
@@ -165,7 +199,7 @@ NHIỆM VỤ CỦA BẠN:
       handleSend('Hãy tóm tắt thu chi của tôi trong 7 ngày qua.');
     } else if (action === 'Xuất CSV') {
       // Trigger export from parent or just tell user how
-      setMessages(prev => [...prev, { id: Date.now().toString(), sender: 'ai', text: 'Bạn có thể nhấn nút "Xuất CSV" ở phần Lịch Sử Giao Dịch nhé!' }]);
+      setMessages(prev => [...prev, { id: Date.now().toString(), sender: 'ai', text: 'Bạn có thể nhấn nút "Xuất CSV" ở phần Lịch Sử Giao Dịch nhé!', isTyping: true }]);
     }
   };
 
@@ -195,12 +229,26 @@ NHIỆM VỤ CỦA BẠN:
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 custom-scrollbar">
               {messages.map(msg => (
                 <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${
+                  <div className={`max-w-[80%] p-3 rounded-2xl text-sm whitespace-pre-wrap ${
                     msg.sender === 'user' 
                       ? 'bg-blue-500 text-white rounded-br-sm' 
                       : 'bg-white border border-slate-100 rounded-bl-sm shadow-sm'
                   }`}>
-                    {msg.text}
+                    {msg.sender === 'ai' ? (
+                      msg.isTyping ? (
+                        <TypingMessage 
+                          text={msg.text} 
+                          onComplete={() => {
+                            setMessages(prev => prev.map(m => m.id === msg.id ? { ...m, isTyping: false } : m));
+                          }}
+                          onUpdate={scrollToBottom}
+                        />
+                      ) : (
+                        <span dangerouslySetInnerHTML={{ __html: msg.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>') }} />
+                      )
+                    ) : (
+                      msg.text
+                    )}
                   </div>
                 </div>
               ))}
