@@ -23,11 +23,12 @@ const TypingMessage = ({ text, onComplete, onUpdate }: { text: string, onComplet
 
   useEffect(() => {
     let i = 0;
+    const safeText = text || '';
     const interval = setInterval(() => {
-      setDisplayedText(text.slice(0, i + 1));
+      setDisplayedText(safeText.slice(0, i + 1));
       i++;
       if (i % 2 === 0) onUpdate();
-      if (i >= text.length) {
+      if (i >= safeText.length) {
         clearInterval(interval);
         onUpdate();
         onComplete();
@@ -67,9 +68,9 @@ export default function FinanceChatbot({ transactions, goals, setTransactions }:
       const now = new Date();
       if (now.getHours() === 20 && now.getMinutes() === 0 && now.getSeconds() === 0) {
         const today = now.toISOString().split('T')[0];
-        const todayTxs = transactions.filter(t => t.date === today);
-        const todayIncome = todayTxs.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-        const todayExpense = todayTxs.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+        const todayTxs = transactions.filter(t => (t.date || '') === today);
+        const todayIncome = todayTxs.filter(t => t.type === 'income').reduce((sum, t) => sum + (t.amount || 0), 0);
+        const todayExpense = todayTxs.filter(t => t.type === 'expense').reduce((sum, t) => sum + (t.amount || 0), 0);
         
         setMessages(prev => [...prev, {
           id: Date.now().toString(),
@@ -244,10 +245,10 @@ NHIỆM VỤ CỦA BẠN:
                           onUpdate={scrollToBottom}
                         />
                       ) : (
-                        <span dangerouslySetInnerHTML={{ __html: msg.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>') }} />
+                        <span dangerouslySetInnerHTML={{ __html: (msg.text || '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>') }} />
                       )
                     ) : (
-                      msg.text
+                      msg.text || ''
                     )}
                   </div>
                 </div>

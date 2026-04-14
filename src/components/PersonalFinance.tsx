@@ -28,8 +28,9 @@ export interface Goal {
 const COLORS = ['#BAE1FF', '#BAFFC9', '#FFDFBA', '#FFFFBA', '#FFB3BA', '#E0BBE4', '#957DAD', '#D291BC', '#FEC8D8', '#FFDFD3'];
 
 // Format number with commas
-export const formatNumber = (num: number) => {
-  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+export const formatNumber = (num: number | undefined | null) => {
+  if (num === undefined || num === null || isNaN(Number(num))) return "0";
+  return Number(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
 
 // Parse formatted number
@@ -38,9 +39,12 @@ export const parseNumber = (str: string) => {
 };
 
 export default function PersonalFinance() {
-  const [transactions, setTransactions] = useLocalStorage<Transaction[]>('pf_transactions', []);
-  const [goals, setGoals] = useLocalStorage<Goal[]>('pf_goals', []);
+  const [rawTransactions, setTransactions] = useLocalStorage<Transaction[]>('pf_transactions', []);
+  const [rawGoals, setGoals] = useLocalStorage<Goal[]>('pf_goals', []);
   const [initialBalance, setInitialBalance] = useLocalStorage<number>('pf_initial_balance', 0);
+
+  const transactions = Array.isArray(rawTransactions) ? rawTransactions : [];
+  const goals = Array.isArray(rawGoals) ? rawGoals : [];
 
   // Form state
   const [type, setType] = useState<TransactionType>('expense');
@@ -60,9 +64,9 @@ export default function PersonalFinance() {
   const [depositAmountStr, setDepositAmountStr] = useState('');
 
   // Calculate totals
-  const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-  const totalExpense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-  const currentBalance = initialBalance + totalIncome - totalExpense;
+  const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + (t.amount || 0), 0);
+  const totalExpense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + (t.amount || 0), 0);
+  const currentBalance = (Number(initialBalance) || 0) + totalIncome - totalExpense;
 
   // AI Categorization
   const handleDescriptionBlur = async () => {
@@ -171,11 +175,11 @@ export default function PersonalFinance() {
   const exportCSV = () => {
     const headers = ['Ngày', 'Loại', 'Số tiền', 'Danh mục', 'Mô tả'];
     const rows = transactions.map(t => [
-      t.date,
+      t.date || '',
       t.type === 'income' ? 'Thu' : 'Chi',
       t.amount,
-      t.category,
-      t.description
+      t.category || '',
+      t.description || ''
     ]);
     const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + 
       [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
@@ -193,7 +197,8 @@ export default function PersonalFinance() {
   const expensesByCategory = transactions
     .filter(t => t.type === 'expense')
     .reduce((acc, t) => {
-      acc[t.category] = (acc[t.category] || 0) + t.amount;
+      const cat = t.category || 'Khác';
+      acc[cat] = (acc[cat] || 0) + t.amount;
       return acc;
     }, {} as Record<string, number>);
   
@@ -203,7 +208,8 @@ export default function PersonalFinance() {
   }));
 
   const monthlyData = transactions.reduce((acc, t) => {
-    const month = t.date.substring(0, 7); // YYYY-MM
+    const dateStr = t.date || new Date().toISOString().split('T')[0];
+    const month = dateStr.substring(0, 7); // YYYY-MM
     if (!acc[month]) acc[month] = { name: month, income: 0, expense: 0 };
     if (t.type === 'income') acc[month].income += t.amount;
     else acc[month].expense += t.amount;
@@ -214,7 +220,8 @@ export default function PersonalFinance() {
 
   // Group transactions by month
   const groupedTransactions = transactions.reduce((acc, t) => {
-    const month = t.date.substring(0, 7);
+    const dateStr = t.date || new Date().toISOString().split('T')[0];
+    const month = dateStr.substring(0, 7);
     if (!acc[month]) acc[month] = [];
     acc[month].push(t);
     return acc;
@@ -233,7 +240,7 @@ export default function PersonalFinance() {
               <span className="text-sm opacity-70">Số dư ban đầu:</span>
               <input 
                 type="text"
-                value={formatNumber(initialBalance)}
+                value={formatNumber(Number(initialBalance) || 0)}
                 onChange={(e) => {
                   const val = e.target.value.replace(/[^0-9]/g, '');
                   setInitialBalance(val ? parseInt(val, 10) : 0);
@@ -354,7 +361,7 @@ export default function PersonalFinance() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {goals.map(goal => {
-              const percent = Math.min(100, Math.round((goal.currentAmount / goal.targetAmount) * 100));
+              const percent = goal.targetAmount ? Math.min(100, Math.round((goal.currentAmount / goal.targetAmount) * 100)) : 0;
               const isDepositing = depositGoalId === goal.id;
               return (
                 <div key={goal.id} className="p-4 bg-white/40 rounded-xl border border-white/20 relative group">
@@ -533,7 +540,7 @@ export default function PersonalFinance() {
                           </div>
                           <div>
                             <p className="font-medium">{t.description}</p>
-                            <p className="text-xs opacity-60">{t.category} • {t.date}</p>
+                            <p className="text-xs opacity-60">{t.category || 'Khác'} • {t.date || 'Không rõ'}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-4">
@@ -579,7 +586,8 @@ function DashboardCard({ title, amount, color }: { title: string, amount: number
     const duration = 300; // 0.3s
     const steps = 20;
     const stepTime = duration / steps;
-    const diff = amount - displayAmount;
+    const safeAmount = Number(amount) || 0;
+    const diff = safeAmount - displayAmount;
     
     if (diff === 0) return;
 
@@ -588,7 +596,7 @@ function DashboardCard({ title, amount, color }: { title: string, amount: number
       currentStep++;
       setDisplayAmount(prev => {
         const next = prev + (diff / steps);
-        return currentStep >= steps ? amount : next;
+        return currentStep >= steps ? safeAmount : next;
       });
       if (currentStep >= steps) clearInterval(interval);
     }, stepTime);
