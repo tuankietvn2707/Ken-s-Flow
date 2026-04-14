@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Student, ClassSession } from '../types';
+import { Student, ClassSession, parseDateSafe } from '../types';
 import { Plus, X, Edit2, Trash2 } from 'lucide-react';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
@@ -165,7 +165,9 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
 
   const sortedClasses = [...classes]
     .filter(cls => {
-      const classDate = new Date(cls.date);
+      const classDate = parseDateSafe(cls.date);
+      if (isNaN(classDate.getTime())) return false;
+      
       const classMonth = (classDate.getMonth() + 1).toString();
       const classYear = classDate.getFullYear().toString();
       
@@ -175,12 +177,15 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
       return matchMonth && matchYear;
     })
     .sort((a, b) => {
-      const dateA = new Date(a.date).getTime();
-      const dateB = new Date(b.date).getTime();
+      const dateA = parseDateSafe(a.date).getTime();
+      const dateB = parseDateSafe(b.date).getTime();
       return dateB - dateA;
     });
 
-  const availableYears = Array.from(new Set(classes.map(c => new Date(c.date).getFullYear().toString()))).sort((a, b) => b.localeCompare(a));
+  const availableYears = Array.from(new Set(classes.map(c => {
+    const d = parseDateSafe(c.date);
+    return isNaN(d.getTime()) ? '' : d.getFullYear().toString();
+  }).filter(Boolean))).sort((a, b) => b.localeCompare(a));
   if (!availableYears.includes(new Date().getFullYear().toString())) {
     availableYears.push(new Date().getFullYear().toString());
     availableYears.sort((a, b) => b.localeCompare(a));
@@ -405,7 +410,9 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                 sortedClasses.map((cls) => (
                   <tr key={cls.id} className="hover:bg-[#F8FAFC] transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
-                      {new Date(cls.date).toLocaleDateString('vi-VN')}
+                      {!isNaN(parseDateSafe(cls.date).getTime()) 
+                        ? parseDateSafe(cls.date).toLocaleDateString('vi-VN') 
+                        : 'Ngày không hợp lệ'}
                       {cls.time && <span className="text-slate-500 ml-2 text-xs">{cls.time}</span>}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

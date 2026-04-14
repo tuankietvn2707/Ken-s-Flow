@@ -38,3 +38,27 @@ export interface ClassSession {
 export const formatVND = (amount: number) => {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 };
+
+export const parseDateSafe = (dateStr?: string): Date => {
+  if (!dateStr) return new Date(NaN);
+  
+  // Handle DD/MM/YYYY format
+  if (dateStr.includes('/')) {
+    const parts = dateStr.split('/');
+    if (parts.length === 3) {
+      const [day, month, year] = parts;
+      // Convert to YYYY-MM-DD for standard parsing
+      return new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T00:00:00`);
+    }
+  }
+  
+  // Handle standard formats (YYYY-MM-DD, ISO, etc.)
+  const parsed = new Date(dateStr);
+  
+  // If Safari fails to parse YYYY-MM-DD without time, try adding time
+  if (isNaN(parsed.getTime()) && dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    return new Date(`${dateStr}T00:00:00`);
+  }
+  
+  return parsed;
+};

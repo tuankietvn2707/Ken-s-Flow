@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Student, ClassSession, formatVND } from '../types';
+import { Student, ClassSession, formatVND, parseDateSafe } from '../types';
 import { Users, Calendar, Plus, UserPlus, CalendarPlus, CreditCard } from 'lucide-react';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/themes/light.css';
@@ -132,13 +132,8 @@ export default function Dashboard({ students, classes, setActiveTab }: Dashboard
   });
 
   const filteredClasses = classes.filter(c => {
-    let classDate;
-    if (c.date.includes('/')) {
-      const [day, month, year] = c.date.split('/');
-      classDate = new Date(`${year}-${month}-${day}`);
-    } else {
-      classDate = new Date(c.date);
-    }
+    const classDate = parseDateSafe(c.date);
+    if (isNaN(classDate.getTime())) return false;
     const classMonth = `${classDate.getFullYear()}-${(classDate.getMonth() + 1).toString().padStart(2, '0')}`;
     return classMonth === selectedMonth;
   });
@@ -172,7 +167,8 @@ export default function Dashboard({ students, classes, setActiveTab }: Dashboard
   endOfWeek.setHours(23, 59, 59, 999);
 
   const classesThisWeek = classes.filter(c => {
-    const classDate = new Date(c.date);
+    const classDate = parseDateSafe(c.date);
+    if (isNaN(classDate.getTime())) return false;
     return classDate >= startOfWeek && classDate <= endOfWeek;
   }).length;
 
@@ -180,7 +176,9 @@ export default function Dashboard({ students, classes, setActiveTab }: Dashboard
   const revenueTrendMap = new Map<string, { name: string, actual: number, potential: number, sortKey: string }>();
   
   classes.forEach(c => {
-    const classDate = new Date(c.date);
+    const classDate = parseDateSafe(c.date);
+    if (isNaN(classDate.getTime())) return;
+    
     const month = classDate.getMonth() + 1;
     const year = classDate.getFullYear();
     const monthYear = `T${month}/${year.toString().slice(-2)}`;

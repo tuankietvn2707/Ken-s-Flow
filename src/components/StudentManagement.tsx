@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Student, ClassSession, formatVND } from '../types';
+import { Student, ClassSession, formatVND, parseDateSafe } from '../types';
 import { Plus, Edit2, Trash2, X, User, BookOpen, CreditCard, Calendar, FileText, GripVertical, ChevronDown, ChevronUp } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { motion } from 'motion/react';
@@ -118,7 +118,7 @@ export default function StudentManagement({ students, addStudent, updateStudent,
     let lName = student.lastName || '';
     
     if (!fName && !lName && student.name) {
-      const parts = student.name.split(' ');
+      const parts = (student.name || '').split(' ');
       fName = parts.pop() || '';
       lName = parts.join(' ');
     }
@@ -189,7 +189,7 @@ export default function StudentManagement({ students, addStudent, updateStudent,
     <div key={cls.id} className="bg-white rounded-[20px] border border-slate-100 shadow-[0_10px_30px_rgba(0,0,0,0.04)] overflow-hidden">
       <div className={`${isPaid ? 'bg-emerald-50/50' : 'bg-blue-50/50'} px-6 py-3 border-b border-slate-200 flex justify-between items-center`}>
         <div className={`font-bold ${isPaid ? 'text-emerald-900' : 'text-blue-900'}`}>
-          Buổi {idx + 1} <span className="text-slate-500 font-normal ml-2">({new Date(cls.date).toLocaleDateString('vi-VN')})</span>
+          Buổi {idx + 1} <span className="text-slate-500 font-normal ml-2">({!isNaN(parseDateSafe(cls.date).getTime()) ? parseDateSafe(cls.date).toLocaleDateString('vi-VN') : 'Ngày không hợp lệ'})</span>
         </div>
         <div className="text-sm font-medium text-slate-600 bg-white px-2 py-1 rounded border border-slate-200">
           {cls.duration} buổi
@@ -742,7 +742,7 @@ export default function StudentManagement({ students, addStudent, updateStudent,
                   <div className="space-y-4">
                     {(() => {
                       const unpaidClasses = classes.filter(c => c.studentId === selectedStudent.id && !c.isPaid);
-                      unpaidClasses.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+                      unpaidClasses.sort((a, b) => parseDateSafe(a.date).getTime() - parseDateSafe(b.date).getTime());
                       const paidClassesCount = classes.filter(c => c.studentId === selectedStudent.id && c.isPaid).length;
                       
                       if (unpaidClasses.length === 0) {
@@ -776,13 +776,14 @@ export default function StudentManagement({ students, addStudent, updateStudent,
                         );
                       }
 
-                      paidClasses.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+                      paidClasses.sort((a, b) => parseDateSafe(a.date).getTime() - parseDateSafe(b.date).getTime());
                       const classesWithIndex = paidClasses.map((cls, idx) => ({ cls, idx }));
-                      classesWithIndex.sort((a, b) => new Date(b.cls.date).getTime() - new Date(a.cls.date).getTime());
+                      classesWithIndex.sort((a, b) => parseDateSafe(b.cls.date).getTime() - parseDateSafe(a.cls.date).getTime());
 
                       const groupedClasses: Record<string, {cls: ClassSession, idx: number}[]> = {};
                       classesWithIndex.forEach(item => {
-                        const date = new Date(item.cls.date);
+                        const date = parseDateSafe(item.cls.date);
+                        if (isNaN(date.getTime())) return;
                         const monthYear = `Tháng ${date.getMonth() + 1}/${date.getFullYear()}`;
                         if (!groupedClasses[monthYear]) {
                           groupedClasses[monthYear] = [];

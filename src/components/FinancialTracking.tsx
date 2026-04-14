@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Student, ClassSession, formatVND } from '../types';
+import { Student, ClassSession, formatVND, parseDateSafe } from '../types';
 import { CheckCircle, X, Download, RotateCcw } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import { motion } from 'motion/react';
@@ -276,23 +276,17 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
                     <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
                       {[...receiptData.unpaidClasses]
                         .sort((a, b) => {
-                          // Hàm parse ngày để hỗ trợ cả định dạng YYYY-MM-DD và DD/MM/YYYY
-                          const parseDate = (dateStr: string) => {
-                            if (dateStr.includes('/')) {
-                              const [day, month, year] = dateStr.split('/');
-                              return new Date(`${year}-${month}-${day}`).getTime();
-                            }
-                            return new Date(dateStr).getTime();
-                          };
-                          return parseDate(a.date) - parseDate(b.date);
+                          return parseDateSafe(a.date).getTime() - parseDateSafe(b.date).getTime();
                         })
                         .map((c, index) => (
                         <div key={c.id} className="flex justify-between text-sm">
                           <span className="text-slate-500">Buổi {index + 1}</span>
                           <span className="font-medium text-slate-800">
-                            {new Date(c.date).toLocaleDateString('vi-VN', {
-                              day: '2-digit', month: '2-digit', year: 'numeric'
-                            })}
+                            {!isNaN(parseDateSafe(c.date).getTime()) 
+                              ? parseDateSafe(c.date).toLocaleDateString('vi-VN', {
+                                  day: '2-digit', month: '2-digit', year: 'numeric'
+                                })
+                              : 'Ngày không hợp lệ'}
                           </span>
                         </div>
                       ))}
