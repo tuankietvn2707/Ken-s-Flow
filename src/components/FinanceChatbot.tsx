@@ -2,12 +2,13 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MessageCircle, X, Send, Bot, User, FileText, Download } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
-import { Transaction, Goal, formatNumber } from './PersonalFinance';
+import { Transaction, Goal, TransactionType } from '../types';
+import { formatNumber } from './PersonalFinance';
 
 interface Props {
   transactions: Transaction[];
   goals: Goal[];
-  setTransactions: (t: Transaction[]) => void;
+  addTransaction: (t: Transaction) => Promise<void>;
 }
 
 interface Message {
@@ -44,7 +45,7 @@ const TypingMessage = ({ text, onComplete, onUpdate }: { text: string, onComplet
   return <span dangerouslySetInnerHTML={{ __html: formatText(displayedText) }} />;
 };
 
-export default function FinanceChatbot({ transactions, goals, setTransactions }: Props) {
+export default function FinanceChatbot({ transactions, goals, addTransaction }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     { id: '1', sender: 'ai', text: 'Chào bạn! Mình là trợ lý tài chính AI. Mình có thể giúp gì cho bạn hôm nay?' }
@@ -154,7 +155,7 @@ NHIỆM VỤ CỦA BẠN:
             category: parsed.data.category,
             date: new Date().toISOString().split('T')[0],
           };
-          setTransactions([newTx, ...transactions]);
+          addTransaction(newTx);
           
           setMessages(prev => [...prev, {
             id: Date.now().toString(),

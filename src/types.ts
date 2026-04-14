@@ -62,3 +62,21 @@ export const parseDateSafe = (dateStr?: string): Date => {
   
   return parsed;
 };
+
+export type TransactionType = 'income' | 'expense';
+
+export interface Transaction {
+  id: string;
+  type: TransactionType;
+  amount: number;
+  description: string;
+  category: string;
+  date: string;
+}
+
+export interface Goal {
+  id: string;
+  name: string;
+  targetAmount: number;
+  currentAmount: number;
+}

@@ -1,0 +1,105 @@
+{
+  "entities": {
+    "Student": {
+      "title": "Student",
+      "description": "Information about a student",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "order": { "type": "number" },
+        "birthYear": { "type": "number" },
+        "gender": { "type": "string" },
+        "occupation": { "type": "string" },
+        "currentLevel": { "type": "string" },
+        "goal": { "type": "string" },
+        "targetColor": { "type": "string" },
+        "fee": { "type": "number" },
+        "feeCycle": { "type": "number" },
+        "schedule": { "type": "string" },
+        "notes": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "inactive"] }
+      },
+      "required": ["id", "name"]
+    },
+    "ClassSession": {
+      "title": "ClassSession",
+      "description": "Information about a class session",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "studentId": { "type": "string" },
+        "date": { "type": "string" },
+        "time": { "type": "string" },
+        "duration": { "type": "number" },
+        "topic": { "type": "string" },
+        "strengths": { "type": "string" },
+        "weaknesses": { "type": "string" },
+        "mistakes": { "type": "string" },
+        "remedies": { "type": "string" },
+        "nextLessonPrep": { "type": "string" },
+        "isPaid": { "type": "boolean" },
+        "paymentBatchId": { "type": "number" }
+      },
+      "required": ["id", "studentId", "date"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Personal finance transaction",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string", "enum": ["income", "expense"] },
+        "amount": { "type": "number" },
+        "description": { "type": "string" },
+        "category": { "type": "string" },
+        "date": { "type": "string" }
+      },
+      "required": ["id", "type", "amount", "date"]
+    },
+    "Goal": {
+      "title": "Goal",
+      "description": "Financial goal",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "targetAmount": { "type": "number" },
+        "currentAmount": { "type": "number" }
+      },
+      "required": ["id", "name", "targetAmount"]
+    },
+    "FinanceSettings": {
+      "title": "FinanceSettings",
+      "description": "Settings for personal finance",
+      "type": "object",
+      "properties": {
+        "initialBalance": { "type": "number" }
+      }
+    }
+  },
+  "firestore": {
+    "/users/{userId}/students/{studentId}": {
+      "schema": "Student",
+      "description": "Students managed by the user"
+    },
+    "/users/{userId}/classes/{classId}": {
+      "schema": "ClassSession",
+      "description": "Class sessions managed by the user"
+    },
+    "/users/{userId}/transactions/{transactionId}": {
+      "schema": "Transaction",
+      "description": "Personal finance transactions"
+    },
+    "/users/{userId}/goals/{goalId}": {
+      "schema": "Goal",
+      "description": "Financial goals"
+    },
+    "/users/{userId}/settings/finance": {
+      "schema": "FinanceSettings",
+      "description": "Personal finance settings"
+    }
+  }
+}

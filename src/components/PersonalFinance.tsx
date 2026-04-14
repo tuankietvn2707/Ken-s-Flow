@@ -1,29 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useLocalStorage } from '../hooks/useLocalStorage';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Plus, Minus, Target, Download, Trash2, Edit2, Check, X, MessageCircle } from 'lucide-react';
 import FinanceChatbot from './FinanceChatbot';
 import { GoogleGenAI } from '@google/genai';
-
-// Types
-export type TransactionType = 'income' | 'expense';
-
-export interface Transaction {
-  id: string;
-  type: TransactionType;
-  amount: number;
-  description: string;
-  category: string;
-  date: string;
-}
-
-export interface Goal {
-  id: string;
-  name: string;
-  targetAmount: number;
-  currentAmount: number;
-}
+import { Transaction, Goal, TransactionType } from '../types';
 
 const COLORS = ['#BAE1FF', '#BAFFC9', '#FFDFBA', '#FFFFBA', '#FFB3BA', '#E0BBE4', '#957DAD', '#D291BC', '#FEC8D8', '#FFDFD3'];
 
@@ -38,14 +19,29 @@ export const parseNumber = (str: string) => {
   return parseInt(str.replace(/,/g, ''), 10) || 0;
 };
 
-export default function PersonalFinance() {
-  const [rawTransactions, setTransactions] = useLocalStorage<Transaction[]>('pf_transactions', []);
-  const [rawGoals, setGoals] = useLocalStorage<Goal[]>('pf_goals', []);
-  const [initialBalance, setInitialBalance] = useLocalStorage<number>('pf_initial_balance', 0);
+interface PersonalFinanceProps {
+  transactions: Transaction[];
+  goals: Goal[];
+  initialBalance: number;
+  addTransaction: (tx: Transaction) => Promise<void>;
+  deleteTransaction: (id: string) => Promise<void>;
+  addGoal: (goal: Goal) => Promise<void>;
+  updateGoal: (goal: Goal) => Promise<void>;
+  deleteGoal: (id: string) => Promise<void>;
+  updateInitialBalance: (balance: number) => Promise<void>;
+}
 
-  const transactions = Array.isArray(rawTransactions) ? rawTransactions : [];
-  const goals = Array.isArray(rawGoals) ? rawGoals : [];
-
+export default function PersonalFinance({
+  transactions,
+  goals,
+  initialBalance,
+  addTransaction,
+  deleteTransaction,
+  addGoal,
+  updateGoal,
+  deleteGoal,
+  updateInitialBalance
+}: PersonalFinanceProps) {
   // Form state
   const [type, setType] = useState<TransactionType>('expense');
   const [amountStr, setAmountStr] = useState('');
@@ -109,14 +105,14 @@ export default function PersonalFinance() {
       date,
     };
 
-    setTransactions([newTx, ...transactions]);
+    addTransaction(newTx);
     setAmountStr('');
     setDescription('');
     setCategory('');
   };
 
   const handleDeleteTransaction = (id: string) => {
-    setTransactions(transactions.filter(t => t.id !== id));
+    deleteTransaction(id);
   };
 
   const handleAddGoal = (e: React.FormEvent) => {
@@ -131,14 +127,14 @@ export default function PersonalFinance() {
       currentAmount: 0,
     };
 
-    setGoals([...goals, newGoal]);
+    addGoal(newGoal);
     setGoalName('');
     setGoalTargetStr('');
     setShowGoalForm(false);
   };
 
   const handleDeleteGoal = (id: string) => {
-    setGoals(goals.filter(g => g.id !== id));
+    deleteGoal(id);
   };
 
   const handleDeposit = (e: React.FormEvent) => {
@@ -151,7 +147,8 @@ export default function PersonalFinance() {
     if (!goal) return;
 
     // Update goal
-    setGoals(goals.map(g => g.id === depositGoalId ? { ...g, currentAmount: g.currentAmount + amount } : g));
+    const updatedGoal = { ...goal, currentAmount: goal.currentAmount + amount };
+    updateGoal(updatedGoal);
 
     // Add expense transaction
     const newTx: Transaction = {
@@ -162,7 +159,7 @@ export default function PersonalFinance() {
       category: 'Tiết kiệm',
       date: new Date().toISOString().split('T')[0],
     };
-    setTransactions([newTx, ...transactions]);
+    addTransaction(newTx);
 
     setDepositGoalId(null);
     setDepositAmountStr('');
@@ -239,7 +236,7 @@ export default function PersonalFinance() {
                 value={formatNumber(Number(initialBalance) || 0)}
                 onChange={(e) => {
                   const val = e.target.value.replace(/[^0-9]/g, '');
-                  setInitialBalance(val ? parseInt(val, 10) : 0);
+                  updateInitialBalance(val ? parseInt(val, 10) : 0);
                 }}
                 className="w-24 bg-transparent outline-none font-medium text-right"
               />
@@ -559,7 +556,7 @@ export default function PersonalFinance() {
       </div>
 
       {/* Chatbot FAB */}
-      <FinanceChatbot transactions={transactions} goals={goals} setTransactions={setTransactions} />
+      <FinanceChatbot transactions={transactions} goals={goals} addTransaction={addTransaction} />
 
       <style>{`
         .glass-card {

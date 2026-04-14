@@ -1,0 +1,79 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+    function isValidStudent(data) {
+      return data.id is string &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100;
+    }
+
+    function isValidClass(data) {
+      return data.id is string &&
+             data.studentId is string &&
+             data.date is string;
+    }
+
+    function isValidTransaction(data) {
+      return data.id is string &&
+             data.type in ['income', 'expense'] &&
+             data.amount is number && data.amount >= 0 &&
+             data.date is string;
+    }
+
+    function isValidGoal(data) {
+      return data.id is string &&
+             data.name is string && data.name.size() > 0 &&
+             data.targetAmount is number && data.targetAmount >= 0 &&
+             data.currentAmount is number && data.currentAmount >= 0;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+
+      match /students/{studentId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidStudent(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+
+      match /classes/{classId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidClass(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+
+      match /transactions/{transactionId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidTransaction(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+
+      match /goals/{goalId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidGoal(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+
+      match /settings/finance {
+        allow read: if isOwner(userId);
+        allow write: if isOwner(userId);
+      }
+    }
+  }
+}

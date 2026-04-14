@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Student, ClassSession } from './types';
+import { Student, ClassSession, Transaction, Goal } from './types';
 import { Users, BookOpen, LayoutDashboard, LogOut, Wallet } from 'lucide-react';
 import { auth, db } from './firebase';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
-import { collection, getDocs, doc, setDoc, deleteDoc, writeBatch, deleteField } from 'firebase/firestore';
+import { collection, getDocs, doc, setDoc, deleteDoc, writeBatch, deleteField, getDoc } from 'firebase/firestore';
 
 // Components
 import Dashboard from './components/Dashboard';
@@ -40,6 +40,9 @@ export default function App() {
   
   const [students, setStudents] = useState<Student[]>([]);
   const [classes, setClasses] = useState<ClassSession[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [initialBalance, setInitialBalance] = useState<number>(0);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [loadingData, setLoadingData] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -67,14 +70,77 @@ export default function App() {
   const fetchData = async (uid: string) => {
     setLoadingData(true);
     try {
-      const studentsSnap = await getDocs(collection(db, `users/${uid}/students`));
-      const classesSnap = await getDocs(collection(db, `users/${uid}/classes`));
+      const [studentsSnap, classesSnap, transactionsSnap, goalsSnap, settingsSnap] = await Promise.all([
+        getDocs(collection(db, `users/${uid}/students`)),
+        getDocs(collection(db, `users/${uid}/classes`)),
+        getDocs(collection(db, `users/${uid}/transactions`)),
+        getDocs(collection(db, `users/${uid}/goals`)),
+        getDoc(doc(db, `users/${uid}/settings/finance`))
+      ]);
       
       const studentsData = studentsSnap.docs.map(doc => doc.data() as Student);
       const classesData = classesSnap.docs.map(doc => doc.data() as ClassSession);
+      const transactionsData = transactionsSnap.docs.map(doc => doc.data() as Transaction);
+      const goalsData = goalsSnap.docs.map(doc => doc.data() as Goal);
+      const settingsData = settingsSnap.exists() ? settingsSnap.data() : { initialBalance: 0 };
       
       setStudents(studentsData);
       setClasses(classesData);
+      setTransactions(transactionsData);
+      setGoals(goalsData);
+      setInitialBalance(settingsData.initialBalance || 0);
+
+      // Migration logic from localStorage to Firestore
+      if (transactionsData.length === 0 && goalsData.length === 0 && !settingsSnap.exists()) {
+        try {
+          const localTxs = localStorage.getItem('pf_transactions');
+          const localGoals = localStorage.getItem('pf_goals');
+          const localBalance = localStorage.getItem('pf_initial_balance');
+
+          if (localTxs || localGoals || localBalance) {
+            const batch = writeBatch(db);
+            let hasData = false;
+
+            if (localTxs) {
+              const txs = JSON.parse(localTxs) as Transaction[];
+              if (Array.isArray(txs)) {
+                txs.forEach(tx => {
+                  batch.set(doc(db, `users/${uid}/transactions`, tx.id), tx);
+                });
+                setTransactions(txs);
+                hasData = true;
+              }
+            }
+
+            if (localGoals) {
+              const gs = JSON.parse(localGoals) as Goal[];
+              if (Array.isArray(gs)) {
+                gs.forEach(g => {
+                  batch.set(doc(db, `users/${uid}/goals`, g.id), g);
+                });
+                setGoals(gs);
+                hasData = true;
+              }
+            }
+
+            if (localBalance) {
+              const balance = Number(localBalance);
+              if (!isNaN(balance)) {
+                batch.set(doc(db, `users/${uid}/settings/finance`), { initialBalance: balance });
+                setInitialBalance(balance);
+                hasData = true;
+              }
+            }
+
+            if (hasData) {
+              await batch.commit();
+              console.log("Successfully migrated local data to Firestore.");
+            }
+          }
+        } catch (migrateError) {
+          console.error("Error during migration:", migrateError);
+        }
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -195,6 +261,67 @@ export default function App() {
       console.error("Error undoing payment:", error);
     } finally {
       hideLoading();
+    }
+  };
+
+  // Personal Finance CRUD
+  const addTransaction = async (tx: Transaction) => {
+    if (!user) return;
+    try {
+      await setDoc(doc(db, `users/${user.uid}/transactions`, tx.id), tx);
+      setTransactions(prev => [tx, ...prev]);
+    } catch (error) {
+      console.error("Error adding transaction:", error);
+    }
+  };
+
+  const deleteTransaction = async (id: string) => {
+    if (!user) return;
+    try {
+      await deleteDoc(doc(db, `users/${user.uid}/transactions`, id));
+      setTransactions(prev => prev.filter(t => t.id !== id));
+    } catch (error) {
+      console.error("Error deleting transaction:", error);
+    }
+  };
+
+  const addGoal = async (goal: Goal) => {
+    if (!user) return;
+    try {
+      await setDoc(doc(db, `users/${user.uid}/goals`, goal.id), goal);
+      setGoals(prev => [...prev, goal]);
+    } catch (error) {
+      console.error("Error adding goal:", error);
+    }
+  };
+
+  const updateGoal = async (goal: Goal) => {
+    if (!user) return;
+    try {
+      await setDoc(doc(db, `users/${user.uid}/goals`, goal.id), goal);
+      setGoals(prev => prev.map(g => g.id === goal.id ? goal : g));
+    } catch (error) {
+      console.error("Error updating goal:", error);
+    }
+  };
+
+  const deleteGoal = async (id: string) => {
+    if (!user) return;
+    try {
+      await deleteDoc(doc(db, `users/${user.uid}/goals`, id));
+      setGoals(prev => prev.filter(g => g.id !== id));
+    } catch (error) {
+      console.error("Error deleting goal:", error);
+    }
+  };
+
+  const updateInitialBalance = async (balance: number) => {
+    if (!user) return;
+    try {
+      await setDoc(doc(db, `users/${user.uid}/settings/finance`), { initialBalance: balance });
+      setInitialBalance(balance);
+    } catch (error) {
+      console.error("Error updating initial balance:", error);
     }
   };
 
@@ -328,7 +455,19 @@ export default function App() {
             {activeTab === 'students' && <StudentManagement students={students} addStudent={addStudent} updateStudent={updateStudent} deleteStudent={deleteStudent} classes={classes} markClassesAsPaid={markClassesAsPaid} />}
             {activeTab === 'classes' && <ClassTracker students={students} classes={classes} addClass={addClass} updateClass={updateClass} deleteClass={deleteClass} />}
             {activeTab === 'finances' && <FinancialTracking students={students} classes={classes} markClassesAsPaid={markClassesAsPaid} undoLastPayment={undoLastPayment} />}
-            {activeTab === 'personal_finance' && <PersonalFinance />}
+            {activeTab === 'personal_finance' && (
+              <PersonalFinance 
+                transactions={transactions}
+                goals={goals}
+                initialBalance={initialBalance}
+                addTransaction={addTransaction}
+                deleteTransaction={deleteTransaction}
+                addGoal={addGoal}
+                updateGoal={updateGoal}
+                deleteGoal={deleteGoal}
+                updateInitialBalance={updateInitialBalance}
+              />
+            )}
           </>
         )}
       </main>
