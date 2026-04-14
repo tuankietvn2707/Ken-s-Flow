@@ -1,10 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Student, ClassSession, formatVND, parseDateSafe } from '../types';
 import { Users, Calendar, Plus, UserPlus, CalendarPlus, CreditCard } from 'lucide-react';
-import Flatpickr from 'react-flatpickr';
-import 'flatpickr/dist/themes/light.css';
-import monthSelectPlugin from 'flatpickr/dist/plugins/monthSelect';
-import 'flatpickr/dist/plugins/monthSelect/style.css';
 import { motion } from 'motion/react';
 import {
   BarChart,
@@ -316,32 +312,16 @@ export default function Dashboard({ students, classes, setActiveTab }: Dashboard
           <div className="p-6 border-b border-slate-50 flex justify-between items-center">
             <h3 className="text-lg font-bold text-[#64748B] font-sans">Tỷ lệ thu hồi học phí</h3>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Calendar className="h-4 w-4 text-slate-400" />
-              </div>
-              <Flatpickr
+              <input
+                type="month"
                 id="financialMonthFilter"
                 value={selectedMonth}
-                onChange={([date]) => {
-                  if (date) {
-                    setSelectedMonth(`${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`);
+                onChange={(e) => {
+                  if (e.target.value) {
+                    setSelectedMonth(e.target.value);
                   }
                 }}
-                options={{
-                  plugins: [
-                    monthSelectPlugin({
-                      shorthand: true,
-                      dateFormat: "Y-m",
-                      altFormat: "\\T\\h\\á\\n\\g m/Y",
-                      theme: "light"
-                    })
-                  ],
-                  altInput: true,
-                  altFormat: "\\T\\h\\á\\n\\g m/Y",
-                  dateFormat: "Y-m",
-                }}
-                className="text-sm border border-slate-200 rounded-lg pl-9 pr-3 py-1.5 text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB] bg-white shadow-sm w-36 cursor-pointer hover:border-slate-300 transition-colors"
-                placeholder="Chọn tháng"
+                className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB] bg-white shadow-sm w-40 cursor-pointer hover:border-slate-300 transition-colors"
               />
             </div>
           </div>
