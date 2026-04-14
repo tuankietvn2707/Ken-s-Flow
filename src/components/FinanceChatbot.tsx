@@ -63,7 +63,17 @@ export default function FinanceChatbot({ transactions, goals, setTransactions }:
     setIsLoading(true);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          sender: 'ai',
+          text: 'Lỗi: Chưa cấu hình GEMINI_API_KEY. Vui lòng thêm biến môi trường này trên Vercel.'
+        }]);
+        setIsLoading(false);
+        return;
+      }
+      const ai = new GoogleGenAI({ apiKey });
       
       // Context for AI
       const context = `

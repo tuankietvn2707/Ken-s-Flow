@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Plus, Minus, Target, Download, Trash2, Edit2, Check, X, MessageCircle } from 'lucide-react';
 import FinanceChatbot from './FinanceChatbot';
 import { GoogleGenAI } from '@google/genai';
@@ -69,7 +69,13 @@ export default function PersonalFinance() {
     if (!description || description.length < 3) return;
     setIsCategorizing(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        console.error('Lỗi: Chưa cấu hình GEMINI_API_KEY.');
+        setIsCategorizing(false);
+        return;
+      }
+      const ai = new GoogleGenAI({ apiKey });
       const prompt = `Phân loại giao dịch sau vào 1 danh mục ngắn gọn (1-3 từ). Giao dịch: "${description}". Loại: ${type === 'income' ? 'Thu nhập' : 'Chi tiêu'}. Chỉ trả về tên danh mục, không giải thích. Ví dụ: Ăn uống, Lương, Mua sắm, Tiền điện.`;
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
@@ -284,11 +290,24 @@ export default function PersonalFinance() {
             <div className="flex-1 min-h-0">
               {barData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={barData}>
-                    <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
-                    <Tooltip formatter={(value: number) => formatNumber(value)} cursor={{fill: 'transparent'}} />
-                    <Bar dataKey="income" name="Thu" fill="#34d399" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="expense" name="Chi" fill="#fb7185" radius={[4, 4, 0, 0]} />
+                  <BarChart data={barData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                    <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} tick={{ fill: '#64748b' }} dy={10} />
+                    <YAxis 
+                      fontSize={12} 
+                      tickLine={false} 
+                      axisLine={false} 
+                      tick={{ fill: '#64748b' }} 
+                      tickFormatter={(value) => value >= 1000000 ? `${(value / 1000000).toFixed(1)}M` : value >= 1000 ? `${(value / 1000).toFixed(0)}k` : value} 
+                    />
+                    <Tooltip 
+                      formatter={(value: number) => [`${formatNumber(value)} đ`, undefined]} 
+                      cursor={{fill: '#f1f5f9'}}
+                      contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }}
+                    />
+                    <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+                    <Bar dataKey="income" name="Thu nhập" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                    <Bar dataKey="expense" name="Chi tiêu" fill="#f43f5e" radius={[4, 4, 0, 0]} maxBarSize={40} />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
