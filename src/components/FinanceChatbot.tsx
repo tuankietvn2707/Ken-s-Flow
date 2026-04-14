@@ -92,7 +92,7 @@ NHIỆM VỤ CỦA BẠN:
       `;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-1.5-flash-8b',
         contents: text,
         config: {
           systemInstruction: systemInstruction,
@@ -143,7 +143,7 @@ NHIỆM VỤ CỦA BẠN:
       const errorString = error?.message || String(error);
       
       if (errorString.includes('429') || errorString.includes('Quota exceeded') || errorString.includes('RESOURCE_EXHAUSTED')) {
-        errorMessage = 'Hệ thống AI đang nhận quá nhiều yêu cầu (vượt giới hạn gói miễn phí). Vui lòng đợi khoảng 15-30 giây rồi thử lại nhé!';
+        errorMessage = 'Lỗi từ Google Gemini: Tài khoản API của bạn đã vượt quá giới hạn số lượt dùng miễn phí (Quota exceeded).';
       } else {
         errorMessage = `Xin lỗi, có lỗi xảy ra khi xử lý yêu cầu của bạn. Chi tiết: ${errorString}`;
       }
