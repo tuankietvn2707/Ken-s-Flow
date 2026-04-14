@@ -52,12 +52,13 @@
       "properties": {
         "id": { "type": "string" },
         "type": { "type": "string", "enum": ["income", "expense"] },
+        "source": { "type": "string", "enum": ["cash", "banking"] },
         "amount": { "type": "number" },
         "description": { "type": "string" },
         "category": { "type": "string" },
         "date": { "type": "string" }
       },
-      "required": ["id", "type", "amount", "date"]
+      "required": ["id", "type", "source", "amount", "date"]
     },
     "Goal": {
       "title": "Goal",

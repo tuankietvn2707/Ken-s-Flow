@@ -42,7 +42,7 @@ export default function App() {
   const [classes, setClasses] = useState<ClassSession[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
-  const [initialBalance, setInitialBalance] = useState<number>(0);
+  const [initialBalance, setInitialBalance] = useState<{ cash: number; banking: number }>({ cash: 0, banking: 0 });
   const [activeTab, setActiveTab] = useState('dashboard');
   const [loadingData, setLoadingData] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -82,13 +82,13 @@ export default function App() {
       const classesData = classesSnap.docs.map(doc => doc.data() as ClassSession);
       const transactionsData = transactionsSnap.docs.map(doc => doc.data() as Transaction);
       const goalsData = goalsSnap.docs.map(doc => doc.data() as Goal);
-      const settingsData = settingsSnap.exists() ? settingsSnap.data() : { initialBalance: 0 };
+      const settingsData = settingsSnap.exists() ? settingsSnap.data() : { initialBalance: { cash: 0, banking: 0 } };
       
       setStudents(studentsData);
       setClasses(classesData);
       setTransactions(transactionsData);
       setGoals(goalsData);
-      setInitialBalance(settingsData.initialBalance || 0);
+      setInitialBalance(settingsData.initialBalance || { cash: 0, banking: 0 });
 
       // Migration logic from localStorage to Firestore
       if (transactionsData.length === 0 && goalsData.length === 0 && !settingsSnap.exists()) {
@@ -315,7 +315,7 @@ export default function App() {
     }
   };
 
-  const updateInitialBalance = async (balance: number) => {
+  const updateInitialBalance = async (balance: { cash: number; banking: number }) => {
     if (!user) return;
     try {
       await setDoc(doc(db, `users/${user.uid}/settings/finance`), { initialBalance: balance });

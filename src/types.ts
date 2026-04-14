@@ -64,10 +64,12 @@ export const parseDateSafe = (dateStr?: string): Date => {
 };
 
 export type TransactionType = 'income' | 'expense';
+export type PaymentSource = 'cash' | 'banking';
 
 export interface Transaction {
   id: string;
   type: TransactionType;
+  source: PaymentSource;
   amount: number;
   description: string;
   category: string;

@@ -116,12 +116,14 @@ Dữ liệu hiện tại của người dùng:
 - Giao dịch gần đây: ${JSON.stringify(transactions.slice(0, 50))}
 - Mục tiêu tiết kiệm: ${JSON.stringify(goals)}
 
-NHIỆM VỤ CỦA BẠN:
-1. NẾU người dùng muốn THÊM GIAO DỊCH (ví dụ: "Nay tốn 15k tiền ăn sáng", "Vừa nhận lương 10 triệu"):
-   BẮT BUỘC chỉ trả về MỘT chuỗi JSON duy nhất, tuyệt đối không có markdown (\`\`\`json), không có text nào khác.
-   Định dạng JSON: {"action": "add_transaction", "data": {"type": "expense" | "income", "amount": number, "description": "string", "category": "string"}}
+QUY TẮC QUAN TRỌNG:
+1. NẾU người dùng muốn THÊM GIAO DỊCH (ví dụ: "Nay tốn 15k tiền ăn sáng"):
+   - Bạn PHẢI xác định được: Loại (thu/chi), Số tiền, Mô tả, và NGUỒN TIỀN (Tiền mặt hay Chuyển khoản/Ngân hàng).
+   - NẾU người dùng CHƯA nói rõ nguồn tiền là tiền mặt hay chuyển khoản, bạn KHÔNG được trả về JSON. Thay vào đó, hãy hỏi lại: "Bạn sử dụng tiền mặt hay chuyển khoản ngân hàng cho giao dịch này?"
+   - NẾU đã có đủ thông tin, chỉ trả về MỘT chuỗi JSON duy nhất, tuyệt đối không có markdown (\`\`\`json), không có text nào khác.
+   - Định dạng JSON: {"action": "add_transaction", "data": {"type": "expense" | "income", "source": "cash" | "banking", "amount": number, "description": "string", "category": "string"}}
 
-2. NẾU người dùng hỏi thông tin, tóm tắt, phân tích, hoặc trò chuyện bình thường (ví dụ: "Tóm tắt thu chi 7 ngày qua", "Tôi tiêu nhiều nhất vào đâu?"):
+2. NẾU người dùng hỏi thông tin, tóm tắt, phân tích, hoặc trò chuyện bình thường:
    Hãy trả lời như một chuyên gia tài chính, phân tích số liệu từ dữ liệu JSON được cung cấp. Trả lời ngắn gọn, súc tích, dễ hiểu, có thể dùng emoji. KHÔNG trả về JSON trong trường hợp này.
       `;
 
@@ -145,28 +147,32 @@ NHIỆM VỤ CỦA BẠN:
 
       // Check if reply is a JSON action
       try {
-        const parsed = JSON.parse(reply.trim());
-        if (parsed.action === 'add_transaction') {
-          const newTx: Transaction = {
-            id: Date.now().toString(),
-            type: parsed.data.type,
-            amount: parsed.data.amount,
-            description: parsed.data.description,
-            category: parsed.data.category,
-            date: new Date().toISOString().split('T')[0],
-          };
-          addTransaction(newTx);
-          
-          setMessages(prev => [...prev, {
-            id: Date.now().toString(),
-            sender: 'ai',
-            text: `Đã tự động thêm giao dịch: ${parsed.data.type === 'income' ? 'Thu' : 'Chi'} ${formatNumber(parsed.data.amount)}đ cho "${parsed.data.description}" (${parsed.data.category}).`,
-            isTyping: true
-          }]);
-          return;
+        const trimmedReply = reply.trim();
+        if (trimmedReply.startsWith('{') && trimmedReply.endsWith('}')) {
+          const parsed = JSON.parse(trimmedReply);
+          if (parsed.action === 'add_transaction') {
+            const newTx: Transaction = {
+              id: Date.now().toString(),
+              type: parsed.data.type,
+              source: parsed.data.source || 'cash',
+              amount: parsed.data.amount,
+              description: parsed.data.description,
+              category: parsed.data.category,
+              date: new Date().toISOString().split('T')[0],
+            };
+            addTransaction(newTx);
+            
+            setMessages(prev => [...prev, {
+              id: Date.now().toString(),
+              sender: 'ai',
+              text: `Đã tự động thêm giao dịch: ${parsed.data.type === 'income' ? 'Thu' : 'Chi'} ${formatNumber(parsed.data.amount)}đ từ ${parsed.data.source === 'cash' ? 'Tiền mặt' : 'Ngân hàng'} cho "${parsed.data.description}" (${parsed.data.category}).`,
+              isTyping: true
+            }]);
+            return;
+          }
         }
       } catch (e) {
-        // Not JSON, just normal text. This is expected for conversational queries.
+        // Not JSON or invalid JSON, just normal text.
       }
 
       setMessages(prev => [...prev, { id: Date.now().toString(), sender: 'ai', text: reply, isTyping: true }]);

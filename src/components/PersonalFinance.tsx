@@ -4,7 +4,7 @@ import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Toolti
 import { Plus, Minus, Target, Download, Trash2, Edit2, Check, X, MessageCircle } from 'lucide-react';
 import FinanceChatbot from './FinanceChatbot';
 import { GoogleGenAI } from '@google/genai';
-import { Transaction, Goal, TransactionType } from '../types';
+import { Transaction, Goal, TransactionType, PaymentSource } from '../types';
 
 const COLORS = ['#BAE1FF', '#BAFFC9', '#FFDFBA', '#FFFFBA', '#FFB3BA', '#E0BBE4', '#957DAD', '#D291BC', '#FEC8D8', '#FFDFD3'];
 
@@ -22,13 +22,13 @@ export const parseNumber = (str: string) => {
 interface PersonalFinanceProps {
   transactions: Transaction[];
   goals: Goal[];
-  initialBalance: number;
+  initialBalance: { cash: number; banking: number };
   addTransaction: (tx: Transaction) => Promise<void>;
   deleteTransaction: (id: string) => Promise<void>;
   addGoal: (goal: Goal) => Promise<void>;
   updateGoal: (goal: Goal) => Promise<void>;
   deleteGoal: (id: string) => Promise<void>;
-  updateInitialBalance: (balance: number) => Promise<void>;
+  updateInitialBalance: (balance: { cash: number; banking: number }) => Promise<void>;
 }
 
 export default function PersonalFinance({
@@ -44,6 +44,7 @@ export default function PersonalFinance({
 }: PersonalFinanceProps) {
   // Form state
   const [type, setType] = useState<TransactionType>('expense');
+  const [source, setSource] = useState<PaymentSource>('cash');
   const [amountStr, setAmountStr] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
@@ -62,7 +63,16 @@ export default function PersonalFinance({
   // Calculate totals
   const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + (t.amount || 0), 0);
   const totalExpense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + (t.amount || 0), 0);
-  const currentBalance = (Number(initialBalance) || 0) + totalIncome - totalExpense;
+  
+  const cashIncome = transactions.filter(t => t.type === 'income' && t.source === 'cash').reduce((sum, t) => sum + (t.amount || 0), 0);
+  const cashExpense = transactions.filter(t => t.type === 'expense' && t.source === 'cash').reduce((sum, t) => sum + (t.amount || 0), 0);
+  const currentCashBalance = (initialBalance.cash || 0) + cashIncome - cashExpense;
+
+  const bankingIncome = transactions.filter(t => t.type === 'income' && t.source === 'banking').reduce((sum, t) => sum + (t.amount || 0), 0);
+  const bankingExpense = transactions.filter(t => t.type === 'expense' && t.source === 'banking').reduce((sum, t) => sum + (t.amount || 0), 0);
+  const currentBankingBalance = (initialBalance.banking || 0) + bankingIncome - bankingExpense;
+  
+  const currentBalance = currentCashBalance + currentBankingBalance;
 
   // AI Categorization
   const handleDescriptionBlur = async () => {
@@ -99,6 +109,7 @@ export default function PersonalFinance({
     const newTx: Transaction = {
       id: Date.now().toString(),
       type,
+      source,
       amount,
       description,
       category,
@@ -154,6 +165,7 @@ export default function PersonalFinance({
     const newTx: Transaction = {
       id: Date.now().toString(),
       type: 'expense',
+      source: 'banking', // Default to banking for deposit
       amount,
       description: `Nạp tiền vào mục tiêu: ${goal.name}`,
       category: 'Tiết kiệm',
@@ -229,35 +241,60 @@ export default function PersonalFinance({
             Theo dõi Thu - Chi
           </h1>
           <div className="flex items-center gap-4">
+          <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2 bg-white/50 px-3 py-1.5 rounded-xl border border-white/20">
-              <span className="text-sm opacity-70">Số dư ban đầu:</span>
+              <span className="text-sm opacity-70">Tiền mặt:</span>
               <input 
                 type="text"
-                value={formatNumber(Number(initialBalance) || 0)}
+                value={formatNumber(Number(initialBalance.cash) || 0)}
                 onChange={(e) => {
                   const val = e.target.value.replace(/[^0-9]/g, '');
-                  updateInitialBalance(val ? parseInt(val, 10) : 0);
+                  updateInitialBalance({ ...initialBalance, cash: val ? parseInt(val, 10) : 0 });
+                }}
+                className="w-24 bg-transparent outline-none font-medium text-right"
+              />
+              <span className="text-sm opacity-70">đ</span>
+            </div>
+            <div className="flex items-center gap-2 bg-white/50 px-3 py-1.5 rounded-xl border border-white/20">
+              <span className="text-sm opacity-70">Ngân hàng:</span>
+              <input 
+                type="text"
+                value={formatNumber(Number(initialBalance.banking) || 0)}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/[^0-9]/g, '');
+                  updateInitialBalance({ ...initialBalance, banking: val ? parseInt(val, 10) : 0 });
                 }}
                 className="w-24 bg-transparent outline-none font-medium text-right"
               />
               <span className="text-sm opacity-70">đ</span>
             </div>
           </div>
+          </div>
         </div>
 
         {/* 1. Dashboard Cards */}
-        <motion.div 
-          initial="hidden" animate="visible"
-          variants={{
-            hidden: { opacity: 0 },
-            visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
-          }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6"
-        >
-          <DashboardCard title="Tổng Số Dư" amount={currentBalance} color="text-blue-600" />
-          <DashboardCard title="Tổng Thu" amount={totalIncome} color="text-emerald-600" />
-          <DashboardCard title="Tổng Chi" amount={totalExpense} color="text-rose-600" />
-        </motion.div>
+        <div className="space-y-6">
+          <motion.div 
+            initial="hidden" animate="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+            }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+          >
+            <DashboardCard title="Tổng Số Dư" amount={currentBalance} color="text-indigo-600" />
+            <DashboardCard title="Tiền Mặt" amount={currentCashBalance} color="text-emerald-600" />
+            <DashboardCard title="Ngân Hàng" amount={currentBankingBalance} color="text-blue-600" />
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+            className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto"
+          >
+            <DashboardCard title="Thu Nhập" amount={totalIncome} color="text-emerald-600" />
+            <DashboardCard title="Chi Tiêu" amount={totalExpense} color="text-rose-600" />
+          </motion.div>
+        </div>
 
         {/* 2. Charts */}
         <motion.div 
@@ -428,7 +465,7 @@ export default function PersonalFinance({
             <h2 className="text-xl font-semibold mb-4">Thêm Giao Dịch</h2>
             
             {/* Toggle Type */}
-            <div className="flex p-1 bg-slate-200/50 rounded-xl mb-6 relative">
+            <div className="flex p-1 bg-slate-200/50 rounded-xl mb-4 relative">
               <div 
                 className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white rounded-lg shadow-sm transition-all duration-300 ease-out ${type === 'income' ? 'left-1' : 'left-[calc(50%+2px)]'}`}
               />
@@ -445,6 +482,27 @@ export default function PersonalFinance({
                 className={`flex-1 py-2 text-sm font-medium z-10 transition-colors ${type === 'expense' ? 'text-rose-600' : 'text-slate-500'}`}
               >
                 Chi Tiêu
+              </button>
+            </div>
+
+            {/* Toggle Source */}
+            <div className="flex p-1 bg-slate-200/50 rounded-xl mb-6 relative">
+              <div 
+                className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white rounded-lg shadow-sm transition-all duration-300 ease-out ${source === 'cash' ? 'left-1' : 'left-[calc(50%+2px)]'}`}
+              />
+              <button
+                type="button"
+                onClick={() => setSource('cash')}
+                className={`flex-1 py-2 text-sm font-medium z-10 transition-colors ${source === 'cash' ? 'text-slate-800' : 'text-slate-500'}`}
+              >
+                Tiền mặt
+              </button>
+              <button
+                type="button"
+                onClick={() => setSource('banking')}
+                className={`flex-1 py-2 text-sm font-medium z-10 transition-colors ${source === 'banking' ? 'text-slate-800' : 'text-slate-500'}`}
+              >
+                Ngân hàng
               </button>
             </div>
 

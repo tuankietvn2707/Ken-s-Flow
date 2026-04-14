@@ -29,6 +29,7 @@ service cloud.firestore {
     function isValidTransaction(data) {
       return data.id is string &&
              data.type in ['income', 'expense'] &&
+             data.source in ['cash', 'banking'] &&
              data.amount is number && data.amount >= 0 &&
              data.date is string;
     }
