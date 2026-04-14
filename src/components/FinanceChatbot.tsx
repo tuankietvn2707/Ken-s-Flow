@@ -76,24 +76,38 @@ export default function FinanceChatbot({ transactions, goals, setTransactions }:
       const ai = new GoogleGenAI({ apiKey });
       
       // Context for AI
-      const context = `
-        Bạn là trợ lý quản lý tài chính cá nhân.
-        Dữ liệu hiện tại của người dùng (JSON):
-        Giao dịch: ${JSON.stringify(transactions.slice(0, 50))} // Giới hạn 50 giao dịch gần nhất
-        Mục tiêu: ${JSON.stringify(goals)}
-        
-        Nếu người dùng nói về việc thêm giao dịch (ví dụ: "Nay tốn 15k tiền ăn sáng"), hãy trả về MỘT chuỗi JSON duy nhất (không có markdown, không có text nào khác) với định dạng:
-        {"action": "add_transaction", "data": {"type": "expense" | "income", "amount": number, "description": "string", "category": "string"}}
-        
-        Nếu người dùng hỏi thông tin, hãy trả lời ngắn gọn, thân thiện dựa trên dữ liệu trên.
+      const systemInstruction = `
+Bạn là trợ lý quản lý tài chính cá nhân thông minh, thân thiện và chuyên nghiệp.
+Dữ liệu hiện tại của người dùng:
+- Giao dịch gần đây: ${JSON.stringify(transactions.slice(0, 50))}
+- Mục tiêu tiết kiệm: ${JSON.stringify(goals)}
+
+NHIỆM VỤ CỦA BẠN:
+1. NẾU người dùng muốn THÊM GIAO DỊCH (ví dụ: "Nay tốn 15k tiền ăn sáng", "Vừa nhận lương 10 triệu"):
+   BẮT BUỘC chỉ trả về MỘT chuỗi JSON duy nhất, tuyệt đối không có markdown (\`\`\`json), không có text nào khác.
+   Định dạng JSON: {"action": "add_transaction", "data": {"type": "expense" | "income", "amount": number, "description": "string", "category": "string"}}
+
+2. NẾU người dùng hỏi thông tin, tóm tắt, phân tích, hoặc trò chuyện bình thường (ví dụ: "Tóm tắt thu chi 7 ngày qua", "Tôi tiêu nhiều nhất vào đâu?"):
+   Hãy trả lời như một chuyên gia tài chính, phân tích số liệu từ dữ liệu JSON được cung cấp. Trả lời ngắn gọn, súc tích, dễ hiểu, có thể dùng emoji. KHÔNG trả về JSON trong trường hợp này.
       `;
 
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
-        contents: `Context: ${context}\n\nUser: ${text}`,
+        contents: text,
+        config: {
+          systemInstruction: systemInstruction,
+          temperature: 0.7,
+        }
       });
 
-      const reply = response.text || '';
+      let reply = response.text || '';
+      
+      // Clean up potential markdown if AI accidentally includes it for JSON
+      if (reply.startsWith('\`\`\`json')) {
+        reply = reply.replace(/^\`\`\`json\n/, '').replace(/\n\`\`\`$/, '');
+      } else if (reply.startsWith('\`\`\`')) {
+        reply = reply.replace(/^\`\`\`\n/, '').replace(/\n\`\`\`$/, '');
+      }
 
       // Check if reply is a JSON action
       try {
@@ -117,14 +131,18 @@ export default function FinanceChatbot({ transactions, goals, setTransactions }:
           return;
         }
       } catch (e) {
-        // Not JSON, just normal text
+        // Not JSON, just normal text. This is expected for conversational queries.
       }
 
       setMessages(prev => [...prev, { id: Date.now().toString(), sender: 'ai', text: reply }]);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Chat error:', error);
-      setMessages(prev => [...prev, { id: Date.now().toString(), sender: 'ai', text: 'Xin lỗi, có lỗi xảy ra khi kết nối với AI.' }]);
+      setMessages(prev => [...prev, { 
+        id: Date.now().toString(), 
+        sender: 'ai', 
+        text: `Xin lỗi, có lỗi xảy ra khi xử lý yêu cầu của bạn. Chi tiết: ${error?.message || 'Lỗi không xác định'}` 
+      }]);
     } finally {
       setIsLoading(false);
     }
