@@ -116,9 +116,7 @@ export default function PersonalFinance() {
   };
 
   const handleDeleteTransaction = (id: string) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa giao dịch này?')) {
-      setTransactions(transactions.filter(t => t.id !== id));
-    }
+    setTransactions(transactions.filter(t => t.id !== id));
   };
 
   const handleAddGoal = (e: React.FormEvent) => {
@@ -140,9 +138,7 @@ export default function PersonalFinance() {
   };
 
   const handleDeleteGoal = (id: string) => {
-    if (window.confirm('Xóa mục tiêu này?')) {
-      setGoals(goals.filter(g => g.id !== id));
-    }
+    setGoals(goals.filter(g => g.id !== id));
   };
 
   const handleDeposit = (e: React.FormEvent) => {
