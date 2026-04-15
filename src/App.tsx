@@ -368,14 +368,17 @@ export default function App() {
           <div className="flex justify-between h-16">
             <div className="flex">
               <div className="flex-shrink-0 flex items-center">
-                <div className="animated-border-box">
+                <button 
+                  onClick={() => window.location.reload()}
+                  className="animated-border-box cursor-pointer hover:opacity-80 transition-opacity"
+                >
                   <div className="animated-border-inner">
                     <BookOpen className="w-6 h-6 text-indigo-600" />
                     <span className="text-xl font-bold text-indigo-600">
                       TutorFlow
                     </span>
                   </div>
-                </div>
+                </button>
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:space-x-2">
                 <TabButton 

@@ -60,6 +60,18 @@ export default function PersonalFinance({
   const [depositGoalId, setDepositGoalId] = useState<string | null>(null);
   const [depositAmountStr, setDepositAmountStr] = useState('');
 
+  // Chatbot state
+  const [showChatbot, setShowChatbot] = useState(false);
+
+  // Local state for initial balance inputs to prevent lag
+  const [localCash, setLocalCash] = useState((initialBalance?.cash || 0).toString());
+  const [localBanking, setLocalBanking] = useState((initialBalance?.banking || 0).toString());
+
+  useEffect(() => {
+    setLocalCash((initialBalance?.cash || 0).toString());
+    setLocalBanking((initialBalance?.banking || 0).toString());
+  }, [initialBalance]);
+
   // Calculate totals
   const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + (t.amount || 0), 0);
   const totalExpense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + (t.amount || 0), 0);
@@ -255,10 +267,21 @@ export default function PersonalFinance({
               <span className="text-sm opacity-70">Tiền mặt:</span>
               <input 
                 type="text"
-                value={formatNumber(Number(initialBalance.cash) || 0)}
+                value={localCash === '' ? '' : formatNumber(Number(localCash) || 0)}
                 onChange={(e) => {
                   const val = e.target.value.replace(/[^0-9]/g, '');
-                  updateInitialBalance({ ...initialBalance, cash: val ? parseInt(val, 10) : 0 });
+                  setLocalCash(val);
+                }}
+                onBlur={() => {
+                  const val = parseInt(localCash, 10) || 0;
+                  updateInitialBalance({ ...initialBalance, cash: val });
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    const val = parseInt(localCash, 10) || 0;
+                    updateInitialBalance({ ...initialBalance, cash: val });
+                    e.currentTarget.blur();
+                  }
                 }}
                 className="w-24 bg-transparent outline-none font-medium text-right"
               />
@@ -268,10 +291,21 @@ export default function PersonalFinance({
               <span className="text-sm opacity-70">Ngân hàng:</span>
               <input 
                 type="text"
-                value={formatNumber(Number(initialBalance.banking) || 0)}
+                value={localBanking === '' ? '' : formatNumber(Number(localBanking) || 0)}
                 onChange={(e) => {
                   const val = e.target.value.replace(/[^0-9]/g, '');
-                  updateInitialBalance({ ...initialBalance, banking: val ? parseInt(val, 10) : 0 });
+                  setLocalBanking(val);
+                }}
+                onBlur={() => {
+                  const val = parseInt(localBanking, 10) || 0;
+                  updateInitialBalance({ ...initialBalance, banking: val });
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    const val = parseInt(localBanking, 10) || 0;
+                    updateInitialBalance({ ...initialBalance, banking: val });
+                    e.currentTarget.blur();
+                  }
                 }}
                 className="w-24 bg-transparent outline-none font-medium text-right"
               />
