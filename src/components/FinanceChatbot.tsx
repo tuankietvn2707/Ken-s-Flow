@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MessageCircle, X, Send, Bot, User, FileText, Download } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
+import OpenAI from 'openai';
 import { Transaction, Goal, TransactionType } from '../types';
 import { formatNumber } from './PersonalFinance';
 
@@ -96,19 +97,6 @@ export default function FinanceChatbot({ transactions, goals, addTransaction }: 
     setIsLoading(true);
 
     try {
-      const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey) {
-        setMessages(prev => [...prev, {
-          id: Date.now().toString(),
-          sender: 'ai',
-          text: 'Lỗi: Chưa cấu hình GEMINI_API_KEY. Vui lòng thêm biến môi trường này trên Vercel.',
-          isTyping: true
-        }]);
-        setIsLoading(false);
-        return;
-      }
-      const ai = new GoogleGenAI({ apiKey });
-      
       // Context for AI
       const systemInstruction = `
 Bạn là trợ lý quản lý tài chính cá nhân thông minh, thân thiện và chuyên nghiệp.
@@ -127,19 +115,67 @@ QUY TẮC QUAN TRỌNG:
    Hãy trả lời như một chuyên gia tài chính, phân tích số liệu từ dữ liệu JSON được cung cấp. Trả lời ngắn gọn, súc tích, dễ hiểu, có thể dùng emoji. KHÔNG trả về JSON trong trường hợp này.
       `;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-flash-latest',
-        contents: text,
-        config: {
-          systemInstruction: systemInstruction,
-          temperature: 0.7,
-        }
-      });
+      const callGemini = async () => {
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) throw new Error("Missing_GEMINI_API_KEY");
+        const ai = new GoogleGenAI({ apiKey });
+        const response = await ai.models.generateContent({
+          model: 'gemini-flash-latest',
+          contents: text,
+          config: {
+            systemInstruction: systemInstruction,
+            temperature: 0.7,
+          }
+        });
+        return response.text || '';
+      };
 
-      let reply = response.text || '';
+      const callOpenAI = async () => {
+        const apiKey = process.env.OPENAI_API_KEY;
+        if (!apiKey) throw new Error("Missing_OPENAI_API_KEY");
+        const openai = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
+        const response = await openai.chat.completions.create({
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: systemInstruction },
+            { role: 'user', content: text }
+          ],
+          temperature: 0.7,
+        });
+        return response.choices[0].message.content || '';
+      };
+
+      let reply = '';
+      let usedModel = '';
+
+      try {
+        // Try Gemini first
+        reply = await callGemini();
+        usedModel = 'Gemini';
+      } catch (geminiError: any) {
+        const errStr = geminiError?.message || String(geminiError);
+        const isQuotaOrMissing = errStr.includes('429') || errStr.includes('Quota') || errStr.includes('RESOURCE_EXHAUSTED') || errStr.includes('503') || errStr.includes('Missing_GEMINI_API_KEY');
+        
+        if (isQuotaOrMissing) {
+          console.warn('Gemini failed or missing, falling back to OpenAI...', errStr);
+          try {
+            reply = await callOpenAI();
+            usedModel = 'ChatGPT';
+          } catch (openAiError: any) {
+            const oaErrStr = openAiError?.message || String(openAiError);
+            if (errStr.includes('Missing_GEMINI_API_KEY') && oaErrStr.includes('Missing_OPENAI_API_KEY')) {
+                throw new Error("Chưa cấu hình GEMINI_API_KEY hoặc OPENAI_API_KEY. Vui lòng thêm biến môi trường.");
+            }
+            throw new Error(`Cả Gemini và ChatGPT đều gặp lỗi hoặc hết lượt.\nGemini: ${errStr}\nChatGPT: ${oaErrStr}`);
+          }
+        } else {
+          throw geminiError;
+        }
+      }
       
       // Clean up potential markdown if AI accidentally includes it for JSON
       if (reply.startsWith('\`\`\`json')) {
+
         reply = reply.replace(/^\`\`\`json\n/, '').replace(/\n\`\`\`$/, '');
       } else if (reply.startsWith('\`\`\`')) {
         reply = reply.replace(/^\`\`\`\n/, '').replace(/\n\`\`\`$/, '');
@@ -165,7 +201,7 @@ QUY TẮC QUAN TRỌNG:
             setMessages(prev => [...prev, {
               id: Date.now().toString(),
               sender: 'ai',
-              text: `Đã tự động thêm giao dịch: ${parsed.data.type === 'income' ? 'Thu' : 'Chi'} ${formatNumber(parsed.data.amount)}đ từ ${parsed.data.source === 'cash' ? 'Tiền mặt' : 'Ngân hàng'} cho "${parsed.data.description}" (${parsed.data.category}).`,
+              text: `Đã tự động thêm giao dịch: ${parsed.data.type === 'income' ? 'Thu' : 'Chi'} ${formatNumber(parsed.data.amount)}đ từ ${parsed.data.source === 'cash' ? 'Tiền mặt' : 'Ngân hàng'} cho "${parsed.data.description}" (${parsed.data.category}). (Đã dùng ${usedModel})`,
               isTyping: true
             }]);
             return;
@@ -183,10 +219,10 @@ QUY TẮC QUAN TRỌNG:
       let errorMessage = 'Xin lỗi, có lỗi xảy ra khi xử lý yêu cầu của bạn.';
       const errorString = error?.message || String(error);
       
-      if (errorString.includes('429') || errorString.includes('Quota exceeded') || errorString.includes('RESOURCE_EXHAUSTED')) {
-        errorMessage = 'Lỗi từ Google Gemini: Tài khoản API đã tạm thời hết lượt dùng miễn phí (Quota exceeded). Vui lòng thử lại sau vài phút hoặc quay lại vào ngày mai nhé!';
-      } else if (errorString.includes('503') || errorString.includes('high demand') || errorString.includes('UNAVAILABLE')) {
-        errorMessage = 'Hệ thống AI của Google hiện đang quá tải do có quá nhiều người sử dụng (High demand). Vui lòng thử lại sau vài phút nhé!';
+      if (errorString.includes('Cả Gemini và ChatGPT đều gặp lỗi')) {
+        errorMessage = errorString;
+      } else if (errorString.includes('Chưa cấu hình')) {
+        errorMessage = errorString;
       } else {
         errorMessage = `Xin lỗi, có lỗi xảy ra khi xử lý yêu cầu của bạn. Chi tiết: ${errorString}`;
       }
@@ -195,6 +231,7 @@ QUY TẮC QUAN TRỌNG:
         id: Date.now().toString(), 
         sender: 'ai', 
         text: errorMessage,
+
         isTyping: true
       }]);
     } finally {
