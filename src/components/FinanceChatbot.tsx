@@ -128,7 +128,7 @@ QUY TẮC QUAN TRỌNG:
       `;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
+        model: 'gemini-flash-latest',
         contents: text,
         config: {
           systemInstruction: systemInstruction,
@@ -184,7 +184,7 @@ QUY TẮC QUAN TRỌNG:
       const errorString = error?.message || String(error);
       
       if (errorString.includes('429') || errorString.includes('Quota exceeded') || errorString.includes('RESOURCE_EXHAUSTED')) {
-        errorMessage = 'Lỗi từ Google Gemini: Tài khoản API của bạn đã vượt quá giới hạn số lượt dùng miễn phí (Quota exceeded).';
+        errorMessage = 'Lỗi từ Google Gemini: Tài khoản API đã tạm thời hết lượt dùng miễn phí (Quota exceeded). Vui lòng thử lại sau vài phút hoặc quay lại vào ngày mai nhé!';
       } else if (errorString.includes('503') || errorString.includes('high demand') || errorString.includes('UNAVAILABLE')) {
         errorMessage = 'Hệ thống AI của Google hiện đang quá tải do có quá nhiều người sử dụng (High demand). Vui lòng thử lại sau vài phút nhé!';
       } else {
