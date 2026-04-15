@@ -78,7 +78,7 @@ export default function App() {
         getDocs(collection(db, `users/${uid}/transactions`)),
         getDocs(collection(db, `users/${uid}/goals`)),
         getDoc(doc(db, `users/${uid}/settings/finance`)),
-        getDoc(doc(db, `users/${uid}/profile`))
+        getDoc(doc(db, `users/${uid}/profile/info`))
       ]);
       
       if (profileSnap.exists()) {
@@ -337,7 +337,7 @@ export default function App() {
   const handleSaveProfile = async (name: string) => {
     if (!user) return;
     try {
-      await setDoc(doc(db, `users/${user.uid}/profile`), { displayName: name });
+      await setDoc(doc(db, `users/${user.uid}/profile/info`), { displayName: name });
       setDisplayName(name);
       setShowOnboarding(false);
     } catch (error) {
