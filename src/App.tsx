@@ -36,6 +36,8 @@ const DongSign = ({ className }: { className?: string }) => (
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
+  const [displayName, setDisplayName] = useState<string>('');
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [loadingAuth, setLoadingAuth] = useState(true);
   
   const [students, setStudents] = useState<Student[]>([]);
@@ -70,14 +72,21 @@ export default function App() {
   const fetchData = async (uid: string) => {
     setLoadingData(true);
     try {
-      const [studentsSnap, classesSnap, transactionsSnap, goalsSnap, settingsSnap] = await Promise.all([
+      const [studentsSnap, classesSnap, transactionsSnap, goalsSnap, settingsSnap, profileSnap] = await Promise.all([
         getDocs(collection(db, `users/${uid}/students`)),
         getDocs(collection(db, `users/${uid}/classes`)),
         getDocs(collection(db, `users/${uid}/transactions`)),
         getDocs(collection(db, `users/${uid}/goals`)),
-        getDoc(doc(db, `users/${uid}/settings/finance`))
+        getDoc(doc(db, `users/${uid}/settings/finance`)),
+        getDoc(doc(db, `users/${uid}/profile`))
       ]);
       
+      if (profileSnap.exists()) {
+        setDisplayName(profileSnap.data().displayName || '');
+        setShowOnboarding(false);
+      } else {
+        setShowOnboarding(true);
+      }
       const studentsData = studentsSnap.docs.map(doc => doc.data() as Student);
       const classesData = classesSnap.docs.map(doc => doc.data() as ClassSession);
       const transactionsData = transactionsSnap.docs.map(doc => doc.data() as Transaction);
@@ -325,6 +334,17 @@ export default function App() {
     }
   };
 
+  const handleSaveProfile = async (name: string) => {
+    if (!user) return;
+    try {
+      await setDoc(doc(db, `users/${user.uid}/profile`), { displayName: name });
+      setDisplayName(name);
+      setShowOnboarding(false);
+    } catch (error) {
+      console.error("Error saving profile:", error);
+    }
+  };
+
   if (loadingAuth) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -335,6 +355,10 @@ export default function App() {
 
   if (!user) {
     return <Login />;
+  }
+
+  if (showOnboarding) {
+    return <Onboarding onSave={handleSaveProfile} />;
   }
 
   return (
@@ -451,7 +475,7 @@ export default function App() {
           </div>
         ) : (
           <>
-            {activeTab === 'dashboard' && <Dashboard students={students} classes={classes} setActiveTab={setActiveTab} />}
+            {activeTab === 'dashboard' && <Dashboard students={students} classes={classes} setActiveTab={setActiveTab} displayName={displayName} />}
             {activeTab === 'students' && <StudentManagement students={students} addStudent={addStudent} updateStudent={updateStudent} deleteStudent={deleteStudent} classes={classes} markClassesAsPaid={markClassesAsPaid} />}
             {activeTab === 'classes' && <ClassTracker students={students} classes={classes} addClass={addClass} updateClass={updateClass} deleteClass={deleteClass} />}
             {activeTab === 'finances' && <FinancialTracking students={students} classes={classes} markClassesAsPaid={markClassesAsPaid} undoLastPayment={undoLastPayment} />}
@@ -515,5 +539,69 @@ function MobileTabButton({ active, onClick, label, colorClass }: { active: boole
     >
       {label}
     </button>
+  );
+}
+
+function Onboarding({ onSave }: { onSave: (name: string) => void }) {
+  const [name, setName] = useState('');
+  const [step, setStep] = useState(1);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (name.trim()) {
+      setStep(2);
+      setTimeout(() => {
+        onSave(name.trim());
+      }, 2500);
+    }
+  };
+
+  if (step === 2) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+        <div className="text-center space-y-4">
+          <div className="text-4xl animate-bounce">👋</div>
+          <h1 className="text-2xl font-bold text-slate-800">
+            Chào mừng <span className="text-indigo-600">{name}</span> đến với WebApp!
+          </h1>
+          <p className="text-slate-500 animate-pulse">Đang chuẩn bị không gian làm việc cho bạn...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+      <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-8 space-y-6">
+        <div className="text-center space-y-2">
+          <div className="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <BookOpen className="w-8 h-8 text-indigo-600" />
+          </div>
+          <h1 className="text-2xl font-bold text-slate-800">Chào mừng bạn!</h1>
+          <p className="text-slate-500">Chúng tôi rất vui khi có bạn đồng hành.</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Bạn là_______?</label>
+            <input
+              type="text"
+              required
+              autoFocus
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Nhập tên của bạn..."
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+          >
+            Bắt đầu ngay
+          </button>
+        </form>
+      </div>
+    </div>
   );
 }

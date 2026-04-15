@@ -108,9 +108,10 @@ interface DashboardProps {
   students: Student[];
   classes: ClassSession[];
   setActiveTab?: (tab: string) => void;
+  displayName?: string;
 }
 
-export default function Dashboard({ students, classes, setActiveTab }: DashboardProps) {
+export default function Dashboard({ students, classes, setActiveTab, displayName }: DashboardProps) {
   const [selectedMonth, setSelectedMonth] = useState(() => {
     const now = new Date();
     return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
@@ -206,9 +207,10 @@ export default function Dashboard({ students, classes, setActiveTab }: Dashboard
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Chào buổi sáng, Tuấn Kiệt!';
-    if (hour < 18) return 'Chào buổi chiều, Tuấn Kiệt!';
-    return 'Chào buổi tối, Tuấn Kiệt!';
+    const name = displayName || 'bạn';
+    if (hour < 12) return `Chào buổi sáng, ${name}!`;
+    if (hour < 18) return `Chào buổi chiều, ${name}!`;
+    return `Chào buổi tối, ${name}!`;
   };
 
   return (
