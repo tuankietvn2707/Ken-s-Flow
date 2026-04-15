@@ -224,7 +224,16 @@ export default function PersonalFinance({
   const barData = Object.values(monthlyData).sort((a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name));
 
   // Group transactions by month
-  const groupedTransactions = transactions.reduce((acc, t) => {
+  const sortedTransactions = [...transactions].sort((a, b) => {
+    // Primary sort by date descending
+    const dateA = a.date || '';
+    const dateB = b.date || '';
+    if (dateA !== dateB) return dateB.localeCompare(dateA);
+    // Secondary sort by ID (timestamp) descending
+    return b.id.localeCompare(a.id);
+  });
+
+  const groupedTransactions = sortedTransactions.reduce((acc, t) => {
     const dateStr = t.date || new Date().toISOString().split('T')[0];
     const month = dateStr.substring(0, 7);
     if (!acc[month]) acc[month] = [];
