@@ -42,6 +42,7 @@ export default function StudentManagement({ students, addStudent, updateStudent,
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [formError, setFormError] = useState('');
   const [expandedMonths, setExpandedMonths] = useState<Record<string, boolean>>({});
 
   const toggleMonth = (monthKey: string) => {
@@ -66,6 +67,21 @@ export default function StudentManagement({ students, addStudent, updateStudent,
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError('');
+    
+    // Manual validation
+    if (!formData.lastName.trim()) {
+      setFormError('Vui lòng nhập Họ và Tên đệm.');
+      return;
+    }
+    if (!formData.firstName.trim()) {
+      setFormError('Vui lòng nhập Tên học viên.');
+      return;
+    }
+    if (!formData.fee) {
+      setFormError('Vui lòng nhập Học phí mỗi buổi.');
+      return;
+    }
     
     // Remove non-numeric characters for fee
     const rawFee = formData.fee.replace(/\D/g, '');
@@ -153,6 +169,7 @@ export default function StudentManagement({ students, addStudent, updateStudent,
   const closeForm = () => {
     setIsFormOpen(false);
     setEditingId(null);
+    setFormError('');
     setFormData({ firstName: '', lastName: '', birthYear: '', gender: 'Nam', occupation: '', currentLevel: '', goal: '', targetColor: '#D0E8FF', fee: '', feeCycle: '8', schedule: '', notes: '', status: 'active' });
   };
 
@@ -358,7 +375,13 @@ export default function StudentManagement({ students, addStudent, updateStudent,
             {editingId ? 'Sửa thông tin Học viên' : 'Thêm Học viên mới'}
           </h2>
           
-          <form onSubmit={handleSubmit} className="space-y-8">
+          {formError && (
+            <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-md border border-red-200">
+              {formError}
+            </div>
+          )}
+          
+          <form onSubmit={handleSubmit} className="space-y-8" noValidate>
             {/* Phần 1: Thông tin cơ bản */}
             <fieldset className="bg-slate-50 p-4 rounded-lg border border-slate-100">
               <legend className="text-sm font-semibold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full mb-2 flex items-center">
@@ -370,7 +393,6 @@ export default function StudentManagement({ students, addStudent, updateStudent,
                   <label className="block text-sm font-medium text-slate-700">Họ và Tên đệm <span className="text-rose-500">*</span></label>
                   <input
                     type="text"
-                    required
                     placeholder="VD: Nguyễn Văn"
                     value={formData.lastName}
                     onChange={e => setFormData({...formData, lastName: e.target.value})}
@@ -381,7 +403,6 @@ export default function StudentManagement({ students, addStudent, updateStudent,
                   <label className="block text-sm font-medium text-slate-700">Tên <span className="text-rose-500">*</span></label>
                   <input
                     type="text"
-                    required
                     placeholder="VD: A"
                     value={formData.firstName}
                     onChange={e => setFormData({...formData, firstName: e.target.value})}
@@ -486,7 +507,6 @@ export default function StudentManagement({ students, addStudent, updateStudent,
                   <div className="mt-1 relative rounded-md shadow-sm">
                     <input
                       type="text"
-                      required
                       placeholder="VD: 200,000"
                       value={formData.fee}
                       onChange={handleFeeChange}

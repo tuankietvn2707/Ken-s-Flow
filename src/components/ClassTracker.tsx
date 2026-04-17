@@ -19,6 +19,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
   const [filterMonth, setFilterMonth] = useState<string>('all');
   const [filterYear, setFilterYear] = useState<string>(new Date().getFullYear().toString());
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
   const timeInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -88,6 +89,26 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError('');
+    
+    // Manual validation
+    if (!formData.studentId) {
+      setFormError('Vui lòng chọn học viên.');
+      return;
+    }
+    if (!formData.date) {
+      setFormError('Vui lòng chọn ngày học.');
+      return;
+    }
+    if (!formData.topic.trim()) {
+      setFormError('Vui lòng nhập chủ đề bài học.');
+      return;
+    }
+    if (!formData.duration || Number(formData.duration) <= 0) {
+      setFormError('Vui lòng nhập thời lượng hợp lệ.');
+      return;
+    }
+
     setIsSubmitting(true);
     
     try {
@@ -155,6 +176,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
   const closeForm = () => {
     setIsFormOpen(false);
     setEditingId(null);
+    setFormError('');
     setFormData({
       studentId: '',
       date: new Date().toISOString().split('T')[0],
@@ -231,12 +253,16 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
           <h2 className="text-lg font-medium text-slate-900 mb-4">
             {editingId ? 'Sửa thông tin Lớp học' : 'Ghi nhận Lớp học mới'}
           </h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {formError && (
+            <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-md border border-red-200">
+              {formError}
+            </div>
+          )}
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-slate-700">Học viên</label>
+                <label className="block text-sm font-medium text-slate-700">Học viên <span className="text-rose-500">*</span></label>
                 <select
-                  required
                   value={formData.studentId}
                   onChange={e => setFormData({...formData, studentId: e.target.value})}
                   className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border bg-white"
@@ -248,10 +274,9 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700">Ngày học</label>
+                <label className="block text-sm font-medium text-slate-700">Ngày học <span className="text-rose-500">*</span></label>
                 <input
                   type="date"
-                  required
                   value={formData.date}
                   onChange={e => setFormData({...formData, date: e.target.value})}
                   className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
@@ -269,10 +294,9 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                 />
               </div>
               <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-slate-700">Chủ đề bài học</label>
+                <label className="block text-sm font-medium text-slate-700">Chủ đề bài học <span className="text-rose-500">*</span></label>
                 <input
                   type="text"
-                  required
                   placeholder="VD: Thì hiện tại hoàn thành, Luyện nói..."
                   value={formData.topic}
                   onChange={e => setFormData({...formData, topic: e.target.value})}
@@ -280,10 +304,9 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700">Thời lượng (1 buổi = 1h30 phút)</label>
+                <label className="block text-sm font-medium text-slate-700">Thời lượng (1 buổi = 1h30 phút) <span className="text-rose-500">*</span></label>
                 <input
                   type="number"
-                  required
                   min="0.5"
                   step="0.5"
                   value={formData.duration}
