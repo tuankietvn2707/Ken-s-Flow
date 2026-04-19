@@ -372,10 +372,10 @@ export default function App() {
                   onClick={() => window.location.reload()}
                   className="animated-border-box cursor-pointer hover:opacity-80 transition-opacity"
                 >
-                  <div className="animated-border-inner">
-                    <BookOpen className="w-6 h-6 text-indigo-600" />
+                  <div className="animated-border-inner flex items-center gap-2">
+                    <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain rounded-full bg-blue-50" />
                     <span className="text-xl font-bold text-indigo-600">
-                      TutorFlow
+                      Thu - Chi AI
                     </span>
                   </div>
                 </button>
