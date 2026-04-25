@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Student, ClassSession, Transaction, Goal } from './types';
+import { Student, ClassSession, Transaction, Goal, FinanceHistoryRecord } from './types';
 import { Users, BookOpen, LayoutDashboard, LogOut, Wallet } from 'lucide-react';
 import { auth, db } from './firebase';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
@@ -43,6 +43,7 @@ export default function App() {
   const [students, setStudents] = useState<Student[]>([]);
   const [classes, setClasses] = useState<ClassSession[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [financeHistory, setFinanceHistory] = useState<FinanceHistoryRecord[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [initialBalance, setInitialBalance] = useState<{ cash: number; banking: number }>({ cash: 0, banking: 0 });
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -72,10 +73,11 @@ export default function App() {
   const fetchData = async (uid: string) => {
     setLoadingData(true);
     try {
-      const [studentsSnap, classesSnap, transactionsSnap, goalsSnap, settingsSnap, profileSnap] = await Promise.all([
+      const [studentsSnap, classesSnap, transactionsSnap, historySnap, goalsSnap, settingsSnap, profileSnap] = await Promise.all([
         getDocs(collection(db, `users/${uid}/students`)),
         getDocs(collection(db, `users/${uid}/classes`)),
         getDocs(collection(db, `users/${uid}/transactions`)),
+        getDocs(collection(db, `users/${uid}/financeHistory`)),
         getDocs(collection(db, `users/${uid}/goals`)),
         getDoc(doc(db, `users/${uid}/settings/finance`)),
         getDoc(doc(db, `users/${uid}/profile/info`))
@@ -90,12 +92,14 @@ export default function App() {
       const studentsData = studentsSnap.docs.map(doc => doc.data() as Student);
       const classesData = classesSnap.docs.map(doc => doc.data() as ClassSession);
       const transactionsData = transactionsSnap.docs.map(doc => doc.data() as Transaction);
+      const historyData = historySnap.docs.map(doc => doc.data() as FinanceHistoryRecord);
       const goalsData = goalsSnap.docs.map(doc => doc.data() as Goal);
       const settingsData = settingsSnap.exists() ? settingsSnap.data() : { initialBalance: { cash: 0, banking: 0 } };
       
       setStudents(studentsData);
       setClasses(classesData);
       setTransactions(transactionsData);
+      setFinanceHistory(historyData);
       setGoals(goalsData);
       setInitialBalance(settingsData.initialBalance || { cash: 0, banking: 0 });
 
@@ -334,6 +338,40 @@ export default function App() {
     }
   };
 
+  const consolidateAndResetBalance = async (newBalances: { cash: number; banking: number }) => {
+    if (!user) return;
+    try {
+      showLoading();
+      const batch = writeBatch(db);
+      
+      const newHistoryRecord: FinanceHistoryRecord = {
+        id: Date.now().toString(),
+        timestamp: new Date().toISOString(),
+        initialBalances: initialBalance,
+        transactions: [...transactions]
+      };
+
+      batch.set(doc(db, `users/${user.uid}/financeHistory`, newHistoryRecord.id), newHistoryRecord);
+      
+      transactions.forEach(tx => {
+        batch.delete(doc(db, `users/${user.uid}/transactions`, tx.id));
+      });
+      
+      batch.set(doc(db, `users/${user.uid}/settings/finance`), { initialBalance: newBalances }, { merge: true });
+      
+      await batch.commit();
+
+      setFinanceHistory(prev => [newHistoryRecord, ...prev].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()));
+      setTransactions([]);
+      setInitialBalance(newBalances);
+      
+    } catch (error) {
+      console.error("Error consolidating finance:", error);
+    } finally {
+      hideLoading();
+    }
+  };
+
   const handleSaveProfile = async (name: string) => {
     if (!user) return;
     try {
@@ -485,6 +523,7 @@ export default function App() {
             {activeTab === 'personal_finance' && (
               <PersonalFinance 
                 transactions={transactions}
+                financeHistory={financeHistory}
                 goals={goals}
                 initialBalance={initialBalance}
                 addTransaction={addTransaction}
@@ -493,6 +532,7 @@ export default function App() {
                 updateGoal={updateGoal}
                 deleteGoal={deleteGoal}
                 updateInitialBalance={updateInitialBalance}
+                consolidateAndResetBalance={consolidateAndResetBalance}
               />
             )}
           </>

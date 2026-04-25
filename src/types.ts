@@ -76,6 +76,16 @@ export interface Transaction {
   date: string;
 }
 
+export interface FinanceHistoryRecord {
+  id: string;
+  timestamp: string; // ISO String
+  initialBalances: {
+    cash: number;
+    banking: number;
+  };
+  transactions: Transaction[];
+}
+
 export interface Goal {
   id: string;
   name: string;

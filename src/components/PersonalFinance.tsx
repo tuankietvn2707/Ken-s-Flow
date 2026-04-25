@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { Plus, Minus, Target, Download, Trash2, Edit2, Check, X, MessageCircle } from 'lucide-react';
+import { Plus, Minus, Target, Download, Trash2, Edit2, Check, X, MessageCircle, Archive, History, Calendar, ChevronRight } from 'lucide-react';
 import FinanceChatbot from './FinanceChatbot';
 import { GoogleGenAI } from '@google/genai';
-import { Transaction, Goal, TransactionType, PaymentSource } from '../types';
+import { Transaction, Goal, TransactionType, PaymentSource, FinanceHistoryRecord } from '../types';
 
 const COLORS = ['#BAE1FF', '#BAFFC9', '#FFDFBA', '#FFFFBA', '#FFB3BA', '#E0BBE4', '#957DAD', '#D291BC', '#FEC8D8', '#FFDFD3'];
 
@@ -19,8 +19,9 @@ export const parseNumber = (str: string) => {
   return parseInt(str.replace(/,/g, ''), 10) || 0;
 };
 
-interface PersonalFinanceProps {
+export interface PersonalFinanceProps {
   transactions: Transaction[];
+  financeHistory: FinanceHistoryRecord[];
   goals: Goal[];
   initialBalance: { cash: number; banking: number };
   addTransaction: (tx: Transaction) => Promise<void>;
@@ -29,10 +30,12 @@ interface PersonalFinanceProps {
   updateGoal: (goal: Goal) => Promise<void>;
   deleteGoal: (id: string) => Promise<void>;
   updateInitialBalance: (balance: { cash: number; banking: number }) => Promise<void>;
+  consolidateAndResetBalance: (newBalances: { cash: number; banking: number }) => Promise<void>;
 }
 
 export default function PersonalFinance({
   transactions,
+  financeHistory,
   goals,
   initialBalance,
   addTransaction,
@@ -40,7 +43,8 @@ export default function PersonalFinance({
   addGoal,
   updateGoal,
   deleteGoal,
-  updateInitialBalance
+  updateInitialBalance,
+  consolidateAndResetBalance
 }: PersonalFinanceProps) {
   // Form state
   const [type, setType] = useState<TransactionType>('expense');
@@ -59,6 +63,14 @@ export default function PersonalFinance({
   // Deposit form state
   const [depositGoalId, setDepositGoalId] = useState<string | null>(null);
   const [depositAmountStr, setDepositAmountStr] = useState('');
+
+  // Consolidate Modal State
+  const [showConsolidateModal, setShowConsolidateModal] = useState(false);
+  const [consolidateCashStr, setConsolidateCashStr] = useState('');
+  const [consolidateBankingStr, setConsolidateBankingStr] = useState('');
+
+  // History Detail Modal State
+  const [selectedHistoryRecord, setSelectedHistoryRecord] = useState<FinanceHistoryRecord | null>(null);
 
   // Chatbot state
   const [showChatbot, setShowChatbot] = useState(false);
@@ -154,6 +166,15 @@ export default function PersonalFinance({
     setGoalName('');
     setGoalTargetStr('');
     setShowGoalForm(false);
+  };
+
+  const handleConsolidate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cash = parseNumber(consolidateCashStr);
+    const banking = parseNumber(consolidateBankingStr);
+    if (cash < 0 || banking < 0) return;
+    await consolidateAndResetBalance({ cash, banking });
+    setShowConsolidateModal(false);
   };
 
   const handleDeleteGoal = (id: string) => {
@@ -252,6 +273,16 @@ export default function PersonalFinance({
     acc[month].push(t);
     return acc;
   }, {} as Record<string, Transaction[]>);
+
+  const groupedHistory = financeHistory.reduce((acc, r) => {
+    const date = new Date(r.timestamp);
+    if (isNaN(date.getTime())) return acc;
+    const dateStr = date.toISOString().split('T')[0];
+    const month = dateStr.substring(0, 7);
+    if (!acc[month]) acc[month] = [];
+    acc[month].push(r);
+    return acc;
+  }, {} as Record<string, FinanceHistoryRecord[]>);
 
   return (
     <div className="min-h-screen transition-colors duration-500 bg-[#f0f9ff] text-slate-800">
@@ -615,10 +646,22 @@ export default function PersonalFinance({
             className="glass-card p-6 rounded-2xl lg:col-span-2"
           >
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">Lịch Sử Giao Dịch</h2>
-              <button onClick={exportCSV} className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors">
-                <Download className="w-4 h-4" /> Xuất CSV
-              </button>
+              <h2 className="text-xl font-semibold">Giao Dịch Hiện Tại</h2>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => {
+                    setConsolidateCashStr(currentCashBalance.toString());
+                    setConsolidateBankingStr(currentBankingBalance.toString());
+                    setShowConsolidateModal(true);
+                  }} 
+                  className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
+                >
+                  <Archive className="w-4 h-4" /> Chốt Sổ
+                </button>
+                <button onClick={exportCSV} className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors">
+                  <Download className="w-4 h-4" /> Xuất CSV
+                </button>
+              </div>
             </div>
 
             <div className="space-y-6">
@@ -650,11 +693,215 @@ export default function PersonalFinance({
                   </div>
                 </div>
               ))}
-              {transactions.length === 0 && <p className="text-center opacity-50 py-8">Chưa có giao dịch nào.</p>}
+              {transactions.length === 0 && <p className="text-center opacity-50 py-8">Chưa có giao dịch hoạt động nào.</p>}
             </div>
           </motion.div>
         </div>
+
+        {/* Consolidate History Section */}
+        {financeHistory.length > 0 && (
+          <motion.div 
+            initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6 }}
+            className="glass-card p-6 rounded-2xl"
+          >
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold">Lịch Sử Giao Dịch Đã Gộp</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Object.keys(groupedHistory).sort().reverse().map(month => (
+                <div key={month} className="space-y-3">
+                  <h3 className="text-sm font-bold opacity-60 border-b border-slate-200 pb-1">{month}</h3>
+                  {groupedHistory[month].map(record => {
+                    const date = new Date(record.timestamp);
+                    const income = record.transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+                    const expense = record.transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+                    return (
+                      <div 
+                        key={record.id} 
+                        onClick={() => setSelectedHistoryRecord(record)}
+                        className="p-4 bg-white/40 rounded-xl border border-white/20 hover:bg-white/60 cursor-pointer transition-all group flex items-center justify-between"
+                      >
+                        <div>
+                          <p className="font-medium flex items-center gap-2">Chốt sổ <span className="text-xs font-normal opacity-70 bg-slate-200 px-2 py-0.5 rounded">{date.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})}</span></p>
+                          <p className="text-xs opacity-70 mt-1">{date.toLocaleDateString('vi-VN')}</p>
+                          <div className="mt-2 flex gap-3 text-xs">
+                            <span className="text-emerald-600">+{formatNumber(income)}</span>
+                            <span className="text-rose-600">-{formatNumber(expense)}</span>
+                          </div>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-cyan-600 transform group-hover:translate-x-1 transition-all" />
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
       </div>
+
+      {/* Consolidate Modal */}
+      <AnimatePresence>
+        {showConsolidateModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+              onClick={() => setShowConsolidateModal(false)}
+            />
+            <motion.div 
+               initial={{ opacity: 0, scale: 0.95, y: 10 }} 
+               animate={{ opacity: 1, scale: 1, y: 0 }} 
+               exit={{ opacity: 0, scale: 0.95, y: 10 }}
+               className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden relative z-10"
+            >
+              <div className="flex items-center justify-between p-4 border-b border-slate-100">
+                <h3 className="font-semibold text-lg flex items-center gap-2">
+                  <Archive className="w-5 h-5 text-cyan-600" />
+                  Gộp Lịch Sử & Chốt Sổ
+                </h3>
+                <button onClick={() => setShowConsolidateModal(false)} className="p-1 hover:bg-slate-100 rounded-lg transition-colors">
+                  <X className="w-5 h-5 text-slate-500" />
+                </button>
+              </div>
+              <form onSubmit={handleConsolidate} className="p-6 space-y-4">
+                <p className="text-sm text-slate-600">
+                  Thao tác này sẽ lưu lại toàn bộ giao dịch hiện tại thành 1 bản ghi lịch sử, làm trống danh sách giao dịch, và cập nhật số dư thực tế mới nhất.
+                </p>
+                
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium mb-1 opacity-80">Số Dư Tiền Mặt Thực Tế</label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={formatNumber(parseNumber(consolidateCashStr))}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/[^0-9]/g, '');
+                          setConsolidateCashStr(val);
+                        }}
+                        className="w-full px-4 py-2 pr-8 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-cyan-500 outline-none transition-all"
+                        required
+                      />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm opacity-50">đ</span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 opacity-80">Số Dư Ngân Hàng Thực Tế</label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={formatNumber(parseNumber(consolidateBankingStr))}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/[^0-9]/g, '');
+                          setConsolidateBankingStr(val);
+                        }}
+                        className="w-full px-4 py-2 pr-8 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-cyan-500 outline-none transition-all"
+                        required
+                      />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm opacity-50">đ</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4 flex gap-3">
+                   <button
+                    type="button"
+                    onClick={() => setShowConsolidateModal(false)}
+                    className="flex-1 py-2 rounded-xl bg-slate-100 text-slate-700 font-medium hover:bg-slate-200 transition-all text-sm"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-medium shadow-md hover:shadow-lg transition-all text-sm"
+                  >
+                    Chốt Các Lần Giao Dịch
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* History Detail Modal */}
+      <AnimatePresence>
+        {selectedHistoryRecord && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+             <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+              onClick={() => setSelectedHistoryRecord(null)}
+            />
+            <motion.div 
+               initial={{ opacity: 0, scale: 0.95, y: 10 }} 
+               animate={{ opacity: 1, scale: 1, y: 0 }} 
+               exit={{ opacity: 0, scale: 0.95, y: 10 }}
+               className="bg-[#f8fafc] rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col relative z-10"
+            >
+              <div className="flex items-center justify-between p-5 border-b border-slate-200 bg-white rounded-t-2xl">
+                <div>
+                  <h3 className="font-bold text-xl flex items-center gap-2">
+                    <History className="w-5 h-5 text-cyan-600" />
+                    Chi Tiết Lần Chốt Sổ
+                  </h3>
+                  <p className="text-sm opacity-60 mt-1 flex items-center gap-1">
+                    <Calendar className="w-3 h-3" /> 
+                    {new Date(selectedHistoryRecord.timestamp).toLocaleString('vi-VN')}
+                  </p>
+                </div>
+                <button onClick={() => setSelectedHistoryRecord(null)} className="p-2 hover:bg-slate-100 rounded-full transition-colors bg-slate-50">
+                  <X className="w-5 h-5 text-slate-500" />
+                </button>
+              </div>
+
+              <div className="overflow-y-auto p-6 space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                    <p className="text-sm opacity-60 font-medium">Số Dư Tiền Mặt (Cũ)</p>
+                    <p className="text-xl font-bold mt-1 text-emerald-600">{formatNumber(selectedHistoryRecord.initialBalances.cash)} đ</p>
+                  </div>
+                  <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                    <p className="text-sm opacity-60 font-medium">Số Dư Ngân Hàng (Cũ)</p>
+                    <p className="text-xl font-bold mt-1 text-blue-600">{formatNumber(selectedHistoryRecord.initialBalances.banking)} đ</p>
+                  </div>
+                </div>
+
+                <div>
+                   <h4 className="font-semibold text-slate-700 mb-3 ml-1 flex items-center gap-2">
+                     Giao Dịch Ghi Nhận ({selectedHistoryRecord.transactions.length})
+                   </h4>
+                   <div className="bg-white rounded-xl border border-slate-100 shadow-sm divide-y divide-slate-100">
+                     {selectedHistoryRecord.transactions.map(t => (
+                        <div key={t.id} className="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors">
+                          <div className="flex items-center gap-4">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${t.type === 'income' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}>
+                              {t.type === 'income' ? <Plus className="w-4 h-4" /> : <Minus className="w-4 h-4" />}
+                            </div>
+                            <div>
+                              <p className="font-medium">{t.description}</p>
+                              <p className="text-xs opacity-60">
+                                {t.category || 'Khác'} • {t.source === 'cash' ? 'Tiền mặt' : 'Ngân hàng'} • {t.date || 'Không rõ'}
+                              </p>
+                            </div>
+                          </div>
+                          <span className={`font-bold ${t.type === 'income' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                            {t.type === 'income' ? '+' : '-'}{formatNumber(t.amount)}
+                          </span>
+                        </div>
+                     ))}
+                     {selectedHistoryRecord.transactions.length === 0 && (
+                       <p className="text-center opacity-50 text-sm py-6">Không có giao dịch nào.</p>
+                     )}
+                   </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Chatbot FAB */}
       <FinanceChatbot transactions={transactions} goals={goals} addTransaction={addTransaction} />
