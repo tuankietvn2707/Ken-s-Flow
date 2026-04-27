@@ -411,9 +411,9 @@ export default function App() {
                   className="animated-border-box cursor-pointer hover:opacity-80 transition-opacity"
                 >
                   <div className="animated-border-inner flex items-center gap-2">
-                    <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain rounded-full bg-blue-50" />
+                    <Wallet className="w-6 h-6 text-indigo-600" />
                     <span className="text-xl font-bold text-indigo-600">
-                      Thu - Chi AI
+                      TutorFlow
                     </span>
                   </div>
                 </button>

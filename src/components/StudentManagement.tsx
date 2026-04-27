@@ -43,6 +43,7 @@ export default function StudentManagement({ students, addStudent, updateStudent,
   const [editingId, setEditingId] = useState<string | null>(null);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [formError, setFormError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [expandedMonths, setExpandedMonths] = useState<Record<string, boolean>>({});
 
   const toggleMonth = (monthKey: string) => {
@@ -68,18 +69,30 @@ export default function StudentManagement({ students, addStudent, updateStudent,
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
+    setFieldErrors({});
     
-    // Manual validation
-    if (!formData.lastName.trim()) {
-      setFormError('Vui lòng nhập Họ và Tên đệm.');
-      return;
+    const errors: Record<string, string> = {};
+    const currentYear = new Date().getFullYear();
+
+    if (!formData.lastName.trim()) errors.lastName = 'Vui lòng nhập Họ và Tên đệm.';
+    if (!formData.firstName.trim()) errors.firstName = 'Vui lòng nhập Tên học viên.';
+    
+    if (formData.birthYear && (Number(formData.birthYear) < 1950 || Number(formData.birthYear) > currentYear)) {
+      errors.birthYear = 'Năm sinh không hợp lệ.';
     }
-    if (!formData.firstName.trim()) {
-      setFormError('Vui lòng nhập Tên học viên.');
-      return;
-    }
+
     if (!formData.fee) {
-      setFormError('Vui lòng nhập Học phí mỗi buổi.');
+      errors.fee = 'Vui lòng nhập Học phí mỗi buổi.';
+    } else {
+      const rawFeeStr = formData.fee.replace(/\D/g, '');
+      if (!rawFeeStr || Number(rawFeeStr) <= 0) {
+        errors.fee = 'Học phí phải lớn hơn 0.';
+      }
+    }
+    
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setFormError('Vui lòng kiểm tra lại thông tin. Một số trường chưa hợp lệ.');
       return;
     }
     
@@ -170,6 +183,7 @@ export default function StudentManagement({ students, addStudent, updateStudent,
     setIsFormOpen(false);
     setEditingId(null);
     setFormError('');
+    setFieldErrors({});
     setFormData({ firstName: '', lastName: '', birthYear: '', gender: 'Nam', occupation: '', currentLevel: '', goal: '', targetColor: '#D0E8FF', fee: '', feeCycle: '8', schedule: '', notes: '', status: 'active' });
   };
 
@@ -395,9 +409,13 @@ export default function StudentManagement({ students, addStudent, updateStudent,
                     type="text"
                     placeholder="VD: Nguyễn Văn"
                     value={formData.lastName}
-                    onChange={e => setFormData({...formData, lastName: e.target.value})}
-                    className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border bg-white"
+                    onChange={e => {
+                      setFormData({...formData, lastName: e.target.value});
+                      if (fieldErrors.lastName) setFieldErrors({...fieldErrors, lastName: ''});
+                    }}
+                    className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm p-2 border bg-white focus:ring-indigo-500 ${fieldErrors.lastName ? 'border-rose-500 focus:border-rose-500' : 'border-slate-300 focus:border-indigo-500'}`}
                   />
+                  {fieldErrors.lastName && <p className="mt-1 text-xs text-rose-500">{fieldErrors.lastName}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700">Tên <span className="text-rose-500">*</span></label>
@@ -405,9 +423,13 @@ export default function StudentManagement({ students, addStudent, updateStudent,
                     type="text"
                     placeholder="VD: A"
                     value={formData.firstName}
-                    onChange={e => setFormData({...formData, firstName: e.target.value})}
-                    className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border bg-white"
+                    onChange={e => {
+                      setFormData({...formData, firstName: e.target.value});
+                      if (fieldErrors.firstName) setFieldErrors({...fieldErrors, firstName: ''});
+                    }}
+                    className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm p-2 border bg-white focus:ring-indigo-500 ${fieldErrors.firstName ? 'border-rose-500 focus:border-rose-500' : 'border-slate-300 focus:border-indigo-500'}`}
                   />
+                  {fieldErrors.firstName && <p className="mt-1 text-xs text-rose-500">{fieldErrors.firstName}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700">Năm sinh</label>
@@ -415,9 +437,13 @@ export default function StudentManagement({ students, addStudent, updateStudent,
                     type="number"
                     placeholder="VD: 2009"
                     value={formData.birthYear}
-                    onChange={e => setFormData({...formData, birthYear: e.target.value})}
-                    className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border bg-white"
+                    onChange={e => {
+                      setFormData({...formData, birthYear: e.target.value});
+                      if (fieldErrors.birthYear) setFieldErrors({...fieldErrors, birthYear: ''});
+                    }}
+                    className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm p-2 border bg-white focus:ring-indigo-500 ${fieldErrors.birthYear ? 'border-rose-500 focus:border-rose-500' : 'border-slate-300 focus:border-indigo-500'}`}
                   />
+                  {fieldErrors.birthYear && <p className="mt-1 text-xs text-rose-500">{fieldErrors.birthYear}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700">Giới tính</label>
@@ -509,13 +535,17 @@ export default function StudentManagement({ students, addStudent, updateStudent,
                       type="text"
                       placeholder="VD: 200,000"
                       value={formData.fee}
-                      onChange={handleFeeChange}
-                      className="block w-full rounded-md border-slate-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2 border bg-white pr-12"
+                      onChange={e => {
+                        handleFeeChange(e);
+                        if (fieldErrors.fee) setFieldErrors({...fieldErrors, fee: ''});
+                      }}
+                      className={`block w-full rounded-md shadow-sm sm:text-sm p-2 border bg-white pr-12 focus:ring-amber-500 ${fieldErrors.fee ? 'border-rose-500 focus:border-rose-500' : 'border-slate-300 focus:border-amber-500'}`}
                     />
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                       <span className="text-slate-500 sm:text-sm">VNĐ</span>
                     </div>
                   </div>
+                  {fieldErrors.fee && <p className="mt-1 text-xs text-rose-500">{fieldErrors.fee}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700">Chu kỳ thu học phí</label>

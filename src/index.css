@@ -33,10 +33,10 @@
   background: conic-gradient(
     from 0deg,
     transparent 0%,
-    #BAE1FF 20%, /* pastel blue */
-    #BAFFC9 40%, /* pastel green */
-    #FFDFBA 60%, /* pastel orange */
-    transparent 80%
+    #BAE1FF 25%,
+    #BAFFC9 50%,
+    #FFDFBA 75%,
+    transparent 100%
   );
   animation: spin-slow 3s linear infinite;
 }
