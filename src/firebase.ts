@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getAnalytics } from 'firebase/analytics';
+import { getMessaging, isSupported } from 'firebase/messaging';
 
 // Cấu hình Firebase của bạn
 export const firebaseConfig = {
@@ -22,3 +23,11 @@ export const googleProvider = new GoogleAuthProvider();
 
 // Khởi tạo Analytics (chỉ chạy trên trình duyệt)
 export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
+
+// Khởi tạo Messaging (chỉ khi trình duyệt hỗ trợ)
+export const getAppMessaging = async () => {
+  if (typeof window !== 'undefined' && await isSupported()) {
+    return getMessaging(app);
+  }
+  return null;
+};

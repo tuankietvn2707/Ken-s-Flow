@@ -218,28 +218,67 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
   );
 
   const requestNotificationPermission = async () => {
-    if (!("Notification" in window)) {
-      alert("Trình duyệt của bạn không hỗ trợ thông báo (Desktop Notifications).");
-      return;
-    }
-    
-    if (Notification.permission === "granted") {
-      new Notification("Thông báo đã được bật!", { 
-        body: "Bạn sẽ nhận được thông báo về lịch học và tài chính mới.",
-        icon: "/logo.png?v=2"
-      });
-      setNotificationPermission('granted');
-    } else if (Notification.permission !== "denied") {
-      const permission = await Notification.requestPermission();
-      setNotificationPermission(permission);
-      if (permission === "granted") {
-        new Notification("Tuyệt vời!", { 
-          body: "Bạn đã bật thông báo thành công.",
-          icon: "/logo.png?v=2"
-        });
+    try {
+      if (!("Notification" in window)) {
+        alert("Trình duyệt của bạn không hỗ trợ thông báo (Desktop Notifications).");
+        return;
       }
-    } else {
-      alert("Bạn đã chặn quyền thông báo. Vui lòng cấp quyền lại trong cài đặt trình duyệt để tiếp tục.");
+      
+      let permission = Notification.permission;
+      if (permission !== "granted" && permission !== "denied") {
+        permission = await Notification.requestPermission();
+      }
+      
+      setNotificationPermission(permission);
+      
+      if (permission === "granted") {
+        const { getAppMessaging } = await import('../firebase');
+        const { getToken, onMessage } = await import('firebase/messaging');
+        const messaging = await getAppMessaging();
+
+        if (messaging) {
+          try {
+            // Note: In production you should pass your VAPID key here if you have one.
+            const currentToken = await getToken(messaging, { 
+              // vapidKey: 'YOUR_VAPID_KEY_HERE' 
+            });
+            if (currentToken) {
+              console.log('FCM Token:', currentToken);
+              
+              // Handle incoming messages while the app is in the foreground
+              onMessage(messaging, (payload) => {
+                console.log('Message received in foreground: ', payload);
+                new Notification(payload.notification?.title || "Thông báo mới", {
+                  body: payload.notification?.body || "Bạn có tin nhắn mới.",
+                  icon: "/logo.png?v=2"
+                });
+              });
+
+              new Notification("Đã kết nối với máy chủ thông báo!", { 
+                body: "Bạn đã bật thông báo thành công. Hệ thống sẽ có thể thông báo ngay cả khi bạn không mở app.",
+                icon: "/logo.png?v=2"
+              });
+            } else {
+              console.log('No registration token available.');
+            }
+          } catch (err) {
+            console.error('An error occurred while retrieving token. ', err);
+            new Notification("Lỗi kết nối", { 
+              body: "Lỗi kết nối máy chủ thông báo. " + err,
+              icon: "/logo.png?v=2"
+            });
+          }
+        } else {
+           new Notification("Máy chủ đẩy không khả dụng!", { 
+            body: "Trình duyệt của bạn không được server Push Notification hỗ trợ.",
+            icon: "/logo.png?v=2"
+          });
+        }
+      } else {
+        alert("Bạn đã chặn quyền thông báo. Vui lòng cấp quyền lại trong cài đặt trình duyệt để tiếp tục.");
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
