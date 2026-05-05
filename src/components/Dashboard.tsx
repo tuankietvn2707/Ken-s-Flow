@@ -220,6 +220,44 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
     typeof window !== 'undefined' ? window.localStorage.getItem('fcm_token') : null
   );
 
+  // Thiết lập Firebase Messaging nếu đã được cấp quyền trước đó
+  useEffect(() => {
+    const setupMessaging = async () => {
+      if (typeof window !== 'undefined' && "Notification" in window && Notification.permission === "granted") {
+        try {
+          const { getAppMessaging } = await import('../firebase');
+          const { getToken, onMessage } = await import('firebase/messaging');
+          const messaging = await getAppMessaging();
+          
+          if (messaging) {
+            // Lấy lại token để đảm bảo nó luôn mới
+            const currentToken = await getToken(messaging);
+            if (currentToken) {
+              window.localStorage.setItem('fcm_token', currentToken);
+              setFcmToken(currentToken);
+            }
+
+            // Lắng nghe thông báo khi app đang mở (foreground)
+            onMessage(messaging, (payload) => {
+              console.log('Message received in foreground: ', payload);
+              // Hiển thị trực tiếp trên UI bằng alert để dễ test
+              alert(`🔔 Có thông báo mới!\n\nTiêu đề: ${payload.notification?.title}\nNội dung: ${payload.notification?.body}`);
+              
+              // Gửi Notification cục bộ của hệ điều hành
+              new Notification(payload.notification?.title || "Thông báo", {
+                body: payload.notification?.body || "",
+                icon: "/logo.png?v=2"
+              });
+            });
+          }
+        } catch (error) {
+          console.error("Lỗi khi kết nối FCM:", error);
+        }
+      }
+    };
+    setupMessaging();
+  }, []);
+
   const requestNotificationPermission = async () => {
     try {
       if (!("Notification" in window)) {
@@ -254,6 +292,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
               // Handle incoming messages while the app is in the foreground
               onMessage(messaging, (payload) => {
                 console.log('Message received in foreground: ', payload);
+                alert(`🔔 Có thông báo mới!\n\nTiêu đề: ${payload.notification?.title}\nNội dung: ${payload.notification?.body}`);
                 new Notification(payload.notification?.title || "Thông báo mới", {
                   body: payload.notification?.body || "Bạn có tin nhắn mới.",
                   icon: "/logo.png?v=2"
