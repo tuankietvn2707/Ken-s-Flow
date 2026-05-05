@@ -216,6 +216,9 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
   const [notificationPermission, setNotificationPermission] = useState<string>(
     typeof Notification !== 'undefined' ? Notification.permission : 'default'
   );
+  const [fcmToken, setFcmToken] = useState<string | null>(
+    typeof window !== 'undefined' ? window.localStorage.getItem('fcm_token') : null
+  );
 
   const requestNotificationPermission = async () => {
     try {
@@ -244,6 +247,9 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
             });
             if (currentToken) {
               console.log('FCM Token:', currentToken);
+              // Lưu token vào local storage hoặc window để người dùng dễ lấy
+              window.localStorage.setItem('fcm_token', currentToken);
+              setFcmToken(currentToken);
               
               // Handle incoming messages while the app is in the foreground
               onMessage(messaging, (payload) => {
@@ -255,7 +261,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
               });
 
               new Notification("Đã kết nối với máy chủ thông báo!", { 
-                body: "Bạn đã bật thông báo thành công. Hệ thống sẽ có thể thông báo ngay cả khi bạn không mở app.",
+                body: "Bạn đã bật thông báo thành công. Có thể sao chép FCM Token dưới góc trái để test nghiệm.",
                 icon: "/logo.png?v=2"
               });
             } else {
@@ -279,6 +285,15 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
       }
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const copyFcmToken = () => {
+    if (fcmToken) {
+      navigator.clipboard.writeText(fcmToken);
+      alert("Đã sao chép FCM Token: " + fcmToken.substring(0, 20) + "...");
+    } else {
+      alert("Chưa có Token. Vui lòng bật thông báo trước!");
     }
   };
 
@@ -369,6 +384,15 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
           </div>
         </div>
       </motion.div>
+
+      {/* Button Tool Copy FCM Token for Dev/Testing */}
+      {notificationPermission === 'granted' && fcmToken && (
+        <div className="flex justify-end -mt-2">
+           <button onClick={copyFcmToken} className="text-xs text-slate-400 hover:text-indigo-500 underline flex items-center gap-1">
+             <span>Copy FCM Token để test gửi thông báo</span>
+           </button>
+        </div>
+      )}
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
