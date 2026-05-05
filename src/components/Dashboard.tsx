@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Student, ClassSession, formatVND, parseDateSafe } from '../types';
-import { Users, Calendar, Plus, UserPlus, CalendarPlus, CreditCard } from 'lucide-react';
+import { Users, Calendar, Plus, UserPlus, CalendarPlus, CreditCard, Bell, BellRing } from 'lucide-react';
 import { motion } from 'motion/react';
 import {
   BarChart,
@@ -213,14 +213,61 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
     return `Chào buổi tối, ${name}!`;
   };
 
+  const [notificationPermission, setNotificationPermission] = useState<string>(
+    typeof Notification !== 'undefined' ? Notification.permission : 'default'
+  );
+
+  const requestNotificationPermission = async () => {
+    if (!("Notification" in window)) {
+      alert("Trình duyệt của bạn không hỗ trợ thông báo (Desktop Notifications).");
+      return;
+    }
+    
+    if (Notification.permission === "granted") {
+      new Notification("Thông báo đã được bật!", { 
+        body: "Bạn sẽ nhận được thông báo về lịch học và tài chính mới.",
+        icon: "/logo.png?v=2"
+      });
+      setNotificationPermission('granted');
+    } else if (Notification.permission !== "denied") {
+      const permission = await Notification.requestPermission();
+      setNotificationPermission(permission);
+      if (permission === "granted") {
+        new Notification("Tuyệt vời!", { 
+          body: "Bạn đã bật thông báo thành công.",
+          icon: "/logo.png?v=2"
+        });
+      }
+    } else {
+      alert("Bạn đã chặn quyền thông báo. Vui lòng cấp quyền lại trong cài đặt trình duyệt để tiếp tục.");
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <motion.h1 
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-        className="text-2xl font-bold text-[#1E293B]"
-      >
-        {getGreeting()}
-      </motion.h1>
+      <div className="flex justify-between items-center">
+        <motion.h1 
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+          className="text-2xl font-bold text-[#1E293B]"
+        >
+          {getGreeting()}
+        </motion.h1>
+
+        <button 
+          onClick={requestNotificationPermission}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all shadow-sm ${
+            notificationPermission === 'granted' 
+              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100' 
+              : 'bg-white text-indigo-600 border border-indigo-200 hover:bg-indigo-50'
+          }`}
+          title={notificationPermission === 'granted' ? "Đã bật thông báo" : "Bật thông báo"}
+        >
+          {notificationPermission === 'granted' ? <BellRing className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
+          <span className="hidden sm:inline">
+            {notificationPermission === 'granted' ? 'Đã bật thông báo' : 'Bật thông báo'}
+          </span>
+        </button>
+      </div>
       
       <motion.div 
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
