@@ -219,6 +219,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
   const [fcmToken, setFcmToken] = useState<string | null>(
     typeof window !== 'undefined' ? window.localStorage.getItem('fcm_token') : null
   );
+  const [inAppNotifications, setInAppNotifications] = useState<{title: string, body: string, time: Date}[]>([]);
 
   // Thiết lập Firebase Messaging nếu đã được cấp quyền trước đó
   useEffect(() => {
@@ -230,8 +231,18 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
           const messaging = await getAppMessaging();
           
           if (messaging) {
+            // Đăng ký Service Worker rõ ràng
+            let swRegistration = undefined;
+            if ('serviceWorker' in navigator) {
+              swRegistration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+                scope: '/'
+              });
+            }
+
             // Lấy lại token để đảm bảo nó luôn mới
-            const currentToken = await getToken(messaging);
+            const currentToken = await getToken(messaging, {
+              serviceWorkerRegistration: swRegistration
+            });
             if (currentToken) {
               window.localStorage.setItem('fcm_token', currentToken);
               setFcmToken(currentToken);
@@ -240,14 +251,23 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
             // Lắng nghe thông báo khi app đang mở (foreground)
             onMessage(messaging, (payload) => {
               console.log('Message received in foreground: ', payload);
-              // Hiển thị trực tiếp trên UI bằng alert để dễ test
-              alert(`🔔 Có thông báo mới!\n\nTiêu đề: ${payload.notification?.title}\nNội dung: ${payload.notification?.body}`);
+              // Lưu vào list thông báo hiển thị trên thẻ giao diện
+              const title = payload.notification?.title || payload.data?.title || "Thông báo";
+              const body = payload.notification?.body || payload.data?.body || "Bạn có tin nhắn mới.";
               
+              setInAppNotifications(prev => [{
+                title,
+                body,
+                time: new Date()
+              }, ...prev]);
+
               // Gửi Notification cục bộ của hệ điều hành
-              new Notification(payload.notification?.title || "Thông báo", {
-                body: payload.notification?.body || "",
-                icon: "/logo.png?v=2"
-              });
+              if (Notification.permission === 'granted') {
+                new Notification(title, {
+                  body,
+                  icon: "/logo.png?v=2"
+                });
+              }
             });
           }
         } catch (error) {
@@ -279,8 +299,16 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
 
         if (messaging) {
           try {
+            let swRegistration = undefined;
+            if ('serviceWorker' in navigator) {
+              swRegistration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+                scope: '/'
+              });
+            }
+
             // Note: In production you should pass your VAPID key here if you have one.
             const currentToken = await getToken(messaging, { 
+              serviceWorkerRegistration: swRegistration
               // vapidKey: 'YOUR_VAPID_KEY_HERE' 
             });
             if (currentToken) {
@@ -292,11 +320,21 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
               // Handle incoming messages while the app is in the foreground
               onMessage(messaging, (payload) => {
                 console.log('Message received in foreground: ', payload);
-                alert(`🔔 Có thông báo mới!\n\nTiêu đề: ${payload.notification?.title}\nNội dung: ${payload.notification?.body}`);
-                new Notification(payload.notification?.title || "Thông báo mới", {
-                  body: payload.notification?.body || "Bạn có tin nhắn mới.",
-                  icon: "/logo.png?v=2"
-                });
+                const title = payload.notification?.title || payload.data?.title || "Thông báo mới";
+                const body = payload.notification?.body || payload.data?.body || "Bạn có tin nhắn mới.";
+                
+                setInAppNotifications(prev => [{
+                  title,
+                  body,
+                  time: new Date()
+                }, ...prev]);
+
+                if (Notification.permission === 'granted') {
+                  new Notification(title, {
+                    body,
+                    icon: "/logo.png?v=2"
+                  });
+                }
               });
 
               new Notification("Đã kết nối với máy chủ thông báo!", { 
@@ -349,18 +387,45 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
         <button 
           onClick={requestNotificationPermission}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all shadow-sm ${
-            notificationPermission === 'granted' 
+            notificationPermission === 'granted' && fcmToken
               ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100' 
-              : 'bg-white text-indigo-600 border border-indigo-200 hover:bg-indigo-50'
+              : notificationPermission === 'granted'
+                ? 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100' 
+                : 'bg-white text-indigo-600 border border-indigo-200 hover:bg-indigo-50'
           }`}
-          title={notificationPermission === 'granted' ? "Đã bật thông báo" : "Bật thông báo"}
+          title={notificationPermission === 'granted' && fcmToken ? "Đã bật thông báo" : notificationPermission === 'granted' ? "Đang kết nối..." : "Bật thông báo"}
         >
           {notificationPermission === 'granted' ? <BellRing className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
           <span className="hidden sm:inline">
-            {notificationPermission === 'granted' ? 'Đã bật thông báo' : 'Bật thông báo'}
+            {notificationPermission === 'granted' && fcmToken ? 'Đã bật thông báo' : notificationPermission === 'granted' ? 'Đang tải Token...' : 'Bật thông báo'}
           </span>
         </button>
       </div>
+
+      {inAppNotifications.length > 0 && (
+        <motion.div 
+          initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
+          className="bg-indigo-50 border border-indigo-100 rounded-[20px] p-4 flex flex-col gap-3 shadow-sm"
+        >
+          <div className="flex justify-between items-center px-2">
+            <h3 className="font-semibold text-indigo-800 flex items-center gap-2">
+              <BellRing className="w-5 h-5" /> Thông báo mới ({inAppNotifications.length})
+            </h3>
+            <button onClick={() => setInAppNotifications([])} className="text-xs text-indigo-500 hover:text-indigo-700 underline">Xoá tất cả</button>
+          </div>
+          <div className="flex flex-col gap-2 max-h-60 overflow-y-auto pr-2">
+            {inAppNotifications.map((note, idx) => (
+              <div key={idx} className="bg-white p-3 rounded-xl shadow-sm border border-slate-100">
+                <div className="flex justify-between items-start mb-1">
+                  <h4 className="font-bold text-slate-800">{note.title}</h4>
+                  <span className="text-xs text-slate-400">{note.time.toLocaleTimeString()}</span>
+                </div>
+                <p className="text-sm text-slate-600">{note.body}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
       
       <motion.div 
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
