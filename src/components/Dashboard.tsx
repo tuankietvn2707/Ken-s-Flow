@@ -290,20 +290,34 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
 
               playNotificationSound();
 
-              // Gửi Notification cục bộ của hệ điều hành ưu tiên dùng Service Worker
+              // Gửi Notification cục bộ của hệ điều hành
               if (Notification.permission === 'granted') {
-                if ('serviceWorker' in navigator) {
-                  navigator.serviceWorker.ready.then(registration => {
-                    registration.showNotification(title, {
-                      body,
-                      icon: "/logo.png?v=2",
-                      vibrate: [200, 100, 200]
-                    });
-                  }).catch(() => {
-                    new Notification(title, { body, icon: "/logo.png?v=2" });
+                try {
+                  // Cố gắng hiển thị qua window.Notification trước (hoạt động tốt trên Macbook/Windows)
+                  const notification = new window.Notification(title, { 
+                    body, 
+                    icon: "/logo.png?v=2",
+                    requireInteraction: true // Giữ thông báo trên màn hình cho đến khi user tương tác
                   });
-                } else {
-                  new Notification(title, { body, icon: "/logo.png?v=2" });
+                  
+                  notification.onclick = function() {
+                    window.focus();
+                    this.close();
+                  };
+                } catch (e) {
+                  // Fallback cho iOS Safari/PWA (yêu cầu dùng qua Service Worker)
+                  if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.getRegistration().then(reg => {
+                      if (reg) {
+                        reg.showNotification(title, {
+                          body,
+                          icon: "/logo.png?v=2",
+                          vibrate: [200, 100, 200],
+                          requireInteraction: true
+                        });
+                      }
+                    });
+                  }
                 }
               }
             });
@@ -355,36 +369,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
               window.localStorage.setItem('fcm_token', currentToken);
               setFcmToken(currentToken);
               
-              // Handle incoming messages while the app is in the foreground
-              onMessage(messaging, (payload) => {
-                console.log('Message received in foreground: ', payload);
-                const title = payload.notification?.title || payload.data?.title || "Thông báo mới";
-                const body = payload.notification?.body || payload.data?.body || "Bạn có tin nhắn mới.";
-                
-                setInAppNotifications(prev => [{
-                  title,
-                  body,
-                  time: new Date()
-                }, ...prev]);
-
-                playNotificationSound();
-
-                if (Notification.permission === 'granted') {
-                  if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.ready.then(registration => {
-                      registration.showNotification(title, {
-                        body,
-                        icon: "/logo.png?v=2",
-                        vibrate: [200, 100, 200]
-                      });
-                    }).catch(() => {
-                      new Notification(title, { body, icon: "/logo.png?v=2" });
-                    });
-                  } else {
-                    new Notification(title, { body, icon: "/logo.png?v=2" });
-                  }
-                }
-              });
+              // Listener đã được đăng ký ở useEffect, không đăng ký lại ở đây để tránh trùng lặp
 
               new Notification("Đã kết nối với máy chủ thông báo!", { 
                 body: "Bạn đã bật thông báo thành công. Có thể sao chép FCM Token dưới góc trái để test nghiệm.",
