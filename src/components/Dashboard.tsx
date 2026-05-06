@@ -213,6 +213,33 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
     return `Chào buổi tối, ${name}!`;
   };
 
+  const playNotificationSound = () => {
+    try {
+      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContext) return;
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+      
+      osc.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      
+      // Tạo âm báo (mô phỏng tiếng ting)
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, ctx.currentTime); // 880Hz (A5)
+      osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.1); 
+      
+      gainNode.gain.setValueAtTime(0, ctx.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.05);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+      
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.5);
+    } catch (e) {
+      console.log('Không thể phát âm thanh', e);
+    }
+  };
+
   const [notificationPermission, setNotificationPermission] = useState<string>(
     typeof Notification !== 'undefined' ? Notification.permission : 'default'
   );
@@ -261,12 +288,23 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
                 time: new Date()
               }, ...prev]);
 
-              // Gửi Notification cục bộ của hệ điều hành
+              playNotificationSound();
+
+              // Gửi Notification cục bộ của hệ điều hành ưu tiên dùng Service Worker
               if (Notification.permission === 'granted') {
-                new Notification(title, {
-                  body,
-                  icon: "/logo.png?v=2"
-                });
+                if ('serviceWorker' in navigator) {
+                  navigator.serviceWorker.ready.then(registration => {
+                    registration.showNotification(title, {
+                      body,
+                      icon: "/logo.png?v=2",
+                      vibrate: [200, 100, 200]
+                    });
+                  }).catch(() => {
+                    new Notification(title, { body, icon: "/logo.png?v=2" });
+                  });
+                } else {
+                  new Notification(title, { body, icon: "/logo.png?v=2" });
+                }
               }
             });
           }
@@ -329,11 +367,22 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
                   time: new Date()
                 }, ...prev]);
 
+                playNotificationSound();
+
                 if (Notification.permission === 'granted') {
-                  new Notification(title, {
-                    body,
-                    icon: "/logo.png?v=2"
-                  });
+                  if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.ready.then(registration => {
+                      registration.showNotification(title, {
+                        body,
+                        icon: "/logo.png?v=2",
+                        vibrate: [200, 100, 200]
+                      });
+                    }).catch(() => {
+                      new Notification(title, { body, icon: "/logo.png?v=2" });
+                    });
+                  } else {
+                    new Notification(title, { body, icon: "/logo.png?v=2" });
+                  }
                 }
               });
 
