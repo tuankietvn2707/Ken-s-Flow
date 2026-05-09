@@ -385,7 +385,7 @@ export default function App() {
 
   if (loadingAuth) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-sky-50/40">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
       </div>
     );
@@ -400,8 +400,8 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans">
-      <nav className="bg-white border-b border-slate-200 sticky top-0 z-10">
+    <div className="min-h-screen text-sky-950 font-sans">
+      <nav className="glass-panel border-b border-sky-300/30 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex">
@@ -411,8 +411,8 @@ export default function App() {
                   className="animated-border-box cursor-pointer hover:opacity-80 transition-opacity"
                 >
                   <div className="animated-border-inner flex items-center gap-2">
-                    <Wallet className="w-6 h-6 text-indigo-600" />
-                    <span className="text-xl font-bold text-indigo-600">
+                    <Wallet className="w-6 h-6 text-sky-600" />
+                    <span className="text-xl font-bold text-sky-600">
                       TutorFlow
                     </span>
                   </div>
@@ -424,48 +424,48 @@ export default function App() {
                   onClick={() => setActiveTab('dashboard')}
                   icon={<LayoutDashboard className="w-4 h-4 mr-2" />}
                   label="Tổng quan"
-                  colorClass="bg-blue-900/10 text-blue-900 border-blue-900/20"
-                  hoverClass="hover:bg-blue-900/5 hover:text-blue-800 hover:border-blue-900/10"
+                  colorClass="glass-active text-sky-900 border-sky-300/40"
+                  hoverClass="hover:bg-sky-50 hover:text-sky-800"
                 />
                 <TabButton 
                   active={activeTab === 'students'} 
                   onClick={() => setActiveTab('students')}
                   icon={<Users className="w-4 h-4 mr-2" />}
                   label="Học viên"
-                  colorClass="bg-blue-100/70 text-blue-800 border-blue-200"
-                  hoverClass="hover:bg-blue-50 hover:text-blue-700 hover:border-blue-100"
+                  colorClass="glass-active text-sky-900 border-sky-300/40"
+                  hoverClass="hover:bg-sky-50 hover:text-sky-800"
                 />
                 <TabButton 
                   active={activeTab === 'classes'} 
                   onClick={() => setActiveTab('classes')}
                   icon={<BookOpen className="w-4 h-4 mr-2" />}
                   label="Lớp học"
-                  colorClass="bg-green-100/70 text-green-800 border-green-200"
-                  hoverClass="hover:bg-green-50 hover:text-green-700 hover:border-green-100"
+                  colorClass="glass-active text-sky-900 border-sky-300/40"
+                  hoverClass="hover:bg-sky-50 hover:text-sky-800"
                 />
                 <TabButton 
                   active={activeTab === 'finances'} 
                   onClick={() => setActiveTab('finances')}
                   icon={<DongSign className="w-4 h-4 mr-2" />}
                   label="Tài chính"
-                  colorClass="bg-orange-100/70 text-orange-800 border-orange-200"
-                  hoverClass="hover:bg-orange-50 hover:text-orange-700 hover:border-orange-100"
+                  colorClass="glass-active text-sky-900 border-sky-300/40"
+                  hoverClass="hover:bg-sky-50 hover:text-sky-800"
                 />
                 <TabButton 
                   active={activeTab === 'personal_finance'} 
                   onClick={() => setActiveTab('personal_finance')}
                   icon={<Wallet className="w-4 h-4 mr-2" />}
                   label="Thu - Chi"
-                  colorClass="bg-cyan-100/70 text-cyan-800 border-cyan-200"
-                  hoverClass="hover:bg-cyan-50 hover:text-cyan-700 hover:border-cyan-100"
+                  colorClass="glass-active text-sky-900 border-sky-300/40"
+                  hoverClass="hover:bg-sky-50 hover:text-sky-800"
                 />
               </div>
             </div>
             <div className="flex items-center">
-              <span className="text-sm text-slate-500 mr-4 hidden sm:block">{user.email}</span>
+              <span className="text-sm text-sky-700/80 mr-4 hidden sm:block">{user.email}</span>
               <button
                 onClick={handleLogout}
-                className="inline-flex items-center px-3 py-1.5 border border-slate-300 shadow-sm text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="inline-flex items-center px-3 py-1.5 border border-sky-300/50 shadow-sm text-sm font-medium rounded-xl text-sky-900 bg-white hover:bg-sky-50/40 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500"
               >
                 <LogOut className="w-4 h-4 sm:mr-2" />
                 <span className="hidden sm:inline">Đăng xuất</span>
@@ -475,36 +475,36 @@ export default function App() {
         </div>
         
         {/* Mobile menu */}
-        <div className="sm:hidden border-t border-slate-200 flex overflow-x-auto p-2 gap-2">
+        <div className="sm:hidden border-t border-sky-300/40 flex overflow-x-auto p-2 gap-2">
            <MobileTabButton 
               active={activeTab === 'dashboard'} 
               onClick={() => setActiveTab('dashboard')}
               label="Tổng quan"
-              colorClass="bg-blue-900/10 text-blue-900 border-blue-900/20"
+              colorClass="glass-active text-sky-900 border-sky-300/40"
             />
             <MobileTabButton 
               active={activeTab === 'students'} 
               onClick={() => setActiveTab('students')}
               label="Học viên"
-              colorClass="bg-blue-100/70 text-blue-800 border-blue-200"
+              colorClass="glass-active text-sky-900 border-sky-300/40"
             />
             <MobileTabButton 
               active={activeTab === 'classes'} 
               onClick={() => setActiveTab('classes')}
               label="Lớp học"
-              colorClass="bg-green-100/70 text-green-800 border-green-200"
+              colorClass="glass-active text-sky-900 border-sky-300/40"
             />
             <MobileTabButton 
               active={activeTab === 'finances'} 
               onClick={() => setActiveTab('finances')}
               label="Tài chính"
-              colorClass="bg-orange-100/70 text-orange-800 border-orange-200"
+              colorClass="glass-active text-sky-900 border-sky-300/40"
             />
             <MobileTabButton 
               active={activeTab === 'personal_finance'} 
               onClick={() => setActiveTab('personal_finance')}
               label="Thu - Chi"
-              colorClass="bg-cyan-100/70 text-cyan-800 border-cyan-200"
+              colorClass="glass-active text-sky-900 border-sky-300/40"
             />
         </div>
       </nav>
@@ -561,7 +561,7 @@ function TabButton({ active, onClick, icon, label, colorClass, hoverClass }: { a
       className={`inline-flex items-center px-4 py-2 my-2 rounded-xl text-sm font-medium transition-all duration-300 border ${
         active 
           ? `${colorClass} shadow-md transform -translate-y-0.5` 
-          : `border-transparent text-slate-500 ${hoverClass} hover:shadow-md hover:-translate-y-0.5`
+          : `border-transparent text-sky-700/80 ${hoverClass} hover:shadow-md hover:-translate-y-0.5`
       }`}
     >
       {icon}
@@ -574,10 +574,10 @@ function MobileTabButton({ active, onClick, label, colorClass }: { active: boole
   return (
     <button
       onClick={onClick}
-      className={`whitespace-nowrap py-2 px-4 rounded-lg text-sm font-medium flex-1 text-center transition-all duration-300 border ${
+      className={`whitespace-nowrap py-2 px-4 rounded-xl text-sm font-medium flex-1 text-center transition-all duration-300 border ${
         active 
           ? `${colorClass} shadow-sm` 
-          : 'border-transparent text-slate-500 hover:bg-slate-50 hover:text-slate-700 hover:shadow-sm'
+          : 'border-transparent text-sky-700/80 hover:bg-sky-50 hover:text-sky-950 hover:shadow-sm'
       }`}
     >
       {label}
@@ -601,32 +601,32 @@ function Onboarding({ onSave }: { onSave: (name: string) => void }) {
 
   if (step === 2) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-sky-50/40 p-4">
         <div className="text-center space-y-4">
           <div className="text-4xl animate-bounce">👋</div>
-          <h1 className="text-2xl font-bold text-slate-800">
-            Chào mừng <span className="text-indigo-600">{name}</span> đến với WebApp!
+          <h1 className="text-2xl font-bold text-sky-900">
+            Chào mừng <span className="text-sky-600">{name}</span> đến với WebApp!
           </h1>
-          <p className="text-slate-500 animate-pulse">Đang chuẩn bị không gian làm việc cho bạn...</p>
+          <p className="text-sky-700/80 animate-pulse">Đang chuẩn bị không gian làm việc cho bạn...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-sky-50/40 p-4">
       <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-8 space-y-6">
         <div className="text-center space-y-2">
           <div className="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <BookOpen className="w-8 h-8 text-indigo-600" />
+            <BookOpen className="w-8 h-8 text-sky-600" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-800">Chào mừng bạn!</h1>
-          <p className="text-slate-500">Chúng tôi rất vui khi có bạn đồng hành.</p>
+          <h1 className="text-2xl font-bold text-sky-900">Chào mừng bạn!</h1>
+          <p className="text-sky-700/80">Chúng tôi rất vui khi có bạn đồng hành.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Bạn là_______?</label>
+            <label className="block text-sm font-medium text-sky-900 mb-2">Bạn là_______?</label>
             <input
               type="text"
               required
@@ -634,12 +634,12 @@ function Onboarding({ onSave }: { onSave: (name: string) => void }) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Nhập tên của bạn..."
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+              className="w-full px-4 py-3 rounded-xl border border-sky-300/40 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
             />
           </div>
           <button
             type="submit"
-            className="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+            className="w-full py-3 bg-sky-600 text-white font-bold rounded-xl shadow-lg hover:bg-sky-700 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
           >
             Bắt đầu ngay
           </button>

@@ -36,30 +36,30 @@ export default function FloatingActionButton({ setActiveTab }: Props) {
       <div className={`flex flex-col items-end gap-3 transition-all duration-300 origin-bottom ${isFabOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
         <button 
           onClick={() => { setIsFabOpen(false); setActiveTab('finances'); }}
-          className="flex items-center gap-3 bg-white px-4 py-2.5 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.08)] text-slate-700 hover:bg-slate-50 hover:text-[#2563EB] transition-colors"
+          className="flex items-center gap-3 glass-panel px-4 py-2.5 rounded-xl shadow-[0_4px_16px_rgba(14,165,233,0.1)] text-sky-900 hover:glass-panel/80 hover:text-sky-600 transition-colors"
         >
           <span className="font-medium text-sm">Thu học phí</span>
-          <div className="bg-orange-100 text-orange-600 p-1.5 rounded-lg">
+          <div className="bg-orange-100 text-orange-600 p-1.5 rounded-xl">
             <CreditCard className="w-4 h-4" />
           </div>
         </button>
         
         <button 
           onClick={() => { setIsFabOpen(false); setActiveTab('classes'); }}
-          className="flex items-center gap-3 bg-white px-4 py-2.5 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.08)] text-slate-700 hover:bg-slate-50 hover:text-[#2563EB] transition-colors"
+          className="flex items-center gap-3 glass-panel px-4 py-2.5 rounded-xl shadow-[0_4px_16px_rgba(14,165,233,0.1)] text-sky-900 hover:glass-panel/80 hover:text-sky-600 transition-colors"
         >
           <span className="font-medium text-sm">Lên lịch học</span>
-          <div className="bg-green-100 text-green-600 p-1.5 rounded-lg">
+          <div className="bg-green-100 text-green-600 p-1.5 rounded-xl">
             <CalendarPlus className="w-4 h-4" />
           </div>
         </button>
 
         <button 
           onClick={() => { setIsFabOpen(false); setActiveTab('students'); }}
-          className="flex items-center gap-3 bg-white px-4 py-2.5 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.08)] text-slate-700 hover:bg-slate-50 hover:text-[#2563EB] transition-colors"
+          className="flex items-center gap-3 glass-panel px-4 py-2.5 rounded-xl shadow-[0_4px_16px_rgba(14,165,233,0.1)] text-sky-900 hover:glass-panel/80 hover:text-sky-600 transition-colors"
         >
           <span className="font-medium text-sm">Thêm học viên mới</span>
-          <div className="bg-blue-100 text-blue-600 p-1.5 rounded-lg">
+          <div className="bg-blue-100 text-blue-600 p-1.5 rounded-xl">
             <UserPlus className="w-4 h-4" />
           </div>
         </button>

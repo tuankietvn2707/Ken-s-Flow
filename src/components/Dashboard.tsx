@@ -62,10 +62,10 @@ const CustomBarTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     const dayName = label === 'CN' ? 'Chủ Nhật' : `Thứ ${label.replace('T', '')}`;
     return (
-      <div className="bg-white p-3 border border-slate-200 shadow-md rounded-lg">
-        <p className="font-semibold text-slate-800 mb-1">{dayName}</p>
-        <p className="text-sm text-slate-600">
-          <span className="font-medium text-[#2563EB]">{payload[0].value} buổi học</span>
+      <div className="glass-panel/90 backdrop-blur-md p-3 border border-sky-300/30 shadow-lg rounded-xl">
+        <p className="font-semibold text-sky-950 mb-1">{dayName}</p>
+        <p className="text-sm text-sky-700/80">
+          <span className="font-medium text-sky-600">{payload[0].value} buổi học</span>
           {' '}
           ({payload[1].value} giờ)
         </p>
@@ -82,20 +82,20 @@ const CustomAreaTooltip = ({ active, payload, label }: any) => {
     const remaining = potential - actual;
 
     return (
-      <div className="bg-white p-4 border border-slate-100 shadow-[0_10px_30px_rgba(0,0,0,0.08)] rounded-xl">
-        <p className="font-semibold text-slate-800 mb-3">{`Tháng ${label.replace('T', '')}`}</p>
+      <div className="glass-panel/90 backdrop-blur-md p-3 border border-sky-300/30 shadow-lg rounded-xl">
+        <p className="font-semibold text-sky-950 mb-3">{`Tháng ${label.replace('T', '')}`}</p>
         <div className="space-y-2">
           <p className="text-sm flex justify-between items-center gap-4">
-            <span className="text-slate-500">Tổng số tiền có thể thu:</span>
-            <span className="font-medium text-[#2563EB]">{formatVND(potential)}</span>
+            <span className="text-sky-700/80">Tổng số tiền có thể thu:</span>
+            <span className="font-medium text-sky-600">{formatVND(potential)}</span>
           </p>
           <p className="text-sm flex justify-between items-center gap-4">
-            <span className="text-slate-500">Đã thanh toán:</span>
-            <span className="font-semibold text-[#16A34A]">{formatVND(actual)}</span>
+            <span className="text-sky-700/80">Đã thanh toán:</span>
+            <span className="font-semibold text-emerald-500">{formatVND(actual)}</span>
           </p>
-          <p className="text-sm flex justify-between items-center gap-4 pt-2 border-t border-slate-100">
-            <span className="text-slate-500">Chờ thanh toán:</span>
-            <span className="font-medium text-[#EA580C]">{formatVND(remaining)}</span>
+          <p className="text-sm flex justify-between items-center gap-4 pt-2 border-t border-sky-300/30">
+            <span className="text-sky-700/80">Chờ thanh toán:</span>
+            <span className="font-medium text-amber-500">{formatVND(remaining)}</span>
           </p>
         </div>
       </div>
@@ -413,7 +413,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
       <div className="flex justify-between items-center">
         <motion.h1 
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-          className="text-2xl font-bold text-[#1E293B]"
+          className="text-2xl font-bold text-sky-950"
         >
           {getGreeting()}
         </motion.h1>
@@ -425,7 +425,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
               ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100' 
               : notificationPermission === 'granted'
                 ? 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100' 
-                : 'bg-white text-indigo-600 border border-indigo-200 hover:bg-indigo-50'
+                : 'bg-white text-sky-600 border border-indigo-200 hover:bg-sky-50'
           }`}
           title={notificationPermission === 'granted' && fcmToken ? "Đã bật thông báo" : notificationPermission === 'granted' ? "Đang kết nối..." : "Bật thông báo"}
         >
@@ -439,22 +439,22 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
       {inAppNotifications.length > 0 && (
         <motion.div 
           initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
-          className="bg-indigo-50 border border-indigo-100 rounded-[20px] p-4 flex flex-col gap-3 shadow-sm"
+          className="bg-sky-50 border border-indigo-100 rounded-3xl p-4 flex flex-col gap-3 shadow-sm"
         >
           <div className="flex justify-between items-center px-2">
             <h3 className="font-semibold text-indigo-800 flex items-center gap-2">
               <BellRing className="w-5 h-5" /> Thông báo mới ({inAppNotifications.length})
             </h3>
-            <button onClick={() => setInAppNotifications([])} className="text-xs text-indigo-500 hover:text-indigo-700 underline">Xoá tất cả</button>
+            <button onClick={() => setInAppNotifications([])} className="text-xs text-sky-500 hover:text-indigo-700 underline">Xoá tất cả</button>
           </div>
           <div className="flex flex-col gap-2 max-h-60 overflow-y-auto pr-2">
             {inAppNotifications.map((note, idx) => (
-              <div key={idx} className="bg-white p-3 rounded-xl shadow-sm border border-slate-100">
+              <div key={idx} className="glass-panel p-3 rounded-xl shadow-sm border border-sky-300/30">
                 <div className="flex justify-between items-start mb-1">
-                  <h4 className="font-bold text-slate-800">{note.title}</h4>
-                  <span className="text-xs text-slate-400">{note.time.toLocaleTimeString()}</span>
+                  <h4 className="font-bold text-sky-900">{note.title}</h4>
+                  <span className="text-xs text-sky-600/50">{note.time.toLocaleTimeString()}</span>
                 </div>
-                <p className="text-sm text-slate-600">{note.body}</p>
+                <p className="text-sm text-sky-700/80">{note.body}</p>
               </div>
             ))}
           </div>
@@ -467,17 +467,17 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
       >
         <div 
           onClick={() => setActiveTab && setActiveTab('students')}
-          className="bg-white overflow-hidden rounded-[20px] shadow-[0_10px_30px_rgba(0,0,0,0.04)] cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(0,0,0,0.08)] hover:ring-2 hover:ring-indigo-100"
+          className="glass-panel border-sky-300/30 overflow-hidden rounded-3xl shadow-[0_8px_32px_rgba(14,165,233,0.08)] cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(14,165,233,0.15)] hover:ring-2 hover:ring-sky-100"
         >
           <div className="p-6">
             <div className="flex items-center">
               <div className="flex-shrink-0 bg-[#BAE1FF] rounded-xl p-3">
-                <Users className="h-6 w-6 text-[#2563EB]" />
+                <Users className="h-6 w-6 text-sky-600" />
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-[#64748B] truncate">Học viên đang hoạt động</dt>
-                  <dd className="text-3xl font-bold text-[#1E293B] mt-1">{students.filter(s => s.status !== 'inactive').length}</dd>
+                  <dt className="text-sm font-medium text-sky-700/80 truncate">Học viên đang hoạt động</dt>
+                  <dd className="text-3xl font-bold text-sky-950 mt-1">{students.filter(s => s.status !== 'inactive').length}</dd>
                 </dl>
               </div>
             </div>
@@ -486,17 +486,17 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
 
         <div 
           onClick={() => setActiveTab && setActiveTab('classes')}
-          className="bg-white overflow-hidden rounded-[20px] shadow-[0_10px_30px_rgba(0,0,0,0.04)] cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(0,0,0,0.08)] hover:ring-2 hover:ring-green-100"
+          className="glass-panel border-sky-300/30 overflow-hidden rounded-3xl shadow-[0_8px_32px_rgba(14,165,233,0.08)] cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(14,165,233,0.15)] hover:ring-2 hover:ring-sky-100"
         >
           <div className="p-6">
             <div className="flex items-center">
               <div className="flex-shrink-0 bg-[#BAFFC9] rounded-xl p-3">
-                <Calendar className="h-6 w-6 text-[#16A34A]" />
+                <Calendar className="h-6 w-6 text-emerald-500" />
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-[#64748B] truncate">Lớp học tuần này</dt>
-                  <dd className="text-3xl font-bold text-[#1E293B] mt-1">{classesThisWeek}</dd>
+                  <dt className="text-sm font-medium text-sky-700/80 truncate">Lớp học tuần này</dt>
+                  <dd className="text-3xl font-bold text-sky-950 mt-1">{classesThisWeek}</dd>
                 </dl>
               </div>
             </div>
@@ -505,17 +505,17 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
 
         <div 
           onClick={() => setActiveTab && setActiveTab('finances')}
-          className="bg-white overflow-hidden rounded-[20px] shadow-[0_10px_30px_rgba(0,0,0,0.04)] cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(0,0,0,0.08)] hover:ring-2 hover:ring-orange-100"
+          className="glass-panel border-sky-300/30 overflow-hidden rounded-3xl shadow-[0_8px_32px_rgba(14,165,233,0.08)] cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(14,165,233,0.15)] hover:ring-2 hover:ring-sky-100"
         >
           <div className="p-6">
             <div className="flex items-center">
               <div className="flex-shrink-0 bg-[#FFDFBA] rounded-xl p-3">
-                <DongSign className="h-6 w-6 text-[#EA580C]" />
+                <DongSign className="h-6 w-6 text-amber-500" />
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-[#64748B] truncate">Chờ thanh toán</dt>
-                  <dd className="text-2xl font-bold text-[#1E293B] mt-1">{formatVND(choThanhToan)}</dd>
+                  <dt className="text-sm font-medium text-sky-700/80 truncate">Chờ thanh toán</dt>
+                  <dd className="text-2xl font-bold text-sky-950 mt-1">{formatVND(choThanhToan)}</dd>
                 </dl>
               </div>
             </div>
@@ -526,7 +526,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
       {/* Button Tool Copy FCM Token for Dev/Testing */}
       {notificationPermission === 'granted' && fcmToken && (
         <div className="flex justify-end -mt-2">
-           <button onClick={copyFcmToken} className="text-xs text-slate-400 hover:text-indigo-500 underline flex items-center gap-1">
+           <button onClick={copyFcmToken} className="text-xs text-sky-600/50 hover:text-sky-500 underline flex items-center gap-1">
              <span>Copy FCM Token để test gửi thông báo</span>
            </button>
         </div>
@@ -537,9 +537,9 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
         className="grid grid-cols-1 gap-5 lg:grid-cols-2"
       >
         {/* Revenue Trend Chart (50%) */}
-        <div className="bg-white rounded-[20px] shadow-[0_10px_30px_rgba(0,0,0,0.04)] lg:col-span-1 flex flex-col">
-          <div className="p-6 border-b border-slate-50">
-            <h3 className="text-lg font-bold text-[#64748B]">Xu hướng doanh thu</h3>
+        <div className="glass-panel border-sky-300/30 rounded-3xl shadow-[0_8px_32px_rgba(14,165,233,0.08)] lg:col-span-1 flex flex-col">
+          <div className="p-6 border-b border-sky-300/30">
+            <h3 className="text-lg font-bold text-sky-900">Xu hướng doanh thu</h3>
           </div>
           <div className="p-6 flex-1 min-h-[450px]">
             <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
@@ -558,9 +558,9 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
         </div>
 
         {/* Tỷ lệ thu hồi học phí (Donut Chart) (50%) */}
-        <div className="bg-white rounded-[20px] shadow-[0_10px_30px_rgba(0,0,0,0.04)] lg:col-span-1 flex flex-col">
-          <div className="p-6 border-b border-slate-50 flex justify-between items-center">
-            <h3 className="text-lg font-bold text-[#64748B] font-sans">Tỷ lệ thu hồi học phí</h3>
+        <div className="glass-panel border-sky-300/30 rounded-3xl shadow-[0_8px_32px_rgba(14,165,233,0.08)] lg:col-span-1 flex flex-col">
+          <div className="p-6 border-b border-sky-300/30 flex justify-between items-center">
+            <h3 className="text-lg font-bold text-sky-900 font-sans">Tỷ lệ thu hồi học phí</h3>
             <div className="relative">
               <input
                 type="month"
@@ -571,7 +571,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
                     setSelectedMonth(e.target.value);
                   }
                 }}
-                className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB] bg-white shadow-sm w-40 cursor-pointer hover:border-slate-300 transition-colors"
+                className="text-sm border border-sky-300/50 rounded-xl px-3 py-1.5 text-sky-900 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 bg-white/70 shadow-sm w-40 cursor-pointer hover:border-sky-300 transition-colors"
               />
             </div>
           </div>
@@ -612,40 +612,40 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-3xl font-bold text-[#1E293B]">{(tongTienCoTheThu > 0 ? (soTienThanhToan / tongTienCoTheThu) * 100 : 0).toFixed(1)}%</span>
-                <span className="text-xs font-medium text-[#64748B] mt-1">Đã hoàn thành</span>
+                <span className="text-3xl font-bold text-sky-950">{(tongTienCoTheThu > 0 ? (soTienThanhToan / tongTienCoTheThu) * 100 : 0).toFixed(1)}%</span>
+                <span className="text-xs font-medium text-sky-700/80 mt-1">Đã hoàn thành</span>
               </div>
             </div>
             
             <div className="mt-4 space-y-3">
               <div className="flex justify-center">
-                <div className="flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
+                <div className="flex items-center gap-2 bg-sky-50/40 px-4 py-2 rounded-xl border border-sky-300/30">
                   <div className="w-3 h-3 rounded-full bg-[#FFB7B2]"></div>
                   <span className="text-sm text-pink-400 font-bold">Tổng số tiền có thể thu: </span>
-                  <span className="font-bold text-slate-800">{formatVND(tongTienCoTheThu)}</span>
+                  <span className="font-bold text-sky-900">{formatVND(tongTienCoTheThu)}</span>
                 </div>
               </div>
               <div className="flex flex-col gap-2 px-4 max-w-md mx-auto w-full">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-[#BDE0FE]"></div>
-                    <span className="text-sm text-slate-600">Số tiền có thể thu còn lại:</span>
+                    <span className="text-sm text-sky-700/80">Số tiền có thể thu còn lại:</span>
                   </div>
-                  <span className="font-semibold text-slate-800">{formatVND(soTienCoTheThuConLai)}</span>
+                  <span className="font-semibold text-sky-900">{formatVND(soTienCoTheThuConLai)}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-[#BAFFC9]"></div>
-                    <span className="text-sm text-slate-600">Số tiền thanh toán:</span>
+                    <span className="text-sm text-sky-700/80">Số tiền thanh toán:</span>
                   </div>
-                  <span className="font-semibold text-slate-800">{formatVND(soTienThanhToan)}</span>
+                  <span className="font-semibold text-sky-900">{formatVND(soTienThanhToan)}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-[#FFB3BA]"></div>
-                    <span className="text-sm text-slate-600">Chờ thanh toán:</span>
+                    <span className="text-sm text-sky-700/80">Chờ thanh toán:</span>
                   </div>
-                  <span className="font-semibold text-slate-800">{formatVND(choThanhToan)}</span>
+                  <span className="font-semibold text-sky-900">{formatVND(choThanhToan)}</span>
                 </div>
               </div>
             </div>

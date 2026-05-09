@@ -58,7 +58,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
     'bg-teal-100 text-teal-600',
     'bg-cyan-100 text-cyan-600',
     'bg-blue-100 text-blue-600',
-    'bg-indigo-100 text-indigo-600',
+    'bg-indigo-100 text-sky-600',
     'bg-violet-100 text-violet-600',
     'bg-purple-100 text-purple-600',
     'bg-fuchsia-100 text-fuchsia-600',
@@ -229,10 +229,10 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
         className="flex justify-between items-center"
       >
-        <h1 className="text-2xl font-bold text-slate-900">Theo dõi Lớp học</h1>
+        <h1 className="text-2xl font-bold text-sky-950">Theo dõi Lớp học</h1>
         <button
           onClick={() => setIsFormOpen(true)}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-slate-800 bg-[#BAE1FF] hover:bg-[#89CFF0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#BAE1FF] transition-colors"
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl shadow-sm text-sky-900 bg-[#BAE1FF] hover:bg-[#89CFF0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#BAE1FF] transition-colors"
         >
           <Plus className="w-4 h-4 mr-2" />
           Ghi nhận Lớp học
@@ -242,30 +242,30 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
       {isFormOpen && (
         <motion.div 
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-          className="bg-white shadow-[0_10px_30px_rgba(0,0,0,0.04)] rounded-[20px] border border-slate-100 p-6 mb-6 relative"
+          className="glass-panel rounded-3xl shadow-[0_8px_32px_rgba(14,165,233,0.08)] border border-sky-300/30 p-6 mb-6 relative"
         >
           <button 
             onClick={closeForm}
-            className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"
+            className="absolute top-4 right-4 text-sky-600/50 hover:text-sky-700/80"
           >
             <X className="w-5 h-5" />
           </button>
-          <h2 className="text-lg font-medium text-slate-900 mb-4">
+          <h2 className="text-lg font-medium text-sky-950 mb-4">
             {editingId ? 'Sửa thông tin Lớp học' : 'Ghi nhận Lớp học mới'}
           </h2>
           {formError && (
-            <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-md border border-red-200">
+            <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-xl border border-red-200">
               {formError}
             </div>
           )}
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-slate-700">Học viên <span className="text-rose-500">*</span></label>
+                <label className="block text-sm font-medium text-sky-900">Học viên <span className="text-rose-500">*</span></label>
                 <select
                   value={formData.studentId}
                   onChange={e => setFormData({...formData, studentId: e.target.value})}
-                  className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border bg-white"
+                  className="mt-1 block w-full rounded-xl border-sky-300/50 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border glass-panel"
                 >
                   <option value="">Chọn học viên...</option>
                   {students.filter(s => s.status !== 'inactive').map(s => (
@@ -274,98 +274,98 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700">Ngày học <span className="text-rose-500">*</span></label>
+                <label className="block text-sm font-medium text-sky-900">Ngày học <span className="text-rose-500">*</span></label>
                 <input
                   type="date"
                   value={formData.date}
                   onChange={e => setFormData({...formData, date: e.target.value})}
-                  className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                  className="mt-1 block w-full rounded-xl border-sky-300/50 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700">Khung giờ (Tùy chọn)</label>
+                <label className="block text-sm font-medium text-sky-900">Khung giờ (Tùy chọn)</label>
                 <input
                   type="text"
                   ref={timeInputRef}
-                  defaultValue={formData.time}
+                  value={formData.time}
                   onChange={e => setFormData({...formData, time: e.target.value})}
-                  className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border bg-white"
+                  className="mt-1 block w-full rounded-xl border-sky-300/50 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border glass-panel"
                   placeholder="Chọn giờ..."
                 />
               </div>
               <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-slate-700">Chủ đề bài học <span className="text-rose-500">*</span></label>
+                <label className="block text-sm font-medium text-sky-900">Chủ đề bài học <span className="text-rose-500">*</span></label>
                 <input
                   type="text"
                   placeholder="VD: Thì hiện tại hoàn thành, Luyện nói..."
-                  defaultValue={formData.topic}
+                  value={formData.topic}
                   onChange={e => setFormData({...formData, topic: e.target.value})}
-                  className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                  className="mt-1 block w-full rounded-xl border-sky-300/50 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700">Thời lượng (1 buổi = 1h30 phút) <span className="text-rose-500">*</span></label>
+                <label className="block text-sm font-medium text-sky-900">Thời lượng (1 buổi = 1h30 phút) <span className="text-rose-500">*</span></label>
                 <input
                   type="number"
                   min="0.5"
                   step="0.5"
-                  defaultValue={formData.duration}
+                  value={formData.duration}
                   onChange={e => setFormData({...formData, duration: e.target.value})}
-                  className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                  className="mt-1 block w-full rounded-xl border-sky-300/50 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border"
                 />
               </div>
               
-              <div className="sm:col-span-2 mt-2 pt-4 border-t border-slate-100">
-                <h4 className="text-sm font-medium text-indigo-600 mb-3">Đánh giá chi tiết buổi học</h4>
+              <div className="sm:col-span-2 mt-2 pt-4 border-t border-sky-300/30">
+                <h4 className="text-sm font-medium text-sky-600 mb-3">Đánh giá chi tiết buổi học</h4>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700">Điểm mạnh</label>
+                    <label className="block text-sm font-medium text-sky-900">Điểm mạnh</label>
                     <textarea
                       rows={2}
                       placeholder="Những điểm học viên làm tốt..."
-                      defaultValue={formData.strengths}
+                      value={formData.strengths}
                       onChange={e => setFormData({...formData, strengths: e.target.value})}
-                      className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                      className="mt-1 block w-full rounded-xl border-sky-300/50 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700">Điểm yếu</label>
+                    <label className="block text-sm font-medium text-sky-900">Điểm yếu</label>
                     <textarea
                       rows={2}
                       placeholder="Những điểm học viên cần cải thiện..."
-                      defaultValue={formData.weaknesses}
+                      value={formData.weaknesses}
                       onChange={e => setFormData({...formData, weaknesses: e.target.value})}
-                      className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                      className="mt-1 block w-full rounded-xl border-sky-300/50 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700">Các lỗi sai</label>
+                    <label className="block text-sm font-medium text-sky-900">Các lỗi sai</label>
                     <textarea
                       rows={2}
                       placeholder="Các lỗi sai thường gặp..."
-                      defaultValue={formData.mistakes}
+                      value={formData.mistakes}
                       onChange={e => setFormData({...formData, mistakes: e.target.value})}
-                      className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                      className="mt-1 block w-full rounded-xl border-sky-300/50 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700">Cách khắc phục</label>
+                    <label className="block text-sm font-medium text-sky-900">Cách khắc phục</label>
                     <textarea
                       rows={2}
                       placeholder="Giải pháp hoặc bài tập để khắc phục..."
-                      defaultValue={formData.remedies}
+                      value={formData.remedies}
                       onChange={e => setFormData({...formData, remedies: e.target.value})}
-                      className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                      className="mt-1 block w-full rounded-xl border-sky-300/50 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700">Soạn bài cho buổi sau</label>
+                    <label className="block text-sm font-medium text-sky-900">Soạn bài cho buổi sau</label>
                     <textarea
                       rows={2}
                       placeholder="Nội dung cần chuẩn bị cho buổi học tiếp theo..."
-                      defaultValue={formData.nextLessonPrep}
+                      value={formData.nextLessonPrep}
                       onChange={e => setFormData({...formData, nextLessonPrep: e.target.value})}
-                      className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                      className="mt-1 block w-full rounded-xl border-sky-300/50 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border"
                     />
                   </div>
                 </div>
@@ -375,14 +375,14 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
               <button
                 type="button"
                 onClick={closeForm}
-                className="mr-3 bg-white py-2 px-4 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="mr-3 glass-panel py-2 px-4 border border-sky-300/50 rounded-xl shadow-sm text-sm font-medium text-sky-900 hover:bg-sky-50/40 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500"
               >
                 Hủy
               </button>
               <button
                 type="submit"
                 disabled={students.length === 0 || isSubmitting}
-                className="bg-indigo-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-sky-600 py-2 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? 'Đang lưu... ⏳' : (editingId ? 'Lưu thay đổi' : 'Lưu')}
               </button>
@@ -393,15 +393,15 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-        className="bg-white shadow-[0_10px_30px_rgba(0,0,0,0.04)] rounded-2xl overflow-hidden"
+        className="glass-panel shadow-[0_10px_30px_rgba(0,0,0,0.04)] rounded-2xl overflow-hidden"
       >
-        <div className="px-6 py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <h3 className="text-lg leading-6 font-medium text-slate-900">Các buổi học gần đây</h3>
+        <div className="px-6 py-5 border-b border-sky-300/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <h3 className="text-lg leading-6 font-medium text-sky-950">Các buổi học gần đây</h3>
           <div className="flex items-center gap-3">
             <select
               value={filterMonth}
               onChange={(e) => setFilterMonth(e.target.value)}
-              className="block w-32 rounded-md border-slate-200 shadow-sm focus:border-[#BAE1FF] focus:ring-[#BAE1FF] sm:text-sm p-2 border bg-slate-50"
+              className="block w-32 rounded-xl border-sky-300/40 shadow-sm focus:border-[#BAE1FF] focus:ring-[#BAE1FF] sm:text-sm p-2 border bg-sky-50/40"
             >
               <option value="all">Tất cả tháng</option>
               {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
@@ -411,7 +411,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
             <select
               value={filterYear}
               onChange={(e) => setFilterYear(e.target.value)}
-              className="block w-28 rounded-md border-slate-200 shadow-sm focus:border-[#BAE1FF] focus:ring-[#BAE1FF] sm:text-sm p-2 border bg-slate-50"
+              className="block w-28 rounded-xl border-sky-300/40 shadow-sm focus:border-[#BAE1FF] focus:ring-[#BAE1FF] sm:text-sm p-2 border bg-sky-50/40"
             >
               <option value="all">Tất cả năm</option>
               {availableYears.map(year => (
@@ -422,7 +422,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full">
-            <thead className="bg-slate-50 border-b border-slate-100">
+            <thead className="bg-sky-50/40 border-b border-sky-300/20">
               <tr>
                 <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-[#64748B] uppercase tracking-wider">Ngày/Giờ</th>
                 <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-[#64748B] uppercase tracking-wider">Học viên</th>
@@ -435,28 +435,28 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
             <tbody className="bg-white divide-y divide-[#F1F5F9]">
               {sortedClasses.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-10 text-center text-sm text-slate-500">
+                  <td colSpan={6} className="px-6 py-10 text-center text-sm text-sky-700/80">
                     Chưa có lớp học nào được ghi nhận trong thời gian này.
                   </td>
                 </tr>
               ) : (
                 sortedClasses.map((cls) => (
                   <tr key={cls.id} className="hover:bg-[#F8FAFC] transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-sky-950">
                       {!isNaN(parseDateSafe(cls.date).getTime()) 
                         ? parseDateSafe(cls.date).toLocaleDateString('vi-VN') 
                         : 'Ngày không hợp lệ'}
-                      {cls.time && <span className="text-slate-500 ml-2 text-xs">{cls.time}</span>}
+                      {cls.time && <span className="text-sky-700/80 ml-2 text-xs">{cls.time}</span>}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStudentColor(cls.studentId)}`}>
                         {getStudentName(cls.studentId)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-500">
+                    <td className="px-6 py-4 text-sm text-sky-700/80">
                       {cls.topic}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-sky-700/80">
                       {cls.duration} buổi
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -473,14 +473,14 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button 
                         onClick={() => editClass(cls)} 
-                        className="text-slate-400 hover:text-indigo-600 mr-4 transition-colors"
+                        className="text-sky-600/50 hover:text-sky-600 mr-4 transition-colors"
                         title="Sửa"
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button 
                         onClick={() => handleDelete(cls.id)} 
-                        className="text-slate-400 hover:text-rose-600 transition-colors"
+                        className="text-sky-600/50 hover:text-rose-600 transition-colors"
                         title="Xóa"
                       >
                         <Trash2 className="w-4 h-4" />

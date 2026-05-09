@@ -285,7 +285,7 @@ export default function PersonalFinance({
   }, {} as Record<string, FinanceHistoryRecord[]>);
 
   return (
-    <div className="min-h-screen transition-colors duration-500 bg-[#f0f9ff] text-slate-800">
+    <div className="min-h-screen transition-colors duration-500 bg-[#f0f9ff] text-sky-900">
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -294,7 +294,7 @@ export default function PersonalFinance({
           </h1>
           <div className="flex items-center gap-4">
           <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2 bg-white/50 px-3 py-1.5 rounded-xl border border-white/20">
+            <div className="flex items-center gap-2 glass-panel/50 px-3 py-1.5 rounded-xl border border-white/20">
               <span className="text-sm opacity-70">Tiền mặt:</span>
               <input 
                 type="text"
@@ -318,7 +318,7 @@ export default function PersonalFinance({
               />
               <span className="text-sm opacity-70">đ</span>
             </div>
-            <div className="flex items-center gap-2 bg-white/50 px-3 py-1.5 rounded-xl border border-white/20">
+            <div className="flex items-center gap-2 glass-panel/50 px-3 py-1.5 rounded-xl border border-white/20">
               <span className="text-sm opacity-70">Ngân hàng:</span>
               <input 
                 type="text"
@@ -356,7 +356,7 @@ export default function PersonalFinance({
             }}
             className="grid grid-cols-1 md:grid-cols-3 gap-6"
           >
-            <DashboardCard title="Tổng Số Dư" amount={currentBalance} color="text-indigo-600" />
+            <DashboardCard title="Tổng Số Dư" amount={currentBalance} color="text-sky-600" />
             <DashboardCard title="Tiền Mặt" amount={currentCashBalance} color="text-emerald-600" />
             <DashboardCard title="Ngân Hàng" amount={currentBankingBalance} color="text-blue-600" />
           </motion.div>
@@ -435,7 +435,7 @@ export default function PersonalFinance({
         >
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">Mục Tiêu Tiết Kiệm</h2>
-            <button onClick={() => setShowGoalForm(!showGoalForm)} className="p-1.5 bg-cyan-100 text-cyan-600 rounded-lg hover:bg-cyan-200 transition-colors">
+            <button onClick={() => setShowGoalForm(!showGoalForm)} className="p-1.5 bg-cyan-100 text-cyan-600 rounded-xl hover:bg-cyan-200 transition-colors">
               <Plus className="w-4 h-4" />
             </button>
           </div>
@@ -448,7 +448,7 @@ export default function PersonalFinance({
               >
                 <input
                   type="text" placeholder="Tên mục tiêu" value={goalName} onChange={e => setGoalName(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg bg-white/50 border border-slate-200 outline-none" required
+                  className="w-full px-3 py-2 text-sm rounded-xl glass-panel/50 border border-sky-300/40 outline-none" required
                 />
                 <input
                   type="text" placeholder="Số tiền cần đạt" value={goalTargetStr}
@@ -456,9 +456,9 @@ export default function PersonalFinance({
                     const val = e.target.value.replace(/[^0-9]/g, '');
                     setGoalTargetStr(val ? formatNumber(parseInt(val, 10)) : '');
                   }}
-                  className="w-full px-3 py-2 text-sm rounded-lg bg-white/50 border border-slate-200 outline-none" required
+                  className="w-full px-3 py-2 text-sm rounded-xl glass-panel/50 border border-sky-300/40 outline-none" required
                 />
-                <button type="submit" className="w-full py-2 text-sm bg-cyan-500 text-white rounded-lg">Thêm</button>
+                <button type="submit" className="w-full py-2 text-sm bg-cyan-500 text-white rounded-xl">Thêm</button>
               </motion.form>
             )}
           </AnimatePresence>
@@ -468,7 +468,7 @@ export default function PersonalFinance({
               const percent = goal.targetAmount ? Math.min(100, Math.round((goal.currentAmount / goal.targetAmount) * 100)) : 0;
               const isDepositing = depositGoalId === goal.id;
               return (
-                <div key={goal.id} className="p-4 bg-white/40 rounded-xl border border-white/20 relative group">
+                <div key={goal.id} className="p-4 glass-panel/40 rounded-xl border border-white/20 relative group">
                   <button onClick={() => handleDeleteGoal(goal.id)} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-rose-500 transition-opacity">
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -476,7 +476,7 @@ export default function PersonalFinance({
                     {/* SVG Circle Progress */}
                     <div className="relative w-16 h-16 flex-shrink-0">
                       <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3" className="text-slate-200" />
+                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3" className="text-sky-300/50" />
                         <motion.path 
                           initial={{ strokeDasharray: "0, 100" }}
                           animate={{ strokeDasharray: `${percent}, 100` }}
@@ -516,7 +516,7 @@ export default function PersonalFinance({
                             const val = e.target.value.replace(/[^0-9]/g, '');
                             setDepositAmountStr(val ? formatNumber(parseInt(val, 10)) : '');
                           }}
-                          className="flex-1 px-2 py-1 text-sm rounded bg-white/50 border border-slate-200 outline-none" required
+                          className="flex-1 px-2 py-1 text-sm rounded glass-panel/50 border border-sky-300/40 outline-none" required
                         />
                         <button type="submit" className="px-3 py-1 bg-cyan-500 text-white text-sm rounded">Nạp</button>
                       </motion.form>
@@ -539,42 +539,42 @@ export default function PersonalFinance({
             <h2 className="text-xl font-semibold mb-4">Thêm Giao Dịch</h2>
             
             {/* Toggle Type */}
-            <div className="flex p-1 bg-slate-200/50 rounded-xl mb-4 relative">
+            <div className="flex p-1 bg-sky-200/50 rounded-xl mb-4 relative">
               <div 
-                className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white rounded-lg shadow-sm transition-all duration-300 ease-out ${type === 'income' ? 'left-1' : 'left-[calc(50%+2px)]'}`}
+                className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white rounded-xl shadow-sm transition-all duration-300 ease-out ${type === 'income' ? 'left-1' : 'left-[calc(50%+2px)]'}`}
               />
               <button
                 type="button"
                 onClick={() => setType('income')}
-                className={`flex-1 py-2 text-sm font-medium z-10 transition-colors ${type === 'income' ? 'text-emerald-600' : 'text-slate-500'}`}
+                className={`flex-1 py-2 text-sm font-medium z-10 transition-colors ${type === 'income' ? 'text-emerald-600' : 'text-sky-700/80'}`}
               >
                 Thu Nhập
               </button>
               <button
                 type="button"
                 onClick={() => setType('expense')}
-                className={`flex-1 py-2 text-sm font-medium z-10 transition-colors ${type === 'expense' ? 'text-rose-600' : 'text-slate-500'}`}
+                className={`flex-1 py-2 text-sm font-medium z-10 transition-colors ${type === 'expense' ? 'text-rose-600' : 'text-sky-700/80'}`}
               >
                 Chi Tiêu
               </button>
             </div>
 
             {/* Toggle Source */}
-            <div className="flex p-1 bg-slate-200/50 rounded-xl mb-6 relative">
+            <div className="flex p-1 bg-sky-200/50 rounded-xl mb-6 relative">
               <div 
-                className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white rounded-lg shadow-sm transition-all duration-300 ease-out ${source === 'cash' ? 'left-1' : 'left-[calc(50%+2px)]'}`}
+                className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white rounded-xl shadow-sm transition-all duration-300 ease-out ${source === 'cash' ? 'left-1' : 'left-[calc(50%+2px)]'}`}
               />
               <button
                 type="button"
                 onClick={() => setSource('cash')}
-                className={`flex-1 py-2 text-sm font-medium z-10 transition-colors ${source === 'cash' ? 'text-slate-800' : 'text-slate-500'}`}
+                className={`flex-1 py-2 text-sm font-medium z-10 transition-colors ${source === 'cash' ? 'text-sky-900' : 'text-sky-700/80'}`}
               >
                 Tiền mặt
               </button>
               <button
                 type="button"
                 onClick={() => setSource('banking')}
-                className={`flex-1 py-2 text-sm font-medium z-10 transition-colors ${source === 'banking' ? 'text-slate-800' : 'text-slate-500'}`}
+                className={`flex-1 py-2 text-sm font-medium z-10 transition-colors ${source === 'banking' ? 'text-sky-900' : 'text-sky-700/80'}`}
               >
                 Ngân hàng
               </button>
@@ -590,7 +590,7 @@ export default function PersonalFinance({
                     const val = e.target.value.replace(/[^0-9]/g, '');
                     setAmountStr(val ? formatNumber(parseInt(val, 10)) : '');
                   }}
-                  className="w-full px-4 py-2 rounded-xl bg-white/50 border border-slate-200 focus:ring-2 focus:ring-cyan-500 outline-none transition-all"
+                  className="w-full px-4 py-2 rounded-xl glass-panel/50 border border-sky-300/40 focus:ring-2 focus:ring-cyan-500 outline-none transition-all"
                   placeholder="0"
                   required
                 />
@@ -602,7 +602,7 @@ export default function PersonalFinance({
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   onBlur={handleDescriptionBlur}
-                  className="w-full px-4 py-2 rounded-xl bg-white/50 border border-slate-200 focus:ring-2 focus:ring-cyan-500 outline-none transition-all"
+                  className="w-full px-4 py-2 rounded-xl glass-panel/50 border border-sky-300/40 focus:ring-2 focus:ring-cyan-500 outline-none transition-all"
                   placeholder="VD: Ăn trưa"
                   required
                 />
@@ -616,7 +616,7 @@ export default function PersonalFinance({
                   type="text"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-4 py-2 rounded-xl bg-white/50 border border-slate-200 focus:ring-2 focus:ring-cyan-500 outline-none transition-all"
+                  className="w-full px-4 py-2 rounded-xl glass-panel/50 border border-sky-300/40 focus:ring-2 focus:ring-cyan-500 outline-none transition-all"
                   placeholder="VD: Ăn uống"
                   required
                 />
@@ -627,7 +627,7 @@ export default function PersonalFinance({
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="w-full px-4 py-2 rounded-xl bg-white/50 border border-slate-200 focus:ring-2 focus:ring-cyan-500 outline-none transition-all"
+                  className="w-full px-4 py-2 rounded-xl glass-panel/50 border border-sky-300/40 focus:ring-2 focus:ring-cyan-500 outline-none transition-all"
                   required
                 />
               </div>
@@ -654,11 +654,11 @@ export default function PersonalFinance({
                     setConsolidateBankingStr(currentBankingBalance.toString());
                     setShowConsolidateModal(true);
                   }} 
-                  className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
+                  className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
                 >
                   <Archive className="w-4 h-4" /> Chốt Sổ
                 </button>
-                <button onClick={exportCSV} className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors">
+                <button onClick={exportCSV} className="flex items-center gap-2 px-3 py-1.5 bg-sky-100/50 rounded-xl text-sm font-medium hover:bg-sky-200 transition-colors">
                   <Download className="w-4 h-4" /> Xuất CSV
                 </button>
               </div>
@@ -667,10 +667,10 @@ export default function PersonalFinance({
             <div className="space-y-6">
               {Object.keys(groupedTransactions).sort().reverse().map(month => (
                 <div key={month}>
-                  <h3 className="text-sm font-bold opacity-60 mb-3 border-b border-slate-200 pb-1">{month}</h3>
+                  <h3 className="text-sm font-bold opacity-60 mb-3 border-b border-sky-300/40 pb-1">{month}</h3>
                   <div className="space-y-3">
                     {groupedTransactions[month].map(t => (
-                      <div key={t.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-white/50 transition-colors group">
+                      <div key={t.id} className="flex items-center justify-between p-3 rounded-xl hover:glass-panel/50 transition-colors group">
                         <div className="flex items-center gap-4">
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center ${t.type === 'income' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}>
                             {t.type === 'income' ? <Plus className="w-5 h-5" /> : <Minus className="w-5 h-5" />}
@@ -711,7 +711,7 @@ export default function PersonalFinance({
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {Object.keys(groupedHistory).sort().reverse().map(month => (
                 <div key={month} className="space-y-3">
-                  <h3 className="text-sm font-bold opacity-60 border-b border-slate-200 pb-1">{month}</h3>
+                  <h3 className="text-sm font-bold opacity-60 border-b border-sky-300/40 pb-1">{month}</h3>
                   {groupedHistory[month].map(record => {
                     const date = new Date(record.timestamp);
                     const income = record.transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
@@ -723,14 +723,14 @@ export default function PersonalFinance({
                         className="p-4 bg-white/40 rounded-xl border border-white/20 hover:bg-white/60 cursor-pointer transition-all group flex items-center justify-between"
                       >
                         <div>
-                          <p className="font-medium flex items-center gap-2">Chốt sổ <span className="text-xs font-normal opacity-70 bg-slate-200 px-2 py-0.5 rounded">{date.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})}</span></p>
+                          <p className="font-medium flex items-center gap-2">Chốt sổ <span className="text-xs font-normal opacity-70 bg-sky-200 px-2 py-0.5 rounded">{date.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})}</span></p>
                           <p className="text-xs opacity-70 mt-1">{date.toLocaleDateString('vi-VN')}</p>
                           <div className="mt-2 flex gap-3 text-xs">
                             <span className="text-emerald-600">+{formatNumber(income)}</span>
                             <span className="text-rose-600">-{formatNumber(expense)}</span>
                           </div>
                         </div>
-                        <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-cyan-600 transform group-hover:translate-x-1 transition-all" />
+                        <ChevronRight className="w-5 h-5 text-sky-600/50 group-hover:text-cyan-600 transform group-hover:translate-x-1 transition-all" />
                       </div>
                     );
                   })}
@@ -747,26 +747,26 @@ export default function PersonalFinance({
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+              className="absolute inset-0 bg-sky-950/40 backdrop-blur-sm"
               onClick={() => setShowConsolidateModal(false)}
             />
             <motion.div 
                initial={{ opacity: 0, scale: 0.95, y: 10 }} 
                animate={{ opacity: 1, scale: 1, y: 0 }} 
                exit={{ opacity: 0, scale: 0.95, y: 10 }}
-               className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden relative z-10"
+               className="glass-panel rounded-2xl shadow-xl w-full max-w-md overflow-hidden relative z-10"
             >
-              <div className="flex items-center justify-between p-4 border-b border-slate-100">
+              <div className="flex items-center justify-between p-4 border-b border-sky-300/30">
                 <h3 className="font-semibold text-lg flex items-center gap-2">
                   <Archive className="w-5 h-5 text-cyan-600" />
                   Gộp Lịch Sử & Chốt Sổ
                 </h3>
-                <button onClick={() => setShowConsolidateModal(false)} className="p-1 hover:bg-slate-100 rounded-lg transition-colors">
-                  <X className="w-5 h-5 text-slate-500" />
+                <button onClick={() => setShowConsolidateModal(false)} className="p-1 hover:bg-sky-100/50 rounded-xl transition-colors">
+                  <X className="w-5 h-5 text-sky-700/80" />
                 </button>
               </div>
               <form onSubmit={handleConsolidate} className="p-6 space-y-4">
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-sky-700/80">
                   Thao tác này sẽ lưu lại toàn bộ giao dịch hiện tại thành 1 bản ghi lịch sử, làm trống danh sách giao dịch, và cập nhật số dư thực tế mới nhất.
                 </p>
                 
@@ -781,7 +781,7 @@ export default function PersonalFinance({
                           const val = e.target.value.replace(/[^0-9]/g, '');
                           setConsolidateCashStr(val);
                         }}
-                        className="w-full px-4 py-2 pr-8 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-cyan-500 outline-none transition-all"
+                        className="w-full px-4 py-2 pr-8 rounded-xl bg-sky-50/40 border border-sky-300/40 focus:ring-2 focus:ring-cyan-500 outline-none transition-all"
                         required
                       />
                       <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm opacity-50">đ</span>
@@ -797,7 +797,7 @@ export default function PersonalFinance({
                           const val = e.target.value.replace(/[^0-9]/g, '');
                           setConsolidateBankingStr(val);
                         }}
-                        className="w-full px-4 py-2 pr-8 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-cyan-500 outline-none transition-all"
+                        className="w-full px-4 py-2 pr-8 rounded-xl bg-sky-50/40 border border-sky-300/40 focus:ring-2 focus:ring-cyan-500 outline-none transition-all"
                         required
                       />
                       <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm opacity-50">đ</span>
@@ -809,7 +809,7 @@ export default function PersonalFinance({
                    <button
                     type="button"
                     onClick={() => setShowConsolidateModal(false)}
-                    className="flex-1 py-2 rounded-xl bg-slate-100 text-slate-700 font-medium hover:bg-slate-200 transition-all text-sm"
+                    className="flex-1 py-2 rounded-xl bg-sky-100/50 text-sky-900 font-medium hover:bg-sky-200 transition-all text-sm"
                   >
                     Hủy
                   </button>
@@ -832,7 +832,7 @@ export default function PersonalFinance({
           <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
              <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+              className="absolute inset-0 bg-sky-950/60 backdrop-blur-sm"
               onClick={() => setSelectedHistoryRecord(null)}
             />
             <motion.div 
@@ -841,7 +841,7 @@ export default function PersonalFinance({
                exit={{ opacity: 0, scale: 0.95, y: 10 }}
                className="bg-[#f8fafc] rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col relative z-10"
             >
-              <div className="flex items-center justify-between p-5 border-b border-slate-200 bg-white rounded-t-2xl">
+              <div className="flex items-center justify-between p-5 border-b border-sky-300/40 glass-panel rounded-t-2xl">
                 <div>
                   <h3 className="font-bold text-xl flex items-center gap-2">
                     <History className="w-5 h-5 text-cyan-600" />
@@ -852,30 +852,30 @@ export default function PersonalFinance({
                     {new Date(selectedHistoryRecord.timestamp).toLocaleString('vi-VN')}
                   </p>
                 </div>
-                <button onClick={() => setSelectedHistoryRecord(null)} className="p-2 hover:bg-slate-100 rounded-full transition-colors bg-slate-50">
-                  <X className="w-5 h-5 text-slate-500" />
+                <button onClick={() => setSelectedHistoryRecord(null)} className="p-2 hover:bg-sky-100/50 rounded-full transition-colors bg-sky-50/40">
+                  <X className="w-5 h-5 text-sky-700/80" />
                 </button>
               </div>
 
               <div className="overflow-y-auto p-6 space-y-6">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                  <div className="glass-panel p-4 rounded-xl border border-sky-300/30 shadow-sm">
                     <p className="text-sm opacity-60 font-medium">Số Dư Tiền Mặt (Cũ)</p>
                     <p className="text-xl font-bold mt-1 text-emerald-600">{formatNumber(selectedHistoryRecord.initialBalances.cash)} đ</p>
                   </div>
-                  <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                  <div className="glass-panel p-4 rounded-xl border border-sky-300/30 shadow-sm">
                     <p className="text-sm opacity-60 font-medium">Số Dư Ngân Hàng (Cũ)</p>
                     <p className="text-xl font-bold mt-1 text-blue-600">{formatNumber(selectedHistoryRecord.initialBalances.banking)} đ</p>
                   </div>
                 </div>
 
                 <div>
-                   <h4 className="font-semibold text-slate-700 mb-3 ml-1 flex items-center gap-2">
+                   <h4 className="font-semibold text-sky-900 mb-3 ml-1 flex items-center gap-2">
                      Giao Dịch Ghi Nhận ({selectedHistoryRecord.transactions.length})
                    </h4>
-                   <div className="bg-white rounded-xl border border-slate-100 shadow-sm divide-y divide-slate-100">
+                   <div className="glass-panel rounded-xl border border-sky-300/30 shadow-sm divide-y divide-sky-300/30">
                      {selectedHistoryRecord.transactions.map(t => (
-                        <div key={t.id} className="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors">
+                        <div key={t.id} className="flex items-center justify-between p-4 hover:bg-sky-50/40 transition-colors">
                           <div className="flex items-center gap-4">
                             <div className={`w-10 h-10 rounded-full flex items-center justify-center ${t.type === 'income' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}>
                               {t.type === 'income' ? <Plus className="w-4 h-4" /> : <Minus className="w-4 h-4" />}
