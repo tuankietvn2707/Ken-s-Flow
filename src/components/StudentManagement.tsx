@@ -408,7 +408,7 @@ export default function StudentManagement({ students, addStudent, updateStudent,
                   <input
                     type="text"
                     placeholder="VD: Nguyễn Văn"
-                    value={formData.lastName}
+                    defaultValue={formData.lastName}
                     onChange={e => {
                       setFormData({...formData, lastName: e.target.value});
                       if (fieldErrors.lastName) setFieldErrors({...fieldErrors, lastName: ''});
@@ -422,7 +422,7 @@ export default function StudentManagement({ students, addStudent, updateStudent,
                   <input
                     type="text"
                     placeholder="VD: A"
-                    value={formData.firstName}
+                    defaultValue={formData.firstName}
                     onChange={e => {
                       setFormData({...formData, firstName: e.target.value});
                       if (fieldErrors.firstName) setFieldErrors({...fieldErrors, firstName: ''});
@@ -436,7 +436,7 @@ export default function StudentManagement({ students, addStudent, updateStudent,
                   <input
                     type="number"
                     placeholder="VD: 2009"
-                    value={formData.birthYear}
+                    defaultValue={formData.birthYear}
                     onChange={e => {
                       setFormData({...formData, birthYear: e.target.value});
                       if (fieldErrors.birthYear) setFieldErrors({...fieldErrors, birthYear: ''});
@@ -461,7 +461,7 @@ export default function StudentManagement({ students, addStudent, updateStudent,
                   <input
                     type="text"
                     placeholder="VD: Học sinh, Nhân viên ngân hàng..."
-                    value={formData.occupation}
+                    defaultValue={formData.occupation}
                     onChange={e => setFormData({...formData, occupation: e.target.value})}
                     className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border bg-white"
                   />
@@ -498,7 +498,7 @@ export default function StudentManagement({ students, addStudent, updateStudent,
                   <input
                     type="text"
                     placeholder="VD: VSTEP, IELTS 6.5, Giao tiếp..."
-                    value={formData.goal}
+                    defaultValue={formData.goal}
                     onChange={e => setFormData({...formData, goal: e.target.value})}
                     className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm p-2 border bg-white"
                   />
@@ -563,7 +563,7 @@ export default function StudentManagement({ students, addStudent, updateStudent,
                   <input
                     type="text"
                     placeholder="VD: Tối Thứ 3/Thứ 5"
-                    value={formData.schedule}
+                    defaultValue={formData.schedule}
                     onChange={e => setFormData({...formData, schedule: e.target.value})}
                     className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2 border bg-white"
                   />
@@ -584,7 +584,7 @@ export default function StudentManagement({ students, addStudent, updateStudent,
                   <textarea
                     rows={3}
                     placeholder="Ghi chú về điểm mạnh, điểm yếu, lộ trình học..."
-                    value={formData.notes}
+                    defaultValue={formData.notes}
                     onChange={e => setFormData({...formData, notes: e.target.value})}
                     className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2 border bg-white"
                   />

@@ -287,7 +287,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                 <input
                   type="text"
                   ref={timeInputRef}
-                  value={formData.time}
+                  defaultValue={formData.time}
                   onChange={e => setFormData({...formData, time: e.target.value})}
                   className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border bg-white"
                   placeholder="Chọn giờ..."
@@ -298,7 +298,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                 <input
                   type="text"
                   placeholder="VD: Thì hiện tại hoàn thành, Luyện nói..."
-                  value={formData.topic}
+                  defaultValue={formData.topic}
                   onChange={e => setFormData({...formData, topic: e.target.value})}
                   className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
                 />
@@ -309,7 +309,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                   type="number"
                   min="0.5"
                   step="0.5"
-                  value={formData.duration}
+                  defaultValue={formData.duration}
                   onChange={e => setFormData({...formData, duration: e.target.value})}
                   className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
                 />
@@ -323,7 +323,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                     <textarea
                       rows={2}
                       placeholder="Những điểm học viên làm tốt..."
-                      value={formData.strengths}
+                      defaultValue={formData.strengths}
                       onChange={e => setFormData({...formData, strengths: e.target.value})}
                       className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
                     />
@@ -333,7 +333,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                     <textarea
                       rows={2}
                       placeholder="Những điểm học viên cần cải thiện..."
-                      value={formData.weaknesses}
+                      defaultValue={formData.weaknesses}
                       onChange={e => setFormData({...formData, weaknesses: e.target.value})}
                       className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
                     />
@@ -343,7 +343,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                     <textarea
                       rows={2}
                       placeholder="Các lỗi sai thường gặp..."
-                      value={formData.mistakes}
+                      defaultValue={formData.mistakes}
                       onChange={e => setFormData({...formData, mistakes: e.target.value})}
                       className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
                     />
@@ -353,7 +353,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                     <textarea
                       rows={2}
                       placeholder="Giải pháp hoặc bài tập để khắc phục..."
-                      value={formData.remedies}
+                      defaultValue={formData.remedies}
                       onChange={e => setFormData({...formData, remedies: e.target.value})}
                       className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
                     />
@@ -363,7 +363,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                     <textarea
                       rows={2}
                       placeholder="Nội dung cần chuẩn bị cho buổi học tiếp theo..."
-                      value={formData.nextLessonPrep}
+                      defaultValue={formData.nextLessonPrep}
                       onChange={e => setFormData({...formData, nextLessonPrep: e.target.value})}
                       className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
                     />
