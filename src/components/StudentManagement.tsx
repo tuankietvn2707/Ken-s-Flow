@@ -45,7 +45,7 @@ export default function StudentManagement({ students, addStudent, updateStudent,
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
         className="flex justify-between items-center"
       >
-        <h1 className="text-2xl font-bold text-theme-primary">Quản lý Học viên</h1>
+        <h1 className="text-2xl font-bold text-sky-950">Quản lý Học viên</h1>
         <button
           onClick={() => setIsFormOpen(true)}
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500"

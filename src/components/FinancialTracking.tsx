@@ -111,14 +111,14 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
         className="flex justify-between items-center"
       >
-        <h1 className="text-2xl font-bold text-theme-primary">Quản lý Tài chính</h1>
+        <h1 className="text-2xl font-bold text-sky-950">Quản lý Tài chính</h1>
         <div className="flex gap-4">
-          <div className="glass-panel px-4 py-2 rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.04)] border border-theme">
-            <span className="text-sm text-theme-muted mr-2">Số tiền có thể thu:</span>
+          <div className="glass-panel px-4 py-2 rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.04)] border border-sky-300/30">
+            <span className="text-sm text-sky-700/80 mr-2">Số tiền có thể thu:</span>
             <span className="text-lg font-bold text-emerald-600">{formatVND(totalPotentialRevenue)}</span>
           </div>
-          <div className="glass-panel px-4 py-2 rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.04)] border border-theme">
-            <span className="text-sm text-theme-muted mr-2">Chờ Thanh Toán:</span>
+          <div className="glass-panel px-4 py-2 rounded-3xl shadow-[0_4px_12px_rgba(0,0,0,0.04)] border border-sky-300/30">
+            <span className="text-sm text-sky-700/80 mr-2">Chờ Thanh Toán:</span>
             <span className="text-lg font-bold text-rose-600">{formatVND(totalOutstanding)}</span>
           </div>
         </div>
@@ -127,46 +127,40 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
       <motion.div 
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
         className="glass rounded-3xl border overflow-hidden"
-        style={{ 
-          background: 'var(--card-bg)', 
-          borderColor: 'var(--glass-border)',
-          boxShadow: '0 8px 32px var(--glass-shadow)' 
-        }}
+        
       >
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-sky-300/40">
-            <thead className="bg-theme-section">
+            <thead className="bg-sky-50/40">
               <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-theme-muted uppercase tracking-wider">Học viên</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-theme-muted uppercase tracking-wider">Học phí/Buổi</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-theme-muted uppercase tracking-wider">Số buổi chưa thu</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-theme-muted uppercase tracking-wider">Số tiền có thể thu</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-theme-muted uppercase tracking-wider">Chờ Thanh Toán</th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-theme-muted uppercase tracking-wider">Thao tác</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-sky-700/80 uppercase tracking-wider">Học viên</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-sky-700/80 uppercase tracking-wider">Học phí/Buổi</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-sky-700/80 uppercase tracking-wider">Số buổi chưa thu</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-sky-700/80 uppercase tracking-wider">Số tiền có thể thu</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-sky-700/80 uppercase tracking-wider">Chờ Thanh Toán</th>
+                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-sky-700/80 uppercase tracking-wider">Thao tác</th>
               </tr>
             </thead>
             <tbody 
-              className="divide-y divide-[var(--glass-border)]"
-              style={{ background: 'var(--table-body-bg)' }}
-            >
+              className="bg-white divide-y divide-sky-300/40">
               {allFinancials.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-10 text-center text-sm" style={{ color: 'var(--table-body-empty-color)' }}>
+                  <td colSpan={6} className="px-6 py-10 text-center text-sm text-sky-700/80" >
                     Chưa có học viên nào. Vui lòng thêm học viên để theo dõi tài chính.
                   </td>
                 </tr>
               ) : (
                 allFinancials.map(({ student, totalUnpaidSessions, totalOwed, potentialRevenue, unpaidClassIds, unpaidClasses, hasPaidClasses }) => (
-                  <tr key={student.id} className="hover:bg-theme-section">
+                  <tr key={student.id} className="hover:bg-sky-50/40">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-theme-primary">{student.name}</div>
+                      <div className="text-sm font-medium text-sky-950">{student.name}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-theme-muted">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-sky-700/80">
                       {formatVND(student.fee)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        totalUnpaidSessions > 0 ? 'bg-rose-100 text-rose-800' : 'bg-theme-section text-theme-secondary'
+                        totalUnpaidSessions > 0 ? 'bg-rose-100 text-rose-800' : 'bg-sky-50/40 text-sky-900'
                       }`}>
                         {totalUnpaidSessions} / {student.feeCycle} buổi
                       </span>
@@ -190,7 +184,7 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
                           className={`inline-flex items-center px-2 py-1.5 text-xs font-medium rounded shadow-sm transition-colors ${
                             hasPaidClasses
                               ? 'bg-amber-100 text-amber-700 hover:bg-amber-200 border border-amber-200'
-                              : 'bg-theme-section text-theme-muted border border-theme cursor-not-allowed opacity-50'
+                              : 'bg-sky-50/40 text-sky-700/80 border border-sky-300/30 cursor-not-allowed opacity-50'
                           }`}
                         >
                           <RotateCcw className="w-3.5 h-3.5" />
@@ -222,54 +216,54 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-sky-900/20 backdrop-blur-sm p-4">
           <div className="glass-panel rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
             {/* Modal Header */}
-            <div className="flex justify-between items-center p-4 border-b border-theme">
-              <h3 className="text-lg font-bold text-theme-secondary">Biên lai thanh toán</h3>
+            <div className="flex justify-between items-center p-4 border-b border-sky-300/30">
+              <h3 className="text-lg font-bold text-sky-900">Biên lai thanh toán</h3>
               <button 
                 onClick={() => setIsReceiptModalOpen(false)}
-                className="text-theme-muted hover:text-theme-muted transition-colors p-1 rounded-full hover:bg-theme-section"
+                className="text-sky-700/80 hover:text-sky-700/80 transition-colors p-1 rounded-full hover:bg-sky-50/40"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Receipt Content to be captured */}
-            <div className="p-6 bg-theme-section flex-1 overflow-y-auto">
+            <div className="p-6 bg-sky-50/40 flex-1 overflow-y-auto">
               <div 
                 ref={receiptRef} 
-                className="glass rounded-[32px] p-8 border border-theme shadow-sm border border-theme relative overflow-hidden"
+                className="glass rounded-[32px] p-8 border border-sky-300/30 shadow-sm border border-sky-300/30 relative overflow-hidden"
               >
                 {/* Decorative top bar */}
                 <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400"></div>
                 
                 <div className="text-center mb-8 mt-2">
-                  <h2 className="text-3xl font-black text-theme-secondary tracking-tight">English Tutor</h2>
-                  <h3 className="text-xl font-bold text-theme-secondary mt-1">Receipt</h3>
-                  <p className="text-sm text-theme-muted italic mt-2">Biên lai thanh toán học phí</p>
+                  <h2 className="text-3xl font-black text-sky-900 tracking-tight">English Tutor</h2>
+                  <h3 className="text-xl font-bold text-sky-900 mt-1">Receipt</h3>
+                  <p className="text-sm text-sky-700/80 italic mt-2">Biên lai thanh toán học phí</p>
                 </div>
 
                 <div className="space-y-6">
-                  <div className="flex justify-between items-end border-b border-theme pb-4">
-                    <div className="text-theme-muted text-sm">Học viên</div>
-                    <div className="font-bold text-lg text-theme-secondary">{receiptData.student.name}</div>
+                  <div className="flex justify-between items-end border-b border-sky-300/30 pb-4">
+                    <div className="text-sky-700/80 text-sm">Học viên</div>
+                    <div className="font-bold text-lg text-sky-900">{receiptData.student.name}</div>
                   </div>
 
-                  <div className="flex justify-between items-end border-b border-theme pb-4">
-                    <div className="text-theme-muted text-sm">Tổng số tiền</div>
+                  <div className="flex justify-between items-end border-b border-sky-300/30 pb-4">
+                    <div className="text-sky-700/80 text-sm">Tổng số tiền</div>
                     <div className="font-black text-2xl text-emerald-600">{formatVND(receiptData.totalOwed)}</div>
                   </div>
 
                   <div className="pt-2 space-y-3">
                     <div className="flex justify-between text-sm">
-                      <span className="text-theme-muted">Số buổi đã học:</span>
-                      <span className="font-medium text-theme-secondary">{receiptData.totalUnpaidSessions} / {receiptData.student.feeCycle}</span>
+                      <span className="text-sky-700/80">Số buổi đã học:</span>
+                      <span className="font-medium text-sky-900">{receiptData.totalUnpaidSessions} / {receiptData.student.feeCycle}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-theme-muted">Đơn giá:</span>
-                      <span className="font-medium text-theme-secondary">{formatVND(receiptData.student.fee)} / buổi</span>
+                      <span className="text-sky-700/80">Đơn giá:</span>
+                      <span className="font-medium text-sky-900">{formatVND(receiptData.student.fee)} / buổi</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-theme-muted">Ngày thanh toán:</span>
-                      <span className="font-medium text-theme-secondary">
+                      <span className="text-sky-700/80">Ngày thanh toán:</span>
+                      <span className="font-medium text-sky-900">
                         {new Date().toLocaleDateString('vi-VN', { 
                           day: '2-digit', month: '2-digit', year: 'numeric',
                           hour: '2-digit', minute: '2-digit'
@@ -279,8 +273,8 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
                   </div>
 
                   {/* Class Dates Details */}
-                  <div className="pt-4 border-t border-theme">
-                    <h4 className="text-sm font-semibold text-theme-secondary mb-3">Chi tiết các buổi học:</h4>
+                  <div className="pt-4 border-t border-sky-300/30">
+                    <h4 className="text-sm font-semibold text-sky-900 mb-3">Chi tiết các buổi học:</h4>
                     <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
                       {[...receiptData.unpaidClasses]
                         .sort((a, b) => {
@@ -288,8 +282,8 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
                         })
                         .map((c, index) => (
                         <div key={c.id} className="flex justify-between text-sm">
-                          <span className="text-theme-muted">Buổi {index + 1}</span>
-                          <span className="font-medium text-theme-secondary">
+                          <span className="text-sky-700/80">Buổi {index + 1}</span>
+                          <span className="font-medium text-sky-900">
                             {!isNaN(parseDateSafe(c.date).getTime()) 
                               ? parseDateSafe(c.date).toLocaleDateString('vi-VN', {
                                   day: '2-digit', month: '2-digit', year: 'numeric'
@@ -303,11 +297,11 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
                 </div>
 
                 {/* Footer / Watermark */}
-                <div className="mt-10 pt-6 border-t border-dashed border-theme text-center space-y-2">
-                  <p className="text-sm text-theme-muted italic">
+                <div className="mt-10 pt-6 border-t border-dashed border-sky-300/30 text-center space-y-2">
+                  <p className="text-sm text-sky-700/80 italic">
                     Chúc {getPronoun(receiptData.student.birthYear, receiptData.student.gender)} luôn giữ vững tinh thần học tập thật tốt nhé!
                   </p>
-                  <p className="text-xs text-theme-muted italic">
+                  <p className="text-xs text-sky-700/80 italic">
                     Cảm ơn {getPronoun(receiptData.student.birthYear, receiptData.student.gender)} đã đồng hành cùng Võ Nguyễn Tuấn Kiệt - Your English Tutor.
                   </p>
                 </div>
@@ -315,10 +309,10 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
             </div>
 
             {/* Modal Actions */}
-            <div className="p-4 border-t border-theme glass-panel flex justify-end gap-3">
+            <div className="p-4 border-t border-sky-300/30 glass-panel flex justify-end gap-3">
               <button
                 onClick={() => setIsReceiptModalOpen(false)}
-                className="px-4 py-2 text-sm font-medium text-theme-muted bg-theme-section hover:bg-sky-200 rounded-xl transition-colors"
+                className="px-4 py-2 text-sm font-medium text-sky-700/80 bg-sky-50/40 hover:bg-sky-200 rounded-xl transition-colors"
               >
                 Đóng
               </button>

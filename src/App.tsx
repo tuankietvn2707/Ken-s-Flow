@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Student, ClassSession, Transaction, Goal, FinanceHistoryRecord } from './types';
-import { Users, BookOpen, LayoutDashboard, LogOut, Wallet, Sun, Moon } from 'lucide-react';
+import { Users, BookOpen, LayoutDashboard, LogOut, Wallet } from 'lucide-react';
 import { auth, db } from './firebase';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { collection, getDocs, doc, setDoc, deleteDoc, writeBatch, deleteField, getDoc } from 'firebase/firestore';
@@ -49,24 +49,6 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [loadingData, setLoadingData] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-
-  // Dark mode
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    const saved = localStorage.getItem('tutorflow-theme');
-    return saved === 'dark';
-  });
-
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('tutorflow-theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('tutorflow-theme', 'light');
-    }
-  }, [isDark]);
-
-  const toggleDark = () => setIsDark(prev => !prev);
 
   const showLoading = () => setIsProcessing(true);
   const hideLoading = () => setIsProcessing(false);
@@ -404,7 +386,7 @@ export default function App() {
   if (loadingAuth) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 spinner-border"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600"></div>
       </div>
     );
   }
@@ -418,8 +400,8 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen text-theme-primary font-sans">
-      <nav className="glass-panel border-b border-theme sticky top-0 z-10">
+    <div className="min-h-screen text-sky-950 font-sans">
+      <nav className="glass-panel border-b border-sky-300/30 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex">
@@ -442,7 +424,7 @@ export default function App() {
                   onClick={() => setActiveTab('dashboard')}
                   icon={<LayoutDashboard className="w-4 h-4 mr-2" />}
                   label="Tổng quan"
-                  colorClass="glass-active text-theme-secondary border-theme"
+                  colorClass="glass-active text-sky-900 border-sky-300/30"
                   hoverClass="hover:bg-sky-50 hover:text-sky-800"
                 />
                 <TabButton 
@@ -450,7 +432,7 @@ export default function App() {
                   onClick={() => setActiveTab('students')}
                   icon={<Users className="w-4 h-4 mr-2" />}
                   label="Học viên"
-                  colorClass="glass-active text-theme-secondary border-theme"
+                  colorClass="glass-active text-sky-900 border-sky-300/30"
                   hoverClass="hover:bg-sky-50 hover:text-sky-800"
                 />
                 <TabButton 
@@ -458,7 +440,7 @@ export default function App() {
                   onClick={() => setActiveTab('classes')}
                   icon={<BookOpen className="w-4 h-4 mr-2" />}
                   label="Lớp học"
-                  colorClass="glass-active text-theme-secondary border-theme"
+                  colorClass="glass-active text-sky-900 border-sky-300/30"
                   hoverClass="hover:bg-sky-50 hover:text-sky-800"
                 />
                 <TabButton 
@@ -466,7 +448,7 @@ export default function App() {
                   onClick={() => setActiveTab('finances')}
                   icon={<DongSign className="w-4 h-4 mr-2" />}
                   label="Tài chính"
-                  colorClass="glass-active text-theme-secondary border-theme"
+                  colorClass="glass-active text-sky-900 border-sky-300/30"
                   hoverClass="hover:bg-sky-50 hover:text-sky-800"
                 />
                 <TabButton 
@@ -474,28 +456,16 @@ export default function App() {
                   onClick={() => setActiveTab('personal_finance')}
                   icon={<Wallet className="w-4 h-4 mr-2" />}
                   label="Thu - Chi"
-                  colorClass="glass-active text-theme-secondary border-theme"
+                  colorClass="glass-active text-sky-900 border-sky-300/30"
                   hoverClass="hover:bg-sky-50 hover:text-sky-800"
                 />
               </div>
             </div>
             <div className="flex items-center">
-              {/* Dark mode toggle */}
-              <button
-                onClick={toggleDark}
-                title={isDark ? 'Chuyển sang Light Mode' : 'Chuyển sang Dark Mode'}
-                className="p-2 rounded-xl border border-[var(--glass-border)] glass-panel hover:border-[var(--glass-border-strong)] transition-all mr-2"
-                aria-label="Toggle dark mode"
-              >
-                {isDark 
-                  ? <Sun className="w-4 h-4 text-amber-400" /> 
-                  : <Moon className="w-4 h-4 text-sky-700" />
-                }
-              </button>
-              <span className="text-sm text-theme-muted mr-4 hidden sm:block">{user.email}</span>
+              <span className="text-sm text-sky-700/80 mr-4 hidden sm:block">{user.email}</span>
               <button
                 onClick={handleLogout}
-                className="inline-flex items-center px-3 py-1.5 border border-theme shadow-sm text-sm font-medium rounded-xl text-theme-secondary glass-panel hover:glass-active focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500"
+                className="inline-flex items-center px-3 py-1.5 border border-sky-300/30 shadow-sm text-sm font-medium rounded-xl text-sky-900 glass-panel hover:glass-active focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500"
               >
                 <LogOut className="w-4 h-4 sm:mr-2" />
                 <span className="hidden sm:inline">Đăng xuất</span>
@@ -505,36 +475,36 @@ export default function App() {
         </div>
         
         {/* Mobile menu */}
-        <div className="sm:hidden border-t border-theme flex overflow-x-auto p-2 gap-2">
+        <div className="sm:hidden border-t border-sky-300/30 flex overflow-x-auto p-2 gap-2">
            <MobileTabButton 
               active={activeTab === 'dashboard'} 
               onClick={() => setActiveTab('dashboard')}
               label="Tổng quan"
-              colorClass="glass-active text-theme-secondary border-theme"
+              colorClass="glass-active text-sky-900 border-sky-300/30"
             />
             <MobileTabButton 
               active={activeTab === 'students'} 
               onClick={() => setActiveTab('students')}
               label="Học viên"
-              colorClass="glass-active text-theme-secondary border-theme"
+              colorClass="glass-active text-sky-900 border-sky-300/30"
             />
             <MobileTabButton 
               active={activeTab === 'classes'} 
               onClick={() => setActiveTab('classes')}
               label="Lớp học"
-              colorClass="glass-active text-theme-secondary border-theme"
+              colorClass="glass-active text-sky-900 border-sky-300/30"
             />
             <MobileTabButton 
               active={activeTab === 'finances'} 
               onClick={() => setActiveTab('finances')}
               label="Tài chính"
-              colorClass="glass-active text-theme-secondary border-theme"
+              colorClass="glass-active text-sky-900 border-sky-300/30"
             />
             <MobileTabButton 
               active={activeTab === 'personal_finance'} 
               onClick={() => setActiveTab('personal_finance')}
               label="Thu - Chi"
-              colorClass="glass-active text-theme-secondary border-theme"
+              colorClass="glass-active text-sky-900 border-sky-300/30"
             />
         </div>
       </nav>
@@ -590,8 +560,8 @@ function TabButton({ active, onClick, icon, label, colorClass, hoverClass }: { a
       onClick={onClick}
       className={`inline-flex items-center px-4 py-2 my-2 rounded-xl text-sm font-medium transition-all duration-300 border ${
         active 
-          ? `border-[var(--nav-tab-active-border)] text-[var(--nav-tab-active-text)] bg-[var(--nav-tab-active-bg)] shadow-md transform -translate-y-0.5` 
-          : `border-transparent text-theme-muted hover:bg-[var(--nav-tab-active-bg)] hover:text-[var(--nav-tab-active-text)] hover:border-[var(--nav-tab-active-border)] hover:shadow-md hover:-translate-y-0.5`
+          ? `${colorClass} shadow-md transform -translate-y-0.5` 
+          : `border-transparent text-sky-700/80 ${hoverClass} hover:shadow-md hover:-translate-y-0.5`
       }`}
     >
       {icon}
@@ -606,8 +576,8 @@ function MobileTabButton({ active, onClick, label, colorClass }: { active: boole
       onClick={onClick}
       className={`whitespace-nowrap py-2 px-4 rounded-xl text-sm font-medium flex-1 text-center transition-all duration-300 border ${
         active 
-          ? `border-[var(--nav-tab-active-border)] text-[var(--nav-tab-active-text)] bg-[var(--nav-tab-active-bg)] shadow-sm` 
-          : `border-transparent text-theme-muted hover:bg-[var(--nav-tab-active-bg)] hover:text-[var(--nav-tab-active-text)]`
+          ? `${colorClass} shadow-sm` 
+          : `border-transparent text-sky-700/80 hover:bg-white/10 hover:text-sky-900 hover:shadow-sm`
       }`}
     >
       {label}
@@ -634,10 +604,10 @@ function Onboarding({ onSave }: { onSave: (name: string) => void }) {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center space-y-4">
           <div className="text-4xl animate-bounce">👋</div>
-          <h1 className="text-2xl font-bold text-theme-primary">
+          <h1 className="text-2xl font-bold text-sky-950">
             Chào mừng <span className="text-sky-600">{name}</span> đến với WebApp!
           </h1>
-          <p className="text-theme-muted animate-pulse">Đang chuẩn bị không gian làm việc cho bạn...</p>
+          <p className="text-sky-700/80 animate-pulse">Đang chuẩn bị không gian làm việc cho bạn...</p>
         </div>
       </div>
     );
@@ -650,13 +620,13 @@ function Onboarding({ onSave }: { onSave: (name: string) => void }) {
           <div className="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <BookOpen className="w-8 h-8 text-sky-600" />
           </div>
-          <h1 className="text-2xl font-bold text-theme-primary">Chào mừng bạn!</h1>
-          <p className="text-theme-muted">Chúng tôi rất vui khi có bạn đồng hành.</p>
+          <h1 className="text-2xl font-bold text-sky-950">Chào mừng bạn!</h1>
+          <p className="text-sky-700/80">Chúng tôi rất vui khi có bạn đồng hành.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-theme-secondary mb-2">Bạn là_______?</label>
+            <label className="block text-sm font-medium text-sky-900 mb-2">Bạn là_______?</label>
             <input
               type="text"
               required
@@ -664,7 +634,7 @@ function Onboarding({ onSave }: { onSave: (name: string) => void }) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Nhập tên của bạn..."
-              className="w-full px-4 py-3 rounded-xl border border-theme bg-theme-input focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all text-theme-primary"
+              className="w-full px-4 py-3 rounded-xl border border-sky-300/30 bg-white/70 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all text-sky-950"
             />
           </div>
           <button

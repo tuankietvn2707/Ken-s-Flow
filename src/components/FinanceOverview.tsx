@@ -8,7 +8,7 @@ const COLORS = ['#BAE1FF', '#BAFFC9', '#FFDFBA', '#FFFFBA', '#FFB3BA', '#E0BBE4'
 
 export function DashboardCard({ title, amount, color }: { title: string, amount: number, color: string }) {
   return (
-    <div className="glass-panel border border-theme text-theme-primary p-6 rounded-2xl flex flex-col justify-center items-start group hover:-translate-y-1 transition-transform">
+    <div className="glass-panel border border-sky-300/30 text-sky-950 p-6 rounded-2xl flex flex-col justify-center items-start group hover:-translate-y-1 transition-transform">
       <h3 className="text-sm font-semibold opacity-70 mb-2">{title}</h3>
       <p className={`text-3xl font-bold tracking-tight ${color}`}>
         {formatNumber(amount)} <span className="text-lg font-normal opacity-60">đ</span>
@@ -73,7 +73,7 @@ export default function FinanceOverview({
           <p className="text-sky-700/70 mt-1">Theo dõi chi tiêu và mục tiêu cá nhân</p>
         </div>
         <div className="flex flex-col items-end">
-          <p className="text-sm font-medium mb-1 border-b border-theme pb-1">Số dư đầu kỳ</p>
+          <p className="text-sm font-medium mb-1 border-b border-sky-300/30 pb-1">Số dư đầu kỳ</p>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 glass-panel/50 px-3 py-1.5 rounded-xl border border-white/20">
               <span className="text-sm opacity-70">Tiền mặt:</span>
@@ -156,7 +156,7 @@ export default function FinanceOverview({
         initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}
         className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6"
       >
-        <div className="glass-panel border border-theme text-theme-primary p-6 rounded-2xl h-80 flex flex-col">
+        <div className="glass-panel border border-sky-300/30 text-sky-950 p-6 rounded-2xl h-80 flex flex-col">
           <h2 className="text-lg font-semibold mb-4">Cơ Cấu Chi Tiêu</h2>
           <div className="flex-1 min-h-0">
             {pieData.length > 0 ? (
@@ -177,7 +177,7 @@ export default function FinanceOverview({
           </div>
         </div>
 
-        <div className="glass-panel border border-theme text-theme-primary p-6 rounded-2xl h-80 flex flex-col">
+        <div className="glass-panel border border-sky-300/30 text-sky-950 p-6 rounded-2xl h-80 flex flex-col">
           <h2 className="text-lg font-semibold mb-4">Thu / Chi Theo Tháng</h2>
           <div className="flex-1 min-h-0">
             {barData.length > 0 ? (

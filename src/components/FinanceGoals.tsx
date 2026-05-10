@@ -69,7 +69,7 @@ export default function FinanceGoals({ goals, addGoal, updateGoal, deleteGoal, a
   return (
     <motion.div 
       initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}
-      className="glass-panel border border-theme text-theme-primary p-6 rounded-2xl"
+      className="glass-panel border border-sky-300/30 text-sky-950 p-6 rounded-2xl"
     >
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Mục Tiêu Tiết Kiệm</h2>
@@ -86,7 +86,7 @@ export default function FinanceGoals({ goals, addGoal, updateGoal, deleteGoal, a
           >
             <input
               type="text" placeholder="Tên mục tiêu" value={goalName} onChange={e => setGoalName(e.target.value)}
-              className="w-full px-4 py-2 rounded-xl glass-panel/50 border border-theme focus:ring-2 focus:ring-cyan-500 outline-none" required
+              className="w-full px-4 py-2 rounded-xl glass-panel/50 border border-sky-300/30 focus:ring-2 focus:ring-cyan-500 outline-none" required
             />
             <input
               type="text" placeholder="Số tiền mục tiêu (VNĐ)" 
@@ -95,7 +95,7 @@ export default function FinanceGoals({ goals, addGoal, updateGoal, deleteGoal, a
                 const val = e.target.value.replace(/[^0-9]/g, '');
                 setGoalTargetStr(val ? formatNumber(parseInt(val, 10)) : '');
               }}
-              className="w-full px-4 py-2 rounded-xl glass-panel/50 border border-theme focus:ring-2 focus:ring-cyan-500 outline-none" required
+              className="w-full px-4 py-2 rounded-xl glass-panel/50 border border-sky-300/30 focus:ring-2 focus:ring-cyan-500 outline-none" required
             />
             <button type="submit" className="w-full py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl font-medium shadow shadow-cyan-500/20">Thêm Mục Tiêu</button>
           </motion.form>
@@ -107,13 +107,13 @@ export default function FinanceGoals({ goals, addGoal, updateGoal, deleteGoal, a
           const percentage = Math.min((goal.currentAmount / goal.targetAmount) * 100, 100);
           const isCompleted = goal.currentAmount >= goal.targetAmount;
           return (
-            <div key={goal.id} className="p-4 bg-theme-section rounded-xl border border-theme group relative overflow-hidden">
+            <div key={goal.id} className="p-4 bg-sky-50/40 rounded-xl border border-sky-300/30 group relative overflow-hidden">
               <div className="flex justify-between items-start mb-2">
                 <div className="flex items-center gap-2">
                   <div className={`p-1.5 rounded-lg ${isCompleted ? 'bg-emerald-100 text-emerald-600' : 'bg-sky-100 text-sky-600'}`}>
                     {isCompleted ? <Check className="w-4 h-4" /> : <Target className="w-4 h-4" />}
                   </div>
-                  <h3 className="font-semibold text-theme-primary">{goal.name}</h3>
+                  <h3 className="font-semibold text-sky-950">{goal.name}</h3>
                 </div>
                 <button onClick={() => deleteGoal(goal.id)} className="opacity-0 group-hover:opacity-100 text-rose-500 p-1 hover:bg-rose-100 rounded transition-all">
                   <Trash2 className="w-4 h-4" />
@@ -150,7 +150,7 @@ export default function FinanceGoals({ goals, addGoal, updateGoal, deleteGoal, a
                 !isCompleted && (
                   <button 
                     onClick={() => setDepositGoalId(goal.id)}
-                    className="w-full py-1.5 text-sm font-medium text-sky-700 bg-theme-section rounded-lg hover:bg-sky-200 transition-colors"
+                    className="w-full py-1.5 text-sm font-medium text-sky-700 bg-sky-50/40 rounded-lg hover:bg-sky-200 transition-colors"
                   >
                     Nạp Tiết Kiệm
                   </button>

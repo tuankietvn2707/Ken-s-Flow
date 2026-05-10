@@ -128,7 +128,7 @@ export default function PersonalFinance({
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 50, scale: 0.9 }}
-            className="fixed bottom-24 right-6 w-96 h-[600px] z-50 glass-panel border border-theme text-theme-primary rounded-3xl shadow-2xl overflow-hidden border border-white/40 flex flex-col"
+            className="fixed bottom-24 right-6 w-96 h-[600px] z-50 glass-panel border border-sky-300/30 text-sky-950 rounded-3xl shadow-2xl overflow-hidden border border-white/40 flex flex-col"
           >
             <div className="bg-gradient-to-r from-cyan-500 to-blue-600 p-4 shrink-0 flex justify-between items-center text-white">
               <div className="flex items-center gap-2">

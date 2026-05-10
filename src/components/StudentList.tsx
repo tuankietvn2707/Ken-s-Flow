@@ -57,9 +57,9 @@ export default function StudentList({ students, onUpdate, onDelete, onSelect, on
         <tr 
           ref={provided.innerRef}
           {...provided.draggableProps}
-          className={`hover:bg-theme-section transition-colors ${snapshot.isDragging ? 'bg-theme-section shadow-md' : ''} ${isInactive ? 'opacity-60 bg-theme-section' : ''}`}
+          className={`hover:bg-sky-50/40 transition-colors ${snapshot.isDragging ? 'bg-sky-50/40 shadow-md' : ''} ${isInactive ? 'opacity-60 bg-sky-50/40' : ''}`}
         >
-          <td className="px-6 py-4 whitespace-nowrap text-theme-muted">
+          <td className="px-6 py-4 whitespace-nowrap text-sky-700/80">
             <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing p-1 hover:text-sky-600 rounded">
               <GripVertical className="w-5 h-5" />
             </div>
@@ -77,7 +77,7 @@ export default function StudentList({ students, onUpdate, onDelete, onSelect, on
                   {student.lastName} {student.firstName}
                 </span>
               </button>
-              <div className="text-xs text-theme-muted mt-1 ml-2">
+              <div className="text-xs text-sky-700/80 mt-1 ml-2">
                 {student.birthYear ? `${student.birthYear} • ` : ''}
                 {student.occupation || student.background || 'Chưa cập nhật'}
               </div>
@@ -93,10 +93,10 @@ export default function StudentList({ students, onUpdate, onDelete, onSelect, on
               {student.goal || 'Chưa cập nhật'}
             </button>
           </td>
-          <td className="px-6 py-4 whitespace-nowrap text-sm text-theme-primary font-medium">
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-sky-950 font-medium">
             {formatVND(student.fee)}
           </td>
-          <td className="px-6 py-4 whitespace-nowrap text-sm text-theme-muted">
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-sky-700/80">
             {student.schedule || 'Chưa xếp lịch'}
           </td>
           <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -115,14 +115,14 @@ export default function StudentList({ students, onUpdate, onDelete, onSelect, on
           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
             <button 
               onClick={(e) => { e.stopPropagation(); onEdit(student); }} 
-              className="text-theme-muted hover:text-sky-600 mr-4 transition-colors"
+              className="text-sky-700/80 hover:text-sky-600 mr-4 transition-colors"
               title="Sửa"
             >
               <Edit2 className="w-4 h-4" />
             </button>
             <button 
               onClick={(e) => { e.stopPropagation(); onDelete(student.id); }} 
-              className="text-theme-muted hover:text-rose-600 transition-colors"
+              className="text-sky-700/80 hover:text-rose-600 transition-colors"
               title="Xóa"
             >
               <Trash2 className="w-4 h-4" />
@@ -138,13 +138,9 @@ export default function StudentList({ students, onUpdate, onDelete, onSelect, on
       <motion.div 
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
         className="glass rounded-3xl overflow-hidden mb-8 border"
-        style={{ 
-          background: 'var(--card-bg)', 
-          borderColor: 'var(--glass-border)',
-          boxShadow: '0 8px 32px var(--glass-shadow)' 
-        }}
+        
       >
-        <div className="px-6 py-4 border-b" style={{ background: 'var(--card-header-bg)', borderColor: 'var(--glass-border)' }}>
+        <div className="px-6 py-4 border-b border-sky-300/30 bg-sky-50/40">
           <h2 className="text-lg font-semibold text-emerald-800 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
             Học viên đang hoạt động ({activeStudents.length})
@@ -152,14 +148,14 @@ export default function StudentList({ students, onUpdate, onDelete, onSelect, on
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-sky-300/40">
-            <thead className="bg-theme-section border-b border-theme">
+            <thead className="bg-sky-50/40 border-b border-sky-300/30">
               <tr>
                 <th scope="col" className="w-10 px-6 py-3"></th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-theme-muted uppercase tracking-wider">Họ và Tên</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-theme-muted uppercase tracking-wider">Mục tiêu</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-theme-muted uppercase tracking-wider">Học phí/Buổi</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-theme-muted uppercase tracking-wider">Lịch học</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-theme-muted uppercase tracking-wider">Trạng thái</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-sky-700/80 uppercase tracking-wider">Họ và Tên</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-sky-700/80 uppercase tracking-wider">Mục tiêu</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-sky-700/80 uppercase tracking-wider">Học phí/Buổi</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-sky-700/80 uppercase tracking-wider">Lịch học</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-sky-700/80 uppercase tracking-wider">Trạng thái</th>
                 <th scope="col" className="relative px-6 py-3"><span className="sr-only">Thao tác</span></th>
               </tr>
             </thead>
@@ -167,14 +163,12 @@ export default function StudentList({ students, onUpdate, onDelete, onSelect, on
               <Droppable droppableId="active-students-list">
                 {(provided) => (
                   <tbody 
-                    className="divide-y divide-[var(--glass-border)]"
-                    style={{ background: 'var(--table-body-bg)' }}
-                    {...provided.droppableProps}
+                    className="bg-white divide-y divide-sky-300/40"{...provided.droppableProps}
                     ref={provided.innerRef}
                   >
                     {activeStudents.length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="px-6 py-10 text-center text-sm" style={{ color: 'var(--table-body-empty-color)' }}>
+                        <td colSpan={7} className="px-6 py-10 text-center text-sm text-sky-700/80" >
                           Chưa có học viên nào đang hoạt động.
                         </td>
                       </tr>
@@ -194,28 +188,24 @@ export default function StudentList({ students, onUpdate, onDelete, onSelect, on
         <motion.div 
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
           className="glass rounded-3xl overflow-hidden opacity-80 border"
-          style={{ 
-            background: 'var(--card-bg)', 
-            borderColor: 'var(--glass-border)',
-            boxShadow: '0 8px 32px var(--glass-shadow)' 
-          }}
+          
         >
-          <div className="px-6 py-4 border-b" style={{ background: 'var(--card-header-bg)', borderColor: 'var(--glass-border)' }}>
-            <h2 className="text-lg font-semibold text-theme-muted flex items-center gap-2">
+          <div className="px-6 py-4 border-b border-sky-300/30 bg-sky-50/40">
+            <h2 className="text-lg font-semibold text-sky-700/80 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-sky-400"></span>
               Học viên ngưng hoạt động ({inactiveStudents.length})
             </h2>
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-sky-300/40">
-              <thead className="bg-theme-section border-b border-theme">
+              <thead className="bg-sky-50/40 border-b border-sky-300/30">
                 <tr>
                   <th scope="col" className="w-10 px-6 py-3"></th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-theme-muted uppercase tracking-wider">Họ và Tên</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-theme-muted uppercase tracking-wider">Mục tiêu</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-theme-muted uppercase tracking-wider">Học phí/Buổi</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-theme-muted uppercase tracking-wider">Lịch học</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-theme-muted uppercase tracking-wider">Trạng thái</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-sky-700/80 uppercase tracking-wider">Họ và Tên</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-sky-700/80 uppercase tracking-wider">Mục tiêu</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-sky-700/80 uppercase tracking-wider">Học phí/Buổi</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-sky-700/80 uppercase tracking-wider">Lịch học</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-sky-700/80 uppercase tracking-wider">Trạng thái</th>
                   <th scope="col" className="relative px-6 py-3"><span className="sr-only">Thao tác</span></th>
                 </tr>
               </thead>
@@ -223,9 +213,7 @@ export default function StudentList({ students, onUpdate, onDelete, onSelect, on
                 <Droppable droppableId="inactive-students-list">
                   {(provided) => (
                     <tbody 
-                      className="divide-y divide-[var(--glass-border)]"
-                      style={{ background: 'var(--table-body-bg)' }}
-                      {...provided.droppableProps}
+                      className="bg-white divide-y divide-sky-300/40"{...provided.droppableProps}
                       ref={provided.innerRef}
                     >
                       {inactiveStudents.map((student, index) => renderStudentRow(student, index, true))}

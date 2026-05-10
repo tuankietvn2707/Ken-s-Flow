@@ -61,7 +61,7 @@ export default function TransactionList({
     <>
       <motion.div 
         initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }}
-        className="glass-panel border border-theme text-theme-primary p-6 rounded-2xl lg:col-span-2"
+        className="glass-panel border border-sky-300/30 text-sky-950 p-6 rounded-2xl lg:col-span-2"
       >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold">Giao Dịch Hiện Tại</h2>
@@ -76,7 +76,7 @@ export default function TransactionList({
             >
               <Archive className="w-4 h-4" /> Chốt Sổ
             </button>
-            <button onClick={exportCSV} className="flex items-center gap-2 px-3 py-1.5 bg-theme-section rounded-xl text-sm font-medium hover:bg-sky-200 transition-colors">
+            <button onClick={exportCSV} className="flex items-center gap-2 px-3 py-1.5 bg-sky-50/40 rounded-xl text-sm font-medium hover:bg-sky-200 transition-colors">
               <Download className="w-4 h-4" /> Xuất CSV
             </button>
           </div>
@@ -85,7 +85,7 @@ export default function TransactionList({
         <div className="space-y-6">
           {Object.keys(groupedTransactions).sort().reverse().map(month => (
             <div key={month}>
-              <h3 className="text-sm font-bold opacity-60 mb-3 border-b border-theme pb-1">{month}</h3>
+              <h3 className="text-sm font-bold opacity-60 mb-3 border-b border-sky-300/30 pb-1">{month}</h3>
               <div className="space-y-3">
                 {groupedTransactions[month].map(t => (
                   <div key={t.id} className="flex items-center justify-between p-3 rounded-xl hover:glass-panel/50 transition-colors group">
@@ -125,7 +125,7 @@ export default function TransactionList({
             />
             <motion.div 
               initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="relative w-full max-w-md glass-panel border border-theme text-theme-primary rounded-3xl shadow-2xl p-6"
+              className="relative w-full max-w-md glass-panel border border-sky-300/30 text-sky-950 rounded-3xl shadow-2xl p-6"
             >
               <h3 className="text-xl font-bold mb-2">Chốt Sổ Kỳ Này</h3>
               <p className="text-sm opacity-70 mb-6">Thao tác này sẽ lưu toàn bộ giao dịch hiện tại vào Lịch sử và reset danh sách để bắt đầu kỳ mới. Vui lòng nhập số dư THỰC TẾ hiện tại của bạn.</p>
@@ -140,7 +140,7 @@ export default function TransactionList({
                       const val = e.target.value.replace(/[^0-9]/g, '');
                       setConsolidateCashStr(val ? formatNumber(parseInt(val, 10)) : '');
                     }}
-                    className="w-full px-4 py-2 rounded-xl glass-panel/50 border border-theme focus:ring-2 focus:ring-cyan-500 outline-none"
+                    className="w-full px-4 py-2 rounded-xl glass-panel/50 border border-sky-300/30 focus:ring-2 focus:ring-cyan-500 outline-none"
                     required
                   />
                   <div className="flex justify-between text-xs mt-1 px-1">
@@ -157,7 +157,7 @@ export default function TransactionList({
                       const val = e.target.value.replace(/[^0-9]/g, '');
                       setConsolidateBankingStr(val ? formatNumber(parseInt(val, 10)) : '');
                     }}
-                    className="w-full px-4 py-2 rounded-xl glass-panel/50 border border-theme focus:ring-2 focus:ring-cyan-500 outline-none"
+                    className="w-full px-4 py-2 rounded-xl glass-panel/50 border border-sky-300/30 focus:ring-2 focus:ring-cyan-500 outline-none"
                     required
                   />
                   <div className="flex justify-between text-xs mt-1 px-1">
@@ -166,7 +166,7 @@ export default function TransactionList({
                   </div>
                 </div>
                 <div className="pt-4 flex gap-3">
-                  <button type="button" onClick={() => setShowConsolidateModal(false)} className="flex-1 py-2.5 rounded-xl border border-theme font-medium hover:bg-sky-50 transition-colors">Hủy</button>
+                  <button type="button" onClick={() => setShowConsolidateModal(false)} className="flex-1 py-2.5 rounded-xl border border-sky-300/30 font-medium hover:bg-sky-50 transition-colors">Hủy</button>
                   <button type="submit" className="flex-1 py-2.5 rounded-xl bg-sky-600 text-white font-medium shadow-md hover:bg-sky-700 transition-colors">Khóa Sổ</button>
                 </div>
               </form>

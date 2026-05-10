@@ -68,7 +68,7 @@ export default function TransactionForm({ addTransaction }: Props) {
   return (
     <motion.div 
       initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
-      className="glass-panel border border-theme text-theme-primary p-6 rounded-2xl lg:col-span-1"
+      className="glass-panel border border-sky-300/30 text-sky-950 p-6 rounded-2xl lg:col-span-1"
     >
       <h2 className="text-xl font-semibold mb-6">Thêm Giao Dịch Mới</h2>
       <form onSubmit={handleAddTransaction} className="space-y-4">
@@ -76,25 +76,25 @@ export default function TransactionForm({ addTransaction }: Props) {
           <button
             type="button"
             onClick={() => setType('expense')}
-            className={`py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${type === 'expense' ? 'bg-white shadow-sm text-rose-600' : 'text-theme-secondary/60 hover:text-theme-secondary'}`}
+            className={`py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${type === 'expense' ? 'bg-white shadow-sm text-rose-600' : 'text-sky-900/60 hover:text-sky-900'}`}
           >
             <Minus className="w-4 h-4" /> Chi Tiêu
           </button>
           <button
             type="button"
             onClick={() => setType('income')}
-            className={`py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${type === 'income' ? 'bg-white shadow-sm text-emerald-600' : 'text-theme-secondary/60 hover:text-theme-secondary'}`}
+            className={`py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${type === 'income' ? 'bg-white shadow-sm text-emerald-600' : 'text-sky-900/60 hover:text-sky-900'}`}
           >
             <Plus className="w-4 h-4" /> Thu Nhập
           </button>
         </div>
 
         <div className="grid grid-cols-2 gap-2">
-          <label className={`cursor-pointer py-2 px-3 rounded-xl border flex items-center justify-center gap-2 text-sm font-medium transition-all ${source === 'cash' ? 'bg-sky-50 border-sky-300 text-sky-700' : 'border-theme text-theme-secondary/60 hover:border-sky-300/60'}`}>
+          <label className={`cursor-pointer py-2 px-3 rounded-xl border flex items-center justify-center gap-2 text-sm font-medium transition-all ${source === 'cash' ? 'bg-sky-50 border-sky-300 text-sky-700' : 'border-sky-300/30 text-sky-900/60 hover:border-sky-300/60'}`}>
             <input type="radio" value="cash" checked={source === 'cash'} onChange={() => setSource('cash')} className="sr-only" />
             Tiền mặt
           </label>
-          <label className={`cursor-pointer py-2 px-3 rounded-xl border flex items-center justify-center gap-2 text-sm font-medium transition-all ${source === 'banking' ? 'bg-sky-50 border-sky-300 text-sky-700' : 'border-theme text-theme-secondary/60 hover:border-sky-300/60'}`}>
+          <label className={`cursor-pointer py-2 px-3 rounded-xl border flex items-center justify-center gap-2 text-sm font-medium transition-all ${source === 'banking' ? 'bg-sky-50 border-sky-300 text-sky-700' : 'border-sky-300/30 text-sky-900/60 hover:border-sky-300/60'}`}>
             <input type="radio" value="banking" checked={source === 'banking'} onChange={() => setSource('banking')} className="sr-only" />
             Ngân hàng
           </label>
@@ -109,7 +109,7 @@ export default function TransactionForm({ addTransaction }: Props) {
               const val = e.target.value.replace(/[^0-9]/g, '');
               setAmountStr(val ? formatNumber(parseInt(val, 10)) : '');
             }}
-            className="w-full px-4 py-2 rounded-xl glass-panel/50 border border-theme focus:ring-2 focus:ring-cyan-500 outline-none transition-all text-lg font-bold"
+            className="w-full px-4 py-2 rounded-xl glass-panel/50 border border-sky-300/30 focus:ring-2 focus:ring-cyan-500 outline-none transition-all text-lg font-bold"
             placeholder="0"
             required
           />
@@ -121,7 +121,7 @@ export default function TransactionForm({ addTransaction }: Props) {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             onBlur={handleDescriptionBlur}
-            className="w-full px-4 py-2 rounded-xl glass-panel/50 border border-theme focus:ring-2 focus:ring-cyan-500 outline-none transition-all"
+            className="w-full px-4 py-2 rounded-xl glass-panel/50 border border-sky-300/30 focus:ring-2 focus:ring-cyan-500 outline-none transition-all"
             placeholder="VD: Ăn trưa"
             required
           />
@@ -135,7 +135,7 @@ export default function TransactionForm({ addTransaction }: Props) {
             type="text"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="w-full px-4 py-2 rounded-xl glass-panel/50 border border-theme focus:ring-2 focus:ring-cyan-500 outline-none transition-all"
+            className="w-full px-4 py-2 rounded-xl glass-panel/50 border border-sky-300/30 focus:ring-2 focus:ring-cyan-500 outline-none transition-all"
             placeholder="VD: Ăn uống"
             required
           />
@@ -146,7 +146,7 @@ export default function TransactionForm({ addTransaction }: Props) {
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="w-full px-4 py-2 rounded-xl glass-panel/50 border border-theme focus:ring-2 focus:ring-cyan-500 outline-none transition-all"
+            className="w-full px-4 py-2 rounded-xl glass-panel/50 border border-sky-300/30 focus:ring-2 focus:ring-cyan-500 outline-none transition-all"
             required
           />
         </div>

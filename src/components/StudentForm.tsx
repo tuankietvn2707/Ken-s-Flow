@@ -136,15 +136,15 @@ export default function StudentForm({ editingId, initialData, students, onClose,
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-      className="glass rounded-3xl shadow-[0_8px_32px_rgba(14,165,233,0.08)] border border-theme p-6 mb-6 relative"
+      className="glass rounded-3xl shadow-[0_8px_32px_rgba(14,165,233,0.08)] border border-sky-300/30 p-6 mb-6 relative"
     >
       <button 
         onClick={onClose}
-        className="absolute top-4 right-4 text-theme-muted hover:text-theme-muted"
+        className="absolute top-4 right-4 text-sky-700/80 hover:text-sky-700/80"
       >
         <X className="w-5 h-5" />
       </button>
-      <h2 className="text-xl font-bold text-theme-primary mb-6 pb-2 border-b border-theme">
+      <h2 className="text-xl font-bold text-sky-950 mb-6 pb-2 border-b border-sky-300/30">
         {editingId ? 'Sửa thông tin Học viên' : 'Thêm Học viên mới'}
       </h2>
       
@@ -156,14 +156,14 @@ export default function StudentForm({ editingId, initialData, students, onClose,
       
       <form onSubmit={handleSubmit} className="space-y-8" noValidate>
         {/* Phần 1: Thông tin cơ bản */}
-        <fieldset className="bg-theme-section p-4 rounded-2xl border border-theme">
+        <fieldset className="bg-sky-50/40 p-4 rounded-2xl border border-sky-300/30">
           <legend className="text-sm font-semibold text-sky-600 bg-sky-50 px-3 py-1 rounded-full mb-2 flex items-center">
             <User className="w-4 h-4 mr-1.5" />
             Phần 1: Thông tin cơ bản & Bối cảnh
           </legend>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-3">
             <div>
-              <label className="block text-sm font-medium text-theme-secondary">Họ và Tên đệm <span className="text-rose-500">*</span></label>
+              <label className="block text-sm font-medium text-sky-900">Họ và Tên đệm <span className="text-rose-500">*</span></label>
               <input
                 type="text"
                 placeholder="VD: Nguyễn Văn"
@@ -172,12 +172,12 @@ export default function StudentForm({ editingId, initialData, students, onClose,
                   setFormData({...formData, lastName: e.target.value});
                   if (fieldErrors.lastName) setFieldErrors({...fieldErrors, lastName: ''});
                 }}
-                className={`mt-1 block w-full rounded-xl shadow-sm sm:text-sm p-2 border bg-[var(--glass-bg)] text-theme-primary focus:ring-sky-500 ${fieldErrors.lastName ? 'border-rose-500 focus:border-rose-500' : 'border-theme focus:border-sky-500'}`}
+                className={`mt-1 block w-full rounded-xl shadow-sm sm:text-sm p-2 border bg-white text-sky-950 focus:ring-sky-500 ${fieldErrors.lastName ? 'border-rose-500 focus:border-rose-500' : 'border-sky-300/30 focus:border-sky-500'}`}
               />
               {fieldErrors.lastName && <p className="mt-1 text-xs text-rose-500">{fieldErrors.lastName}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-theme-secondary">Tên <span className="text-rose-500">*</span></label>
+              <label className="block text-sm font-medium text-sky-900">Tên <span className="text-rose-500">*</span></label>
               <input
                 type="text"
                 placeholder="VD: A"
@@ -186,12 +186,12 @@ export default function StudentForm({ editingId, initialData, students, onClose,
                   setFormData({...formData, firstName: e.target.value});
                   if (fieldErrors.firstName) setFieldErrors({...fieldErrors, firstName: ''});
                 }}
-                className={`mt-1 block w-full rounded-xl shadow-sm sm:text-sm p-2 border bg-[var(--glass-bg)] text-theme-primary focus:ring-sky-500 ${fieldErrors.firstName ? 'border-rose-500 focus:border-rose-500' : 'border-theme focus:border-sky-500'}`}
+                className={`mt-1 block w-full rounded-xl shadow-sm sm:text-sm p-2 border bg-white text-sky-950 focus:ring-sky-500 ${fieldErrors.firstName ? 'border-rose-500 focus:border-rose-500' : 'border-sky-300/30 focus:border-sky-500'}`}
               />
               {fieldErrors.firstName && <p className="mt-1 text-xs text-rose-500">{fieldErrors.firstName}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-theme-secondary">Năm sinh</label>
+              <label className="block text-sm font-medium text-sky-900">Năm sinh</label>
               <input
                 type="number"
                 placeholder="VD: 2009"
@@ -200,47 +200,47 @@ export default function StudentForm({ editingId, initialData, students, onClose,
                   setFormData({...formData, birthYear: e.target.value});
                   if (fieldErrors.birthYear) setFieldErrors({...fieldErrors, birthYear: ''});
                 }}
-                className={`mt-1 block w-full rounded-xl shadow-sm sm:text-sm p-2 border bg-[var(--glass-bg)] text-theme-primary focus:ring-sky-500 ${fieldErrors.birthYear ? 'border-rose-500 focus:border-rose-500' : 'border-theme focus:border-sky-500'}`}
+                className={`mt-1 block w-full rounded-xl shadow-sm sm:text-sm p-2 border bg-white text-sky-950 focus:ring-sky-500 ${fieldErrors.birthYear ? 'border-rose-500 focus:border-rose-500' : 'border-sky-300/30 focus:border-sky-500'}`}
               />
               {fieldErrors.birthYear && <p className="mt-1 text-xs text-rose-500">{fieldErrors.birthYear}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-theme-secondary">Giới tính</label>
+              <label className="block text-sm font-medium text-sky-900">Giới tính</label>
               <select
                 value={formData.gender}
                 onChange={e => setFormData({...formData, gender: e.target.value})}
-                className="mt-1 block w-full rounded-xl border-theme shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border glass-panel"
+                className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border glass-panel"
               >
                 <option value="Nam">Nam</option>
                 <option value="Nữ">Nữ</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-theme-secondary">Nghề nghiệp / Bối cảnh</label>
+              <label className="block text-sm font-medium text-sky-900">Nghề nghiệp / Bối cảnh</label>
               <input
                 type="text"
                 placeholder="VD: Học sinh, Nhân viên ngân hàng..."
                 value={formData.occupation}
                 onChange={e => setFormData({...formData, occupation: e.target.value})}
-                className="mt-1 block w-full rounded-xl border-theme shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border glass-panel"
+                className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border glass-panel"
               />
             </div>
           </div>
         </fieldset>
 
         {/* Phần 2: Hồ sơ Học thuật */}
-        <fieldset className="bg-theme-section p-4 rounded-2xl border border-theme">
+        <fieldset className="bg-sky-50/40 p-4 rounded-2xl border border-sky-300/30">
           <legend className="text-sm font-semibold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full mb-2 flex items-center">
             <BookOpen className="w-4 h-4 mr-1.5" />
             Phần 2: Hồ sơ Học thuật
           </legend>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-3">
             <div>
-              <label className="block text-sm font-medium text-theme-secondary">Trình độ hiện tại</label>
+              <label className="block text-sm font-medium text-sky-900">Trình độ hiện tại</label>
               <select
                 value={formData.currentLevel}
                 onChange={e => setFormData({...formData, currentLevel: e.target.value})}
-                className="mt-1 block w-full rounded-xl border-theme shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm p-2 border glass-panel"
+                className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm p-2 border glass-panel"
               >
                 <option value="">Chọn trình độ...</option>
                 <option value="Mất gốc">Mất gốc</option>
@@ -253,16 +253,16 @@ export default function StudentForm({ editingId, initialData, students, onClose,
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-theme-secondary">Mục tiêu học tập</label>
+              <label className="block text-sm font-medium text-sky-900">Mục tiêu học tập</label>
               <input
                 type="text"
                 placeholder="VD: VSTEP, IELTS 6.5, Giao tiếp..."
                 value={formData.goal}
                 onChange={e => setFormData({...formData, goal: e.target.value})}
-                className="mt-1 block w-full rounded-xl border-theme shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm p-2 border glass-panel"
+                className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm p-2 border glass-panel"
               />
               <div className="mt-3">
-                <label className="block text-xs font-medium text-theme-muted mb-2">Màu sắc thẻ mục tiêu</label>
+                <label className="block text-xs font-medium text-sky-700/80 mb-2">Màu sắc thẻ mục tiêu</label>
                 <div className="flex flex-wrap gap-2">
                   {['#D0E8FF', '#D1F2EB', '#D4EFDF', '#FCF3CF', '#FDEBD0', '#FAE5D3', '#FADBD8', '#E8DAEF', '#D7BDE2', '#F5B7B1', '#E5E7E9', '#E6E2D3'].map(color => (
                     <button
@@ -281,14 +281,14 @@ export default function StudentForm({ editingId, initialData, students, onClose,
         </fieldset>
 
         {/* Phần 3: Quản lý Tài chính & Ghi chú */}
-        <fieldset className="bg-theme-section p-4 rounded-2xl border border-theme">
+        <fieldset className="bg-sky-50/40 p-4 rounded-2xl border border-sky-300/30">
           <legend className="text-sm font-semibold text-amber-600 bg-amber-50 px-3 py-1 rounded-full mb-2 flex items-center">
             <CreditCard className="w-4 h-4 mr-1.5" />
             Phần 3: Quản lý Tài chính & Ghi chú
           </legend>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-3">
             <div>
-              <label className="block text-sm font-medium text-theme-secondary">Học phí mỗi buổi (VNĐ) <span className="text-rose-500">*</span></label>
+              <label className="block text-sm font-medium text-sky-900">Học phí mỗi buổi (VNĐ) <span className="text-rose-500">*</span></label>
               <div className="mt-1 relative rounded-xl shadow-sm">
                 <input
                   type="text"
@@ -298,64 +298,64 @@ export default function StudentForm({ editingId, initialData, students, onClose,
                     handleFeeChange(e);
                     if (fieldErrors.fee) setFieldErrors({...fieldErrors, fee: ''});
                   }}
-                  className={`block w-full rounded-xl shadow-sm sm:text-sm p-2 border bg-[var(--glass-bg)] text-theme-primary pr-12 focus:ring-amber-500 ${fieldErrors.fee ? 'border-rose-500 focus:border-rose-500' : 'border-theme focus:border-amber-500'}`}
+                  className={`block w-full rounded-xl shadow-sm sm:text-sm p-2 border bg-white text-sky-950 pr-12 focus:ring-amber-500 ${fieldErrors.fee ? 'border-rose-500 focus:border-rose-500' : 'border-sky-300/30 focus:border-amber-500'}`}
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <span className="text-theme-muted sm:text-sm">VNĐ</span>
+                  <span className="text-sky-700/80 sm:text-sm">VNĐ</span>
                 </div>
               </div>
               {fieldErrors.fee && <p className="mt-1 text-xs text-rose-500">{fieldErrors.fee}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-theme-secondary">Chu kỳ thu học phí</label>
+              <label className="block text-sm font-medium text-sky-900">Chu kỳ thu học phí</label>
               <select
                 value={formData.feeCycle}
                 onChange={e => setFormData({...formData, feeCycle: e.target.value})}
-                className="mt-1 block w-full rounded-xl border-theme shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2 border glass-panel"
+                className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2 border glass-panel"
               >
                 <option value="8">8 buổi/lần</option>
                 <option value="12">12 buổi/lần</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-theme-secondary">Lịch học ưu tiên</label>
+              <label className="block text-sm font-medium text-sky-900">Lịch học ưu tiên</label>
               <input
                 type="text"
                 placeholder="VD: Tối Thứ 3/Thứ 5"
                 value={formData.schedule}
                 onChange={e => setFormData({...formData, schedule: e.target.value})}
-                className="mt-1 block w-full rounded-xl border-theme shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2 border glass-panel"
+                className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2 border glass-panel"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-theme-secondary">Trạng thái hoạt động</label>
+              <label className="block text-sm font-medium text-sky-900">Trạng thái hoạt động</label>
               <select
                 value={formData.status}
                 onChange={e => setFormData({...formData, status: e.target.value as 'active' | 'inactive'})}
-                className="mt-1 block w-full rounded-xl border-theme shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2 border glass-panel"
+                className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2 border glass-panel"
               >
                 <option value="active">Đang hoạt động</option>
                 <option value="inactive">Ngưng hoạt động</option>
               </select>
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-theme-secondary">Ghi chú riêng</label>
+              <label className="block text-sm font-medium text-sky-900">Ghi chú riêng</label>
               <textarea
                 rows={3}
                 placeholder="Ghi chú về điểm mạnh, điểm yếu, lộ trình học..."
                 value={formData.notes}
                 onChange={e => setFormData({...formData, notes: e.target.value})}
-                className="mt-1 block w-full rounded-xl border-theme shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2 border glass-panel"
+                className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2 border glass-panel"
               />
             </div>
           </div>
         </fieldset>
 
-        <div className="flex justify-end pt-4 border-t border-theme">
+        <div className="flex justify-end pt-4 border-t border-sky-300/30">
           <button
             type="button"
             onClick={onClose}
-            className="mr-3 glass-panel py-2 px-4 border border-theme rounded-xl shadow-sm text-sm font-medium text-theme-secondary hover:bg-theme-section focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500"
+            className="mr-3 glass-panel py-2 px-4 border border-sky-300/30 rounded-xl shadow-sm text-sm font-medium text-sky-900 hover:bg-sky-50/40 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500"
           >
             Hủy
           </button>

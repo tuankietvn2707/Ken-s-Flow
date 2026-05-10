@@ -42,23 +42,23 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-theme-section flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
+    <div className="min-h-screen bg-sky-50/40 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <div className="w-12 h-12 bg-sky-600 rounded-xl flex items-center justify-center shadow-lg">
             <BookOpen className="w-8 h-8 text-white" />
           </div>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-theme-primary">
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-sky-950">
           TutorFlow
         </h2>
-        <p className="mt-2 text-center text-sm text-theme-muted">
+        <p className="mt-2 text-center text-sm text-sky-700/80">
           {isLogin ? 'Đăng nhập để quản lý lớp học' : 'Đăng ký tài khoản mới'}
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="glass-panel py-8 px-4 rounded-3xl shadow-[0_8px_32px_rgba(14,165,233,0.08)] sm:rounded-2xl sm:px-10 border border-theme">
+        <div className="glass-panel py-8 px-4 rounded-3xl shadow-[0_8px_32px_rgba(14,165,233,0.08)] sm:rounded-2xl sm:px-10 border border-sky-300/30">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
               <div className="bg-rose-50 border border-rose-200 text-rose-600 px-4 py-3 rounded-xl text-sm">
@@ -66,27 +66,27 @@ export default function Login() {
               </div>
             )}
             <div>
-              <label className="block text-sm font-medium text-theme-secondary">Email</label>
+              <label className="block text-sm font-medium text-sky-900">Email</label>
               <div className="mt-1">
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-theme rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 border border-sky-300/30 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-theme-secondary">Mật khẩu</label>
+              <label className="block text-sm font-medium text-sky-900">Mật khẩu</label>
               <div className="mt-1">
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-theme rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 border border-sky-300/30 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
                 />
               </div>
             </div>
@@ -105,10 +105,10 @@ export default function Login() {
           <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-theme" />
+                <div className="w-full border-t border-sky-300/30" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 glass-panel border-x border-theme text-theme-muted">Hoặc tiếp tục với</span>
+                <span className="px-2 glass-panel border-x border-sky-300/30 text-sky-700/80">Hoặc tiếp tục với</span>
               </div>
             </div>
 
@@ -116,7 +116,7 @@ export default function Login() {
               <button
                 onClick={handleGoogleLogin}
                 disabled={loading}
-                className="w-full flex items-center justify-center py-2 px-4 border border-theme rounded-xl shadow-sm glass-panel text-sm font-medium text-theme-secondary hover:bg-theme-section disabled:opacity-50"
+                className="w-full flex items-center justify-center py-2 px-4 border border-sky-300/30 rounded-xl shadow-sm glass-panel text-sm font-medium text-sky-900 hover:bg-sky-50/40 disabled:opacity-50"
               >
                 <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
