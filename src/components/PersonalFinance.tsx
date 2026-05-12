@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Target, MessageCircle, X } from 'lucide-react';
+import { Button } from './ui/Button';
 import FinanceChatbot from './FinanceChatbot';
 import { Transaction, Goal, FinanceHistoryRecord } from '../types';
 
@@ -114,12 +115,13 @@ export default function PersonalFinance({
       )}
 
       {/* Floating Chatbot Button */}
-      <button
+      <Button
+        size="icon"
         onClick={() => setShowChatbot(!showChatbot)}
-        className="fixed bottom-6 right-6 p-4 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-xl hover:shadow-cyan-500/30 hover:scale-105 transition-all z-40 group"
+        className="fixed bottom-6 right-6 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-xl hover:shadow-cyan-500/30 hover:scale-105 transition-all z-40 group h-14 w-14 border-0"
       >
         <MessageCircle className="w-6 h-6 group-hover:animate-pulse" />
-      </button>
+      </Button>
 
       {/* Embedded Chatbot Module */}
       <AnimatePresence>
@@ -128,16 +130,16 @@ export default function PersonalFinance({
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 50, scale: 0.9 }}
-            className="fixed bottom-24 right-6 w-96 h-[600px] z-50 glass-panel border border-sky-300/30 text-sky-950 rounded-3xl shadow-2xl overflow-hidden border border-white/40 flex flex-col"
+            className="fixed bottom-24 right-6 w-96 h-[600px] z-50 glass-panel border border-sky-300/30 text-sky-950 rounded-3xl shadow-2xl overflow-hidden flex flex-col"
           >
             <div className="bg-gradient-to-r from-cyan-500 to-blue-600 p-4 shrink-0 flex justify-between items-center text-white">
               <div className="flex items-center gap-2">
                 <Target className="w-5 h-5 text-cyan-200" />
                 <h3 className="font-semibold">Trợ Lý Tài Chính AI</h3>
               </div>
-              <button onClick={() => setShowChatbot(false)} className="p-1 hover:bg-white/20 rounded-full transition-colors">
+              <Button variant="ghost" size="icon" onClick={() => setShowChatbot(false)} className="hover:bg-white/20 h-8 w-8 text-white rounded-full transition-colors">
                 <X className="w-5 h-5" />
-              </button>
+              </Button>
             </div>
             <div className="flex-1 min-h-0 bg-white/50 backdrop-blur-xl relative">
               <FinanceChatbot 

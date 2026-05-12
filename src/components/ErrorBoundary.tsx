@@ -1,4 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Button } from './ui/Button';
 
 interface Props {
   children?: ReactNode;
@@ -45,41 +46,44 @@ export default class ErrorBoundary extends Component<Props, State> {
               {this.state.error?.toString()}
             </div>
             <div className="flex flex-col gap-3">
-              <button
+              <Button
                 onClick={() => window.location.reload()}
-                className="w-full bg-sky-600 text-white py-3 rounded-xl font-medium hover:bg-sky-700 transition-colors"
+                className="w-full"
               >
                 Tải lại trang
-              </button>
+              </Button>
               
               {!this.state.showConfirmDelete ? (
-                <button
+                <Button
+                  variant="danger"
                   onClick={() => (this as any).setState({ showConfirmDelete: true })}
-                  className="w-full bg-rose-100 text-rose-700 py-3 rounded-xl font-medium hover:bg-rose-200 transition-colors"
+                  className="w-full"
                 >
                   Xóa dữ liệu cũ và tải lại (Khôi phục cài đặt gốc)
-                </button>
+                </Button>
               ) : (
                 <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl">
                   <p className="text-sm text-rose-800 mb-3 font-medium">
                     Hành động này sẽ xóa toàn bộ dữ liệu lưu trên trình duyệt của bạn (Học viên, Lớp học, Thu chi...). Bạn có chắc chắn muốn tiếp tục?
                   </p>
                   <div className="flex gap-2">
-                    <button
+                    <Button
+                      variant="danger"
                       onClick={() => {
                         window.localStorage.clear();
                         window.location.reload();
                       }}
-                      className="flex-1 bg-rose-600 text-white py-2 rounded-xl font-medium hover:bg-rose-700 transition-colors"
+                      className="flex-1"
                     >
                       Xác nhận xóa
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      variant="secondary"
                       onClick={() => (this as any).setState({ showConfirmDelete: false })}
-                      className="flex-1 bg-sky-200 text-sky-900 py-2 rounded-xl font-medium hover:bg-sky-300 transition-colors"
+                      className="flex-1"
                     >
                       Hủy
-                    </button>
+                    </Button>
                   </div>
                 </div>
               )}

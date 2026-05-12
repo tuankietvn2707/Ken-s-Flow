@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Student, ClassSession, formatVND, parseDateSafe } from '../types';
 import { BookOpen, Calendar, X, ChevronUp, ChevronDown } from 'lucide-react';
 import { getAvatarColor } from './StudentManagementUtils';
+import { Button } from './ui/Button';
+import { Card, CardContent } from './ui/Card';
 
 interface Props {
   student: Student;
@@ -25,17 +27,17 @@ export default function StudentDetail({ student, classes, onClose, onEdit, markC
   };
 
   const renderClassCard = (cls: ClassSession, idx: number, isPaid: boolean) => (
-    <div key={cls.id} className="glass-panel rounded-3xl border border-sky-300/30 shadow-[0_10px_30px_rgba(0,0,0,0.04)] overflow-hidden">
-      <div className={`${isPaid ? 'bg-white' : 'bg-white'} px-6 py-3 border-b border-sky-300/30 flex justify-between items-center`}>
+    <Card key={cls.id} className="overflow-hidden">
+      <div className={`${isPaid ? 'bg-white' : 'bg-white'} px-6 py-3 border-b border-sky-100 flex justify-between items-center`}>
         <div className={`font-bold ${isPaid ? 'text-emerald-900' : 'text-blue-900'}`}>
           Buổi {idx + 1} <span className="text-sky-700/80 font-normal ml-2">({!isNaN(parseDateSafe(cls.date).getTime()) ? parseDateSafe(cls.date).toLocaleDateString('vi-VN') : 'Ngày không hợp lệ'})</span>
         </div>
-        <div className="text-sm font-medium text-sky-700/80 glass-panel px-2 py-1 rounded border border-sky-300/30">
+        <div className="text-sm font-medium text-sky-700/80 bg-sky-50 px-2 py-1 rounded border border-sky-100">
           {cls.duration} buổi
         </div>
       </div>
-      <div className="p-6">
-        <div className="mb-5 pb-5 border-b border-sky-300/30">
+      <CardContent className="p-6">
+        <div className="mb-5 pb-5 border-b border-sky-100">
           <p className="text-sm font-semibold text-sky-700/80 uppercase tracking-wider mb-1">Chủ đề / Nội dung</p>
           <p className="text-sky-950 font-medium text-lg">{cls.topic || '—'}</p>
         </div>
@@ -61,43 +63,46 @@ export default function StudentDetail({ student, classes, onClose, onEdit, markC
             <p className="text-sm text-sky-900 whitespace-pre-wrap">{cls.nextLessonPrep || '—'}</p>
           </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
       <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity" aria-hidden="true" onClick={onClose}></div>
+        <div className="fixed inset-0 bg-sky-950/20 backdrop-blur-sm transition-opacity" aria-hidden="true" onClick={onClose}></div>
 
         <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-        <div className="relative z-10 inline-flex flex-col align-bottom glass rounded-[32px] text-left overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.08)] transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full max-h-[90vh]">
-          <div className="glass-panel px-6 py-4 border-b border-sky-300/30 flex justify-between items-center shrink-0">
+        <div className="relative z-10 inline-flex flex-col align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full max-h-[90vh]">
+          <div className="bg-sky-50/50 px-6 py-4 border-b border-sky-100 flex justify-between items-center shrink-0">
             <h3 className="text-xl font-bold text-sky-950" id="modal-title">
               Hồ sơ Học viên: {student.name}
             </h3>
             <div className="flex items-center gap-3">
-              <button
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => {
                   onClose();
                   onEdit(student);
                 }}
-                className="text-sm font-medium text-sky-600 hover:text-indigo-800 glass-panel hover:bg-indigo-100 px-3 py-1.5 rounded-xl transition-colors"
               >
                 Sửa hồ sơ
-              </button>
-              <button 
+              </Button>
+              <Button
+                variant="ghost" 
+                size="icon"
                 onClick={onClose}
-                className="text-sky-700/80 hover:text-sky-700/80 bg-sky-50/40 hover:bg-sky-200 rounded-full p-1.5 transition-colors"
+                className="w-8 h-8 rounded-full bg-sky-100 text-sky-600 hover:bg-sky-200"
               >
                 <X className="w-5 h-5" />
-              </button>
+              </Button>
             </div>
           </div>
 
           <div className="p-6 space-y-6 overflow-y-auto flex-1">
-            <div className="glass-panel rounded-3xl border border-sky-300/30 shadow-[0_10px_30px_rgba(0,0,0,0.04)] p-6">
+            <Card className="p-6">
               <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
                 <div className={`h-20 w-20 rounded-full flex items-center justify-center font-bold text-3xl shrink-0 ${getAvatarColor(student.id)}`}>
                   {student.firstName ? student.firstName.charAt(0).toUpperCase() : student.name.charAt(0).toUpperCase()}
@@ -139,7 +144,7 @@ export default function StudentDetail({ student, classes, onClose, onEdit, markC
                   </div>
                 </div>
               </div>
-            </div>
+            </Card>
 
             <div>
               <h3 className="text-lg font-bold text-sky-950 mb-4 flex items-center">
@@ -155,7 +160,7 @@ export default function StudentDetail({ student, classes, onClose, onEdit, markC
                   
                   if (unpaidClasses.length === 0) {
                     return (
-                      <div className="text-center py-10 glass-panel rounded-3xl border border-sky-300/30 border-dashed">
+                      <div className="text-center py-10 bg-sky-50/50 rounded-2xl border border-sky-200 border-dashed">
                         <p className="text-sky-700/80">Chưa có buổi học nào trong đợt này.</p>
                       </div>
                     );
@@ -177,7 +182,7 @@ export default function StudentDetail({ student, classes, onClose, onEdit, markC
                   const paidClasses = classes.filter(c => c.studentId === student.id && c.isPaid);
                   if (paidClasses.length === 0) {
                     return (
-                      <div className="text-center py-10 glass-panel rounded-3xl border border-sky-300/30 border-dashed">
+                      <div className="text-center py-10 bg-sky-50/50 rounded-2xl border border-sky-200 border-dashed">
                         <p className="text-sky-700/80">Chưa có lịch sử học tập.</p>
                       </div>
                     );
@@ -199,10 +204,10 @@ export default function StudentDetail({ student, classes, onClose, onEdit, markC
                   });
 
                   return Object.entries(groupedClasses).map(([monthYear, monthClasses]) => (
-                    <div key={monthYear} className="glass-panel rounded-3xl border border-sky-300/30 shadow-[0_10px_30px_rgba(0,0,0,0.04)] overflow-hidden">
+                    <Card key={monthYear} className="overflow-hidden">
                       <button
                         onClick={() => toggleMonth(monthYear)}
-                        className="w-full px-6 py-4 flex justify-between items-center glass-panel/40 hover:bg-sky-50/40 transition-colors"
+                        className="w-full px-6 py-4 flex justify-between items-center bg-white hover:bg-sky-50/50 transition-colors"
                       >
                         <div className="font-bold text-sky-900">
                           {monthYear} <span className="text-sky-700/80 font-normal ml-2">({monthClasses.length} buổi)</span>
@@ -214,17 +219,17 @@ export default function StudentDetail({ student, classes, onClose, onEdit, markC
                         )}
                       </button>
                       {expandedMonths[monthYear] && (
-                        <div className="p-4 space-y-4 glass-panel/40">
+                        <CardContent className="p-4 space-y-4 bg-sky-50/30 border-t border-sky-100">
                           {monthClasses.map(({ cls, idx }) => renderClassCard(cls, idx, true))}
-                        </div>
+                        </CardContent>
                       )}
-                    </div>
+                    </Card>
                   ));
                 })()}
               </div>
             </div>
 
-            <div className="glass-panel rounded-3xl border border-sky-300/30 shadow-[0_10px_30px_rgba(0,0,0,0.04)] p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <Card className="p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
                 <p className="text-sm text-sky-700/80 mb-1">Tóm tắt tài chính</p>
                 <div className="flex items-baseline gap-3">
@@ -235,19 +240,19 @@ export default function StudentDetail({ student, classes, onClose, onEdit, markC
                 </div>
               </div>
               {markClassesAsPaid && getUnpaidAmount() > 0 && (
-                <button 
+                <Button 
                   onClick={() => {
                     const unpaidIds = classes.filter(c => c.studentId === student.id && !c.isPaid).map(c => c.id);
                     if (unpaidIds.length > 0) {
                       markClassesAsPaid(student.id, unpaidIds);
                     }
                   }}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-medium transition-colors shadow-sm whitespace-nowrap"
+                  className="whitespace-nowrap"
                 >
                   Đã thanh toán
-                </button>
+                </Button>
               )}
-            </div>
+            </Card>
           </div>
         </div>
       </div>

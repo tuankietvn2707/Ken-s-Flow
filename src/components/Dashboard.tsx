@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Student, ClassSession, formatVND, parseDateSafe } from '../types';
 import { Users, Calendar, Plus, UserPlus, CalendarPlus, CreditCard } from 'lucide-react';
 import { motion } from 'motion/react';
+import { Input } from './ui/Input';
 import {
   BarChart,
   Bar,
@@ -323,7 +324,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
             <div className="flex justify-between items-start mb-8 gap-4">
               <h3 className="text-xl font-extrabold text-sky-950 tracking-tight">Thu hồi học phí</h3>
               <div className="relative shrink-0">
-                <input
+                <Input
                   type="month"
                   id="financialMonthFilter"
                   value={selectedMonth}
@@ -332,7 +333,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
                       setSelectedMonth(e.target.value);
                     }
                   }}
-                  className="text-sm font-medium border-0 ring-1 ring-sky-200 rounded-2xl px-4 py-2 text-sky-900 focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white/80 shadow-sm cursor-pointer hover:ring-sky-300 transition-all"
+                  className="rounded-2xl cursor-pointer w-[150px]"
                 />
               </div>
             </div>
@@ -345,7 +346,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
                     cx="50%"
                     cy="50%"
                     innerRadius="65%"
-                    outerRadius="85%"
+                    outerRadius="100%"
                     paddingAngle={3}
                     dataKey="value"
                     stroke="none"

@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ChevronRight, Plus, Minus, X } from 'lucide-react';
 import { FinanceHistoryRecord } from '../types';
 import { formatNumber } from './PersonalFinance';
+import { Button } from './ui/Button';
+import { Modal } from './ui/Modal';
 
 interface Props {
   financeHistory: FinanceHistoryRecord[];
@@ -60,67 +62,55 @@ export default function FinanceHistory({ financeHistory }: Props) {
         </div>
       </motion.div>
 
-      <AnimatePresence>
+      <Modal
+        isOpen={!!selectedHistoryRecord}
+        onClose={() => setSelectedHistoryRecord(null)}
+        maxWidth="2xl"
+        title={
+          <div>
+            <h3 className="text-xl font-bold">Chi Tiết Kỳ Giao Dịch</h3>
+            <p className="text-sm opacity-70 mt-1 font-normal">Chốt sổ: {selectedHistoryRecord ? new Date(selectedHistoryRecord.timestamp).toLocaleString('vi-VN') : ''}</p>
+          </div>
+        }
+      >
         {selectedHistoryRecord && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-sky-950/40 backdrop-blur-sm"
-              onClick={() => setSelectedHistoryRecord(null)}
-            />
-            <motion.div 
-              initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="relative w-full max-w-2xl max-h-[85vh] flex flex-col glass-panel border border-sky-300/30 text-sky-950 rounded-3xl shadow-2xl p-0 overflow-hidden"
-            >
-              <div className="p-6 border-b border-sky-300/30 flex justify-between items-center glass-panel backdrop-blur-md sticky top-0 z-10">
-                <div>
-                  <h3 className="text-xl font-bold">Chi Tiết Kỳ Giao Dịch</h3>
-                  <p className="text-sm opacity-70 mt-1">Chốt sổ: {new Date(selectedHistoryRecord.timestamp).toLocaleString('vi-VN')}</p>
-                </div>
-                <button onClick={() => setSelectedHistoryRecord(null)} className="p-2 bg-sky-100 text-sky-600 rounded-full hover:bg-sky-200 transition-colors">
-                  <X className="w-5 h-5" />
-                </button>
+          <div className="pt-4 max-h-[60vh] overflow-y-auto">
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="p-4 bg-sky-50 rounded-xl border border-sky-100">
+                <p className="text-sm opacity-70 mb-1">Số dư tiền mặt</p>
+                <p className="text-lg font-bold text-sky-900">{formatNumber(selectedHistoryRecord.balancesSnapshot.cash)}đ</p>
               </div>
-              
-              <div className="p-6 overflow-y-auto flex-1">
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div className="p-4 bg-sky-50 rounded-xl border border-sky-300/30">
-                    <p className="text-sm opacity-70 mb-1">Số dư tiền mặt</p>
-                    <p className="text-lg font-bold text-sky-900">{formatNumber(selectedHistoryRecord.balancesSnapshot.cash)}đ</p>
-                  </div>
-                  <div className="p-4 bg-sky-50 rounded-xl border border-sky-300/30">
-                    <p className="text-sm opacity-70 mb-1">Số dư ngân hàng</p>
-                    <p className="text-lg font-bold text-sky-900">{formatNumber(selectedHistoryRecord.balancesSnapshot.banking)}đ</p>
-                  </div>
-                </div>
+              <div className="p-4 bg-sky-50 rounded-xl border border-sky-100">
+                <p className="text-sm opacity-70 mb-1">Số dư ngân hàng</p>
+                <p className="text-lg font-bold text-sky-900">{formatNumber(selectedHistoryRecord.balancesSnapshot.banking)}đ</p>
+              </div>
+            </div>
 
-                <div className="space-y-3">
-                  <h4 className="font-semibold text-sky-950 sticky top-0 glass-panel backdrop-blur-sm px-2 py-2 rounded">Ghi nhận giao dịch ({selectedHistoryRecord.transactions.length})</h4>
-                  {selectedHistoryRecord.transactions.map(t => (
-                    <div key={t.id} className="flex items-center justify-between p-3 rounded-xl bg-sky-50/40 border border-sky-300/30">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${t.type === 'income' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}>
-                          {t.type === 'income' ? <Plus className="w-5 h-5" /> : <Minus className="w-5 h-5" />}
-                        </div>
-                        <div>
-                          <p className="font-medium text-sm">{t.description}</p>
-                          <p className="text-xs opacity-60">{t.category || 'Khác'} • {t.date || 'Không rõ'}</p>
-                        </div>
-                      </div>
-                      <span className={`font-bold text-sm ${t.type === 'income' ? 'text-emerald-600' : 'text-rose-600'}`}>
-                        {t.type === 'income' ? '+' : '-'}{formatNumber(t.amount)}
-                      </span>
+            <div className="space-y-3">
+              <h4 className="font-semibold text-sky-950 px-2 py-2 rounded">Ghi nhận giao dịch ({selectedHistoryRecord.transactions.length})</h4>
+              {selectedHistoryRecord.transactions.map(t => (
+                <div key={t.id} className="flex items-center justify-between p-3 rounded-xl bg-sky-50/40 border border-sky-100">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${t.type === 'income' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}>
+                      {t.type === 'income' ? <Plus className="w-5 h-5" /> : <Minus className="w-5 h-5" />}
                     </div>
-                  ))}
-                  {selectedHistoryRecord.transactions.length === 0 && (
-                    <p className="text-center opacity-50 py-4 text-sm">Không có giao dịch nào trong kỳ này.</p>
-                  )}
+                    <div>
+                      <p className="font-medium text-sm">{t.description}</p>
+                      <p className="text-xs opacity-60">{t.category || 'Khác'} • {t.date || 'Không rõ'}</p>
+                    </div>
+                  </div>
+                  <span className={`font-bold text-sm ${t.type === 'income' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                    {t.type === 'income' ? '+' : '-'}{formatNumber(t.amount)}
+                  </span>
                 </div>
-              </div>
-            </motion.div>
+              ))}
+              {selectedHistoryRecord.transactions.length === 0 && (
+                <p className="text-center opacity-50 py-4 text-sm">Không có giao dịch nào trong kỳ này.</p>
+              )}
+            </div>
           </div>
         )}
-      </AnimatePresence>
+      </Modal>
     </>
   );
 }

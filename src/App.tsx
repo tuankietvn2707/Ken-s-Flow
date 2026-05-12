@@ -14,6 +14,8 @@ import FinancialTracking from './components/FinancialTracking';
 import PersonalFinance from './components/PersonalFinance';
 import Login from './components/Login';
 import FloatingActionButton from './components/FloatingActionButton';
+import { Button } from './components/ui/Button';
+import { Input } from './components/ui/Input';
 
 const DongSign = ({ className }: { className?: string }) => (
   <svg
@@ -440,9 +442,10 @@ export default function App() {
           <div className="flex justify-between h-16">
             <div className="flex">
               <div className="flex-shrink-0 flex items-center">
-                <button 
+                <Button 
+                  variant="ghost"
                   onClick={() => window.location.reload()}
-                  className="animated-border-box cursor-pointer hover:opacity-80 transition-opacity"
+                  className="animated-border-box cursor-pointer hover:opacity-80 transition-opacity h-auto py-2 px-3"
                 >
                   <div className="animated-border-inner flex items-center gap-2">
                     <Wallet className="w-6 h-6 text-sky-600" />
@@ -450,7 +453,7 @@ export default function App() {
                       TutorFlow
                     </span>
                   </div>
-                </button>
+                </Button>
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:space-x-2">
                 <TabButton 
@@ -497,13 +500,14 @@ export default function App() {
             </div>
             <div className="flex items-center">
               <span className="text-sm text-sky-700/80 mr-4 hidden sm:block">{user.email}</span>
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={handleLogout}
-                className="inline-flex items-center px-3 py-1.5 border border-sky-300/30 shadow-sm text-sm font-medium rounded-xl text-sky-900 glass-panel hover:glass-active focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500"
               >
                 <LogOut className="w-4 h-4 sm:mr-2" />
                 <span className="hidden sm:inline">Đăng xuất</span>
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -601,7 +605,8 @@ export default function App() {
 
 function TabButton({ active, onClick, icon, label, colorClass, hoverClass }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string, colorClass: string, hoverClass: string }) {
   return (
-    <button
+    <Button
+      variant="ghost"
       onClick={onClick}
       className={`inline-flex items-center px-4 py-2 my-2 rounded-xl text-sm font-medium transition-all duration-300 border ${
         active 
@@ -611,13 +616,14 @@ function TabButton({ active, onClick, icon, label, colorClass, hoverClass }: { a
     >
       {icon}
       {label}
-    </button>
+    </Button>
   );
 }
 
 function MobileTabButton({ active, onClick, label, colorClass }: { active: boolean, onClick: () => void, label: string, colorClass: string }) {
   return (
-    <button
+    <Button
+      variant="ghost"
       onClick={onClick}
       className={`whitespace-nowrap py-2 px-4 rounded-xl text-sm font-medium flex-1 text-center transition-all duration-300 border ${
         active 
@@ -626,7 +632,7 @@ function MobileTabButton({ active, onClick, label, colorClass }: { active: boole
       }`}
     >
       {label}
-    </button>
+    </Button>
   );
 }
 
@@ -672,22 +678,22 @@ function Onboarding({ onSave }: { onSave: (name: string) => void }) {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-sky-900 mb-2">Bạn là_______?</label>
-            <input
+            <Input
               type="text"
               required
               autoFocus
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Nhập tên của bạn..."
-              className="w-full px-4 py-3 rounded-xl border border-sky-300/30 bg-white/70 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all text-sky-950"
+              className="bg-white/70"
             />
           </div>
-          <button
+          <Button
             type="submit"
-            className="w-full py-3 bg-sky-600 text-white font-bold rounded-xl shadow-lg hover:bg-sky-700 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+            className="w-full py-6 text-base"
           >
             Bắt đầu ngay
-          </button>
+          </Button>
         </form>
       </div>
     </div>

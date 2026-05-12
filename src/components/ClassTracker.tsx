@@ -4,6 +4,13 @@ import { Plus, X, Edit2, Trash2, AlertTriangle } from 'lucide-react';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import { motion, AnimatePresence } from 'motion/react';
+import { Button } from './ui/Button';
+import { Input } from './ui/Input';
+import { Select } from './ui/Select';
+import { Textarea } from './ui/Textarea';
+import { Card, CardHeader, CardTitle, CardContent } from './ui/Card';
+import { Modal } from './ui/Modal';
+import { Badge } from './ui/Badge';
 
 interface Props {
   students: Student[];
@@ -47,7 +54,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
             });
           }
         }
-      };
+      }
     }
   }, [isFormOpen]);
   
@@ -240,313 +247,304 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
         className="flex justify-between items-center"
       >
         <h1 className="text-2xl font-bold text-sky-950">Theo dõi Lớp học</h1>
-        <button
+        <Button
           onClick={() => setIsFormOpen(true)}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl shadow-sm text-sky-900 bg-[#BAE1FF] hover:bg-[#89CFF0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#BAE1FF] transition-colors"
+          className="bg-sky-200 text-sky-900 border border-sky-300 hover:bg-sky-300 shadow-sm"
         >
           <Plus className="w-4 h-4 mr-2" />
           Ghi nhận Lớp học
-        </button>
+        </Button>
       </motion.div>
 
       {isFormOpen && (
         <motion.div 
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-          className="glass-panel rounded-3xl shadow-[0_8px_32px_rgba(14,165,233,0.08)] border border-sky-300/30 p-6 mb-6 relative"
+          className="mb-6 relative"
         >
-          <button 
-            onClick={closeForm}
-            className="absolute top-4 right-4 text-sky-700/80 hover:text-sky-700/80"
-          >
-            <X className="w-5 h-5" />
-          </button>
-          <h2 className="text-lg font-medium text-sky-950 mb-4">
-            {editingId ? 'Sửa thông tin Lớp học' : 'Ghi nhận Lớp học mới'}
-          </h2>
-          {formError && (
-            <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-xl border border-red-200">
-              {formError}
-            </div>
-          )}
-          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium text-sky-900">Học viên <span className="text-rose-500">*</span></label>
-                <select
-                  value={formData.studentId}
-                  onChange={e => setFormData({...formData, studentId: e.target.value})}
-                  className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border glass-panel"
-                >
-                  <option value="">Chọn học viên...</option>
-                  {students.filter(s => s.status !== 'inactive').map(s => (
-                    <option key={s.id} value={s.id}>{s.name}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-sky-900">Ngày học <span className="text-rose-500">*</span></label>
-                <input
-                  type="date"
-                  value={formData.date}
-                  onChange={e => setFormData({...formData, date: e.target.value})}
-                  className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-sky-900">Khung giờ (Tùy chọn)</label>
-                <input
-                  type="text"
-                  ref={timeInputRef}
-                  value={formData.time}
-                  onChange={e => setFormData({...formData, time: e.target.value})}
-                  className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border glass-panel"
-                  placeholder="Chọn giờ..."
-                />
-              </div>
-              <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-sky-900">Chủ đề bài học <span className="text-rose-500">*</span></label>
-                <input
-                  type="text"
-                  placeholder="VD: Thì hiện tại hoàn thành, Luyện nói..."
-                  value={formData.topic}
-                  onChange={e => setFormData({...formData, topic: e.target.value})}
-                  className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-sky-900">Thời lượng (1 buổi = 1h30 phút) <span className="text-rose-500">*</span></label>
-                <input
-                  type="number"
-                  min="0.5"
-                  step="0.5"
-                  value={formData.duration}
-                  onChange={e => setFormData({...formData, duration: e.target.value})}
-                  className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border"
-                />
-              </div>
-              
-              <div className="sm:col-span-2 mt-2 pt-4 border-t border-sky-300/30">
-                <h4 className="text-sm font-medium text-sky-600 mb-3">Đánh giá chi tiết buổi học</h4>
+          <Card>
+            <Button 
+              variant="ghost"
+              size="icon"
+              onClick={closeForm}
+              className="absolute top-4 right-4 text-sky-400 hover:text-sky-600 hover:bg-sky-50 z-10"
+            >
+              <X className="w-5 h-5" />
+            </Button>
+            <CardHeader className="pt-6">
+              <CardTitle>
+                {editingId ? 'Sửa thông tin Lớp học' : 'Ghi nhận Lớp học mới'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {formError && (
+                <div className="mb-4 p-3 bg-rose-50 text-rose-700 text-sm rounded-xl border border-rose-200">
+                  {formError}
+                </div>
+              )}
+              <form onSubmit={handleSubmit} className="space-y-4" noValidate>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className="block text-sm font-medium text-sky-900">Điểm mạnh</label>
-                    <textarea
-                      rows={2}
-                      placeholder="Những điểm học viên làm tốt..."
-                      value={formData.strengths}
-                      onChange={e => setFormData({...formData, strengths: e.target.value})}
-                      className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border"
+                  <div className="space-y-1">
+                    <label className="block text-sm font-medium text-sky-900">Học viên <span className="text-rose-500">*</span></label>
+                    <Select
+                      value={formData.studentId}
+                      onChange={e => setFormData({...formData, studentId: e.target.value})}
+                    >
+                      <option value="">Chọn học viên...</option>
+                      {students.filter(s => s.status !== 'inactive').map(s => (
+                        <option key={s.id} value={s.id}>{s.name}</option>
+                      ))}
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="block text-sm font-medium text-sky-900">Ngày học <span className="text-rose-500">*</span></label>
+                    <Input
+                      type="date"
+                      value={formData.date}
+                      onChange={e => setFormData({...formData, date: e.target.value})}
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-sky-900">Điểm yếu</label>
-                    <textarea
-                      rows={2}
-                      placeholder="Những điểm học viên cần cải thiện..."
-                      value={formData.weaknesses}
-                      onChange={e => setFormData({...formData, weaknesses: e.target.value})}
-                      className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border"
+                  <div className="space-y-1">
+                    <label className="block text-sm font-medium text-sky-900">Khung giờ (Tùy chọn)</label>
+                    <Input
+                      type="text"
+                      ref={timeInputRef}
+                      value={formData.time}
+                      onChange={e => setFormData({...formData, time: e.target.value})}
+                      placeholder="Chọn giờ..."
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-sky-900">Các lỗi sai</label>
-                    <textarea
-                      rows={2}
-                      placeholder="Các lỗi sai thường gặp..."
-                      value={formData.mistakes}
-                      onChange={e => setFormData({...formData, mistakes: e.target.value})}
-                      className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border"
+                  <div className="sm:col-span-2 space-y-1">
+                    <label className="block text-sm font-medium text-sky-900">Chủ đề bài học <span className="text-rose-500">*</span></label>
+                    <Input
+                      type="text"
+                      placeholder="VD: Thì hiện tại hoàn thành, Luyện nói..."
+                      value={formData.topic}
+                      onChange={e => setFormData({...formData, topic: e.target.value})}
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-sky-900">Cách khắc phục</label>
-                    <textarea
-                      rows={2}
-                      placeholder="Giải pháp hoặc bài tập để khắc phục..."
-                      value={formData.remedies}
-                      onChange={e => setFormData({...formData, remedies: e.target.value})}
-                      className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border"
+                  <div className="space-y-1">
+                    <label className="block text-sm font-medium text-sky-900">Thời lượng (1 buổi = 1h30 phút) <span className="text-rose-500">*</span></label>
+                    <Input
+                      type="number"
+                      min="0.5"
+                      step="0.5"
+                      value={formData.duration}
+                      onChange={e => setFormData({...formData, duration: e.target.value})}
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-sky-900">Soạn bài cho buổi sau</label>
-                    <textarea
-                      rows={2}
-                      placeholder="Nội dung cần chuẩn bị cho buổi học tiếp theo..."
-                      value={formData.nextLessonPrep}
-                      onChange={e => setFormData({...formData, nextLessonPrep: e.target.value})}
-                      className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border"
-                    />
+                  
+                  <div className="sm:col-span-2 mt-2 pt-4 border-t border-sky-100">
+                    <h4 className="text-sm font-medium text-sky-600 mb-3">Đánh giá chi tiết buổi học</h4>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div className="space-y-1">
+                        <label className="block text-sm font-medium text-sky-900">Điểm mạnh</label>
+                        <Textarea
+                          rows={2}
+                          placeholder="Những điểm học viên làm tốt..."
+                          value={formData.strengths}
+                          onChange={e => setFormData({...formData, strengths: e.target.value})}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="block text-sm font-medium text-sky-900">Điểm yếu</label>
+                        <Textarea
+                          rows={2}
+                          placeholder="Những điểm học viên cần cải thiện..."
+                          value={formData.weaknesses}
+                          onChange={e => setFormData({...formData, weaknesses: e.target.value})}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="block text-sm font-medium text-sky-900">Các lỗi sai</label>
+                        <Textarea
+                          rows={2}
+                          placeholder="Các lỗi sai thường gặp..."
+                          value={formData.mistakes}
+                          onChange={e => setFormData({...formData, mistakes: e.target.value})}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="block text-sm font-medium text-sky-900">Cách khắc phục</label>
+                        <Textarea
+                          rows={2}
+                          placeholder="Giải pháp hoặc bài tập để khắc phục..."
+                          value={formData.remedies}
+                          onChange={e => setFormData({...formData, remedies: e.target.value})}
+                        />
+                      </div>
+                      <div className="sm:col-span-2 space-y-1">
+                        <label className="block text-sm font-medium text-sky-900">Soạn bài cho buổi sau</label>
+                        <Textarea
+                          rows={2}
+                          placeholder="Nội dung cần chuẩn bị cho buổi học tiếp theo..."
+                          value={formData.nextLessonPrep}
+                          onChange={e => setFormData({...formData, nextLessonPrep: e.target.value})}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-            <div className="flex justify-end pt-4">
-              <button
-                type="button"
-                onClick={closeForm}
-                className="mr-3 glass-panel py-2 px-4 border border-sky-300/30 rounded-xl shadow-sm text-sm font-medium text-sky-900 hover:bg-sky-50/40 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500"
-              >
-                Hủy
-              </button>
-              <button
-                type="submit"
-                disabled={students.length === 0 || isSubmitting}
-                className="bg-sky-600 py-2 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {isSubmitting && (
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                )}
-                {editingId ? 'Lưu thay đổi' : 'Lưu'}
-              </button>
-            </div>
-          </form>
+                <div className="flex justify-end pt-4 gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={closeForm}
+                  >
+                    Hủy
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={students.length === 0 || isSubmitting}
+                  >
+                    {isSubmitting && (
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                    )}
+                    {editingId ? 'Lưu thay đổi' : 'Lưu'}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
         </motion.div>
       )}
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-        className="glass-panel rounded-2xl overflow-hidden border"
-        
       >
-        <div className="px-6 py-5 border-b border-sky-300/30 bg-sky-50/40">
-          <h3 className="text-lg leading-6 font-medium text-sky-950">Các buổi học gần đây</h3>
-          <div className="flex items-center gap-3">
-            <select
-              value={filterMonth}
-              onChange={(e) => setFilterMonth(e.target.value)}
-              className="block w-32 rounded-xl border-sky-300/30 shadow-sm focus:border-[#BAE1FF] focus:ring-[#BAE1FF] sm:text-sm p-2 border bg-sky-50/40"
-            >
-              <option value="all">Tất cả tháng</option>
-              {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
-                <option key={month} value={month.toString()}>Tháng {month}</option>
-              ))}
-            </select>
-            <select
-              value={filterYear}
-              onChange={(e) => setFilterYear(e.target.value)}
-              className="block w-28 rounded-xl border-sky-300/30 shadow-sm focus:border-[#BAE1FF] focus:ring-[#BAE1FF] sm:text-sm p-2 border bg-sky-50/40"
-            >
-              <option value="all">Tất cả năm</option>
-              {availableYears.map(year => (
-                <option key={year} value={year}>{year}</option>
-              ))}
-            </select>
+        <Card className="overflow-hidden">
+          <div className="px-6 py-5 border-b border-sky-100 bg-sky-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <h3 className="text-lg leading-6 font-medium text-sky-950">Các buổi học gần đây</h3>
+            <div className="flex items-center gap-3">
+              <Select
+                value={filterMonth}
+                onChange={(e) => setFilterMonth(e.target.value)}
+                className="w-32 bg-white"
+              >
+                <option value="all">Tất cả tháng</option>
+                {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
+                  <option key={month} value={month.toString()}>Tháng {month}</option>
+                ))}
+              </Select>
+              <Select
+                value={filterYear}
+                onChange={(e) => setFilterYear(e.target.value)}
+                className="w-28 bg-white"
+              >
+                <option value="all">Tất cả năm</option>
+                {availableYears.map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </Select>
+            </div>
           </div>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full">
-            <thead className="bg-sky-50/40 border-b border-sky-300/30">
-              <tr>
-                <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-[#64748B] uppercase tracking-wider">Ngày/Giờ</th>
-                <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-[#64748B] uppercase tracking-wider">Học viên</th>
-                <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-[#64748B] uppercase tracking-wider">Chủ đề</th>
-                <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-[#64748B] uppercase tracking-wider">Thời lượng</th>
-                <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-[#64748B] uppercase tracking-wider">Trạng thái</th>
-                <th scope="col" className="relative px-6 py-4"><span className="sr-only">Thao tác</span></th>
-              </tr>
-            </thead>
-            <tbody 
-              className="bg-white divide-y divide-sky-300/40">
-              {sortedClasses.length === 0 ? (
+          <div className="overflow-x-auto">
+            <table className="min-w-full">
+              <thead className="bg-sky-50/30 border-b border-sky-100">
                 <tr>
-                  <td colSpan={6} className="px-6 py-10 text-center text-sm text-sky-700/80" >
-                    Chưa có lớp học nào được ghi nhận trong thời gian này.
-                  </td>
+                  <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-sky-600 uppercase tracking-wider">Ngày/Giờ</th>
+                  <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-sky-600 uppercase tracking-wider">Học viên</th>
+                  <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-sky-600 uppercase tracking-wider">Chủ đề</th>
+                  <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-sky-600 uppercase tracking-wider">Thời lượng</th>
+                  <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-sky-600 uppercase tracking-wider">Trạng thái</th>
+                  <th scope="col" className="relative px-6 py-4"><span className="sr-only">Thao tác</span></th>
                 </tr>
-              ) : (
-                sortedClasses.map((cls) => (
-                  <tr key={cls.id} className="hover:bg-[#F8FAFC] transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-sky-950">
-                      {!isNaN(parseDateSafe(cls.date).getTime()) 
-                        ? parseDateSafe(cls.date).toLocaleDateString('vi-VN') 
-                        : 'Ngày không hợp lệ'}
-                      {cls.time && <span className="text-sky-700/80 ml-2 text-xs">{cls.time}</span>}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStudentColor(cls.studentId)}`}>
-                        {getStudentName(cls.studentId)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-sky-700/80">
-                      {cls.topic}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-sky-700/80">
-                      {cls.duration} buổi
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {cls.isPaid ? (
-                        <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-[#BAFFC9] text-green-800">
-                          Đã thanh toán
-                        </span>
-                      ) : (
-                        <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-[#FFDFBA] text-orange-800">
-                          Chưa thanh toán
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button 
-                        onClick={() => editClass(cls)} 
-                        className="text-sky-700/80 hover:text-sky-600 mr-4 transition-colors"
-                        title="Sửa"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      <button 
-                        onClick={() => handleDelete(cls.id)} 
-                        className="text-sky-700/80 hover:text-rose-600 transition-colors"
-                        title="Xóa"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+              </thead>
+              <tbody className="bg-white divide-y divide-sky-50">
+                {sortedClasses.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-10 text-center text-sm text-sky-700/80" >
+                      Chưa có lớp học nào được ghi nhận trong thời gian này.
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                ) : (
+                  sortedClasses.map((cls) => (
+                    <tr key={cls.id} className="hover:bg-sky-50/50 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-sky-950 font-medium">
+                        {!isNaN(parseDateSafe(cls.date).getTime()) 
+                          ? parseDateSafe(cls.date).toLocaleDateString('vi-VN') 
+                          : 'Ngày không hợp lệ'}
+                        {cls.time && <span className="text-sky-600 ml-2 text-xs font-normal bg-sky-100 px-2 py-0.5 rounded-full">{cls.time}</span>}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStudentColor(cls.studentId)}`}>
+                          {getStudentName(cls.studentId)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-sky-700 font-medium max-w-xs truncate">
+                        {cls.topic}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-sky-600">
+                        {cls.duration} buổi
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {cls.isPaid ? (
+                          <Badge variant="success">Đã thanh toán</Badge>
+                        ) : (
+                          <Badge variant="warning">Chưa thanh toán</Badge>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => editClass(cls)} 
+                          className="mr-2 text-sky-600 hover:text-sky-800 hover:bg-sky-100"
+                          title="Sửa"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(cls.id)} 
+                          className="text-rose-500 hover:text-rose-700 hover:bg-rose-100"
+                          title="Xóa"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       </motion.div>
 
       {/* Delete Confirmation Modal */}
-      <AnimatePresence>
-        {confirmDeleteId && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sky-950/20 backdrop-blur-sm">
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }} 
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-3xl shadow-xl max-w-md w-full p-6 border border-sky-100"
+      <Modal
+        isOpen={!!confirmDeleteId}
+        onClose={() => setConfirmDeleteId(null)}
+        maxWidth="sm"
+        title="Xác nhận xóa lớp học"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setConfirmDeleteId(null)} className="flex-1">
+              Hủy
+            </Button>
+            <Button 
+              variant="danger" 
+              onClick={confirmDelete}
+              className="flex-1"
             >
-              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-rose-100 mx-auto mb-4">
-                <AlertTriangle className="w-6 h-6 text-rose-600" />
-              </div>
-              <h3 className="text-xl font-bold text-sky-950 text-center mb-2">Xác nhận xóa lớp học</h3>
-              <p className="text-sky-700/80 text-center mb-8">
-                Bạn có chắc chắn muốn xóa đánh giá và ghi nhận buổi học này? Hành động này không thể hoàn tác.
-              </p>
-              <div className="flex gap-3">
-                <button 
-                  onClick={() => setConfirmDeleteId(null)}
-                  className="flex-1 py-2.5 px-4 rounded-xl text-sky-700 font-medium bg-sky-50 hover:bg-sky-100 transition-colors"
-                >
-                  Hủy
-                </button>
-                <button 
-                  onClick={confirmDelete}
-                  className="flex-1 py-2.5 px-4 rounded-xl text-white font-medium bg-rose-600 hover:bg-rose-700 transition-colors shadow-sm"
-                >
-                  Xóa
-                </button>
-              </div>
-            </motion.div>
+              Xóa
+            </Button>
+          </>
+        }
+      >
+        <div className="flex flex-col items-center pt-2 pb-6">
+          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-rose-100 mb-4">
+            <AlertTriangle className="w-6 h-6 text-rose-600" />
           </div>
-        )}
-      </AnimatePresence>
+          <p className="text-sky-700/80 text-center text-sm">
+            Bạn có chắc chắn muốn xóa đánh giá và ghi nhận buổi học này? Hành động này không thể hoàn tác.
+          </p>
+        </div>
+      </Modal>
     </div>
   );
 }

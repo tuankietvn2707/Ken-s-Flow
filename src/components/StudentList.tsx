@@ -1,9 +1,15 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Student, ClassSession, formatVND } from '../types';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { GripVertical, Edit2, Trash2, Search, Filter, LayoutGrid, List, AlertTriangle, MoreVertical, Calendar, DollarSign, BookOpen, Wallet } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { getAvatarColor } from './StudentManagementUtils';
+import { Select } from './ui/Select';
+import { Input } from './ui/Input';
+import { Button } from './ui/Button';
+import { Modal } from './ui/Modal';
+import { Badge } from './ui/Badge';
+import { Card } from './ui/Card';
 
 interface Props {
   students: Student[];
@@ -17,8 +23,25 @@ interface Props {
 export default function StudentList({ students, classes = [], onUpdate, onDelete, onSelect, onEdit }: Props) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<'all' | 'active' | 'unpaid' | 'upcoming' | 'inactive'>('all');
-  const [sortBy, setSortBy] = useState<'order' | 'nameAsc' | 'nameDesc' | 'feeDesc'>('order');
-  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
+  
+  const [sortBy, setSortBy] = useState<'order' | 'nameAsc' | 'nameDesc' | 'feeDesc'>(() => {
+    const saved = localStorage.getItem('tutorflow_sortBy');
+    return (saved as any) || 'order';
+  });
+  
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>(() => {
+    const saved = localStorage.getItem('tutorflow_viewMode');
+    return (saved as any) || 'list';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('tutorflow_sortBy', sortBy);
+  }, [sortBy]);
+
+  useEffect(() => {
+    localStorage.setItem('tutorflow_viewMode', viewMode);
+  }, [viewMode]);
+
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const studentStats = useMemo(() => {
@@ -107,20 +130,21 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
   };
 
   // Status editable badge wrapper
-  const StatusBadge = ({ student }: { student: Student }) => (
-    <select
-      value={student.status || 'active'}
-      onClick={(e) => e.stopPropagation()}
-      onChange={(e) => onUpdate({ ...student, status: e.target.value as 'active' | 'inactive' })}
-      className={`text-xs font-semibold rounded-full px-3 py-1 cursor-pointer border-0 ring-1 focus:ring-2 focus:ring-sky-500 appearance-none text-center ${
-        student.status === 'inactive' 
-        ? 'bg-gray-100 text-gray-600 ring-gray-200 hover:bg-gray-200' 
-        : 'bg-emerald-50 text-emerald-700 ring-emerald-200 hover:bg-emerald-100'
-      }`}
-    >
-      <option value="active">Hoạt động</option>
-      <option value="inactive">Ngưng</option>
-    </select>
+  const StatusBadgeItem = ({ student }: { student: Student }) => (
+    <div onClick={(e) => e.stopPropagation()}>
+      <Select
+        value={student.status || 'active'}
+        onChange={(e) => onUpdate({ ...student, status: e.target.value as 'active' | 'inactive' })}
+        className={`text-xs font-semibold rounded-full px-3 py-1 cursor-pointer border-0 ring-1 focus:ring-2 focus:ring-sky-500 text-center h-auto pr-6 ${
+          student.status === 'inactive' 
+          ? 'bg-gray-100 text-gray-600 ring-gray-200 hover:bg-gray-200' 
+          : 'bg-emerald-50 text-emerald-700 ring-emerald-200 hover:bg-emerald-100'
+        }`}
+      >
+        <option value="active">Hoạt động</option>
+        <option value="inactive">Ngưng</option>
+      </Select>
+    </div>
   );
 
   const renderGridItem = (student: Student) => (
@@ -138,12 +162,7 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
           {student.firstName ? student.firstName.charAt(0).toUpperCase() : student.name.charAt(0).toUpperCase()}
         </div>
         <div className="flex items-center gap-2">
-          {studentStats[student.id]?.unpaidCount > 0 && (
-            <span className="flex items-center justify-center w-6 h-6 bg-rose-100 text-rose-600 rounded-full" title={`${studentStats[student.id].unpaidCount} buổi chưa thanh toán`}>
-              <DollarSign className="w-3.5 h-3.5" />
-            </span>
-          )}
-          <StatusBadge student={student} />
+          <StatusBadgeItem student={student} />
         </div>
       </div>
       <div>
@@ -166,18 +185,21 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
         </div>
         
         <div className="mt-5 pt-4 border-t border-sky-50 flex items-center justify-between">
-          <button 
+          <Button 
+            variant="secondary"
+            size="sm"
             onClick={(e) => { e.stopPropagation(); onEdit(student); }}
-            className="text-sm font-medium text-sky-600 hover:text-sky-800 bg-sky-50 hover:bg-sky-100 px-3 py-1.5 rounded-lg transition-colors"
           >
             Chỉnh sửa
-          </button>
-          <button 
+          </Button>
+          <Button 
+            variant="danger"
+            size="icon"
             onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(student.id); }}
-            className="text-sm font-medium text-rose-500 hover:text-rose-700 hover:bg-rose-50 px-3 py-1.5 rounded-lg transition-colors"
+            className="w-8 h-8 rounded-lg"
           >
             <Trash2 className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
       </div>
     </motion.div>
@@ -223,12 +245,7 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
         </td>
         <td className="px-4 py-4 whitespace-nowrap">
           <div className="flex items-center gap-2">
-            <StatusBadge student={student} />
-            {studentStats[student.id]?.unpaidCount > 0 && (
-              <span className="flex items-center justify-center bg-rose-50 text-rose-600 text-xs font-bold px-2 py-1 rounded-full border border-rose-100" title={`${studentStats[student.id].unpaidCount} buổi chưa thanh toán`}>
-                <DollarSign className="w-3 h-3 mr-0.5" /> {studentStats[student.id].unpaidCount} nợ
-              </span>
-            )}
+            <StatusBadgeItem student={student} />
           </div>
         </td>
         <td className="px-4 py-4 whitespace-nowrap">
@@ -244,20 +261,24 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
         </td>
         <td className="px-4 py-4 whitespace-nowrap text-right">
           <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button 
+            <Button 
+              variant="outline"
+              size="icon"
               onClick={(e) => { e.stopPropagation(); onEdit(student); }} 
-              className="p-2 text-sky-600 hover:bg-sky-100 rounded-lg transition-colors"
+              className="w-8 h-8 rounded-lg"
               title="Sửa"
             >
               <Edit2 className="w-4 h-4" />
-            </button>
-            <button 
+            </Button>
+            <Button
+              variant="danger"
+              size="icon" 
               onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(student.id); }} 
-              className="p-2 text-rose-500 hover:bg-rose-100 rounded-lg transition-colors"
+              className="w-8 h-8 rounded-lg"
               title="Xóa"
             >
               <Trash2 className="w-4 h-4" />
-            </button>
+            </Button>
           </div>
         </td>
       </tr>
@@ -267,71 +288,81 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
   return (
     <div className="space-y-6">
       {/* Action Bar */}
-      <div className="bg-white p-4 rounded-2xl shadow-sm border border-sky-100 flex flex-col lg:flex-row gap-4 items-center justify-between">
+      <Card className="p-4 flex flex-col lg:flex-row gap-4 items-center justify-between">
         <div className="flex w-full lg:w-1/3 relative">
           <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-sky-400" />
-          <input 
+          <Input 
             type="text" 
             placeholder="Tìm kiếm học viên..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all text-sky-900 placeholder:text-sky-400 font-medium"
+            className="w-full pl-10 pr-4 bg-sky-50/50"
           />
         </div>
         
         <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
           <div className="flex items-center bg-sky-50/50 p-1 rounded-xl border border-sky-100">
-            <button 
+            <Button 
+              variant="ghost"
+              size="sm"
               onClick={() => setFilter('all')} 
-              className={`px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors ${filter === 'all' ? 'bg-white shadow-sm text-sky-900 border border-sky-200/50' : 'text-sky-600 hover:text-sky-900'}`}
+              className={`px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors h-auto ${filter === 'all' ? 'bg-white shadow-sm text-sky-900 border border-sky-200/50 hover:bg-white' : 'text-sky-600 hover:text-sky-900'}`}
             >
               Tất cả
-            </button>
-            <button 
+            </Button>
+            <Button 
+              variant="ghost"
+              size="sm"
               onClick={() => setFilter('active')} 
-              className={`px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors ${filter === 'active' ? 'bg-white shadow-sm text-sky-900 border border-sky-200/50' : 'text-sky-600 hover:text-sky-900'}`}
+              className={`px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors h-auto ${filter === 'active' ? 'bg-white shadow-sm text-sky-900 border border-sky-200/50 hover:bg-white' : 'text-sky-600 hover:text-sky-900'}`}
             >
               Hoạt động
-            </button>
-            <button 
+            </Button>
+            <Button 
+              variant="ghost"
+              size="sm"
               onClick={() => setFilter('unpaid')} 
-              className={`px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors ${filter === 'unpaid' ? 'bg-white shadow-sm text-sky-900 border border-sky-200/50' : 'text-sky-600 hover:text-sky-900'}`}
+              className={`px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors h-auto ${filter === 'unpaid' ? 'bg-white shadow-sm text-sky-900 border border-sky-200/50 hover:bg-white' : 'text-sky-600 hover:text-sky-900'}`}
             >
               Chưa đóng phí
-            </button>
+            </Button>
           </div>
 
           <div className="h-6 w-px bg-sky-200 hidden sm:block"></div>
 
-          <select 
+          <Select 
             value={sortBy} 
             onChange={(e) => setSortBy(e.target.value as any)}
-            className="bg-white border border-sky-100 text-sky-900 font-medium text-sm rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-sky-500"
+            className="w-auto truncate"
           >
             <option value="order">Sắp xếp tùy chỉnh</option>
             <option value="nameAsc">Tên (A-Z)</option>
             <option value="nameDesc">Tên (Z-A)</option>
             <option value="feeDesc">Học phí (Cao-Thấp)</option>
-          </select>
+          </Select>
 
           <div className="flex items-center bg-sky-50/50 p-1 rounded-xl border border-sky-100 hidden sm:flex">
-            <button 
+            <Button 
+              variant="ghost"
+              size="icon"
               onClick={() => setViewMode('list')} 
-              className={`p-1.5 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-white shadow-sm text-sky-700' : 'text-sky-400 hover:text-sky-700'}`}
+              className={`p-1.5 rounded-lg transition-colors h-8 w-8 ${viewMode === 'list' ? 'bg-white shadow-sm text-sky-700 hover:bg-white' : 'text-sky-400 hover:text-sky-700'}`}
               title="Danh sách"
             >
               <List className="w-5 h-5" />
-            </button>
-            <button 
+            </Button>
+            <Button 
+              variant="ghost"
+              size="icon"
               onClick={() => setViewMode('grid')} 
-              className={`p-1.5 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-white shadow-sm text-sky-700' : 'text-sky-400 hover:text-sky-700'}`}
+              className={`p-1.5 rounded-lg transition-colors h-8 w-8 ${viewMode === 'grid' ? 'bg-white shadow-sm text-sky-700 hover:bg-white' : 'text-sky-400 hover:text-sky-700'}`}
               title="Lưới"
             >
               <LayoutGrid className="w-5 h-5" />
-            </button>
+            </Button>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Main Content */}
       <AnimatePresence mode="wait">
@@ -382,11 +413,11 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
                         {(provided) => (
                           <tbody {...provided.droppableProps} ref={provided.innerRef}>
                             {filteredAndSortedStudents.map((student, index) => {
-                              const dragProps: any = { key: student.id, draggableId: student.id, index };
+                              const DraggableComponent = Draggable as any;
                               return (
-                                <Draggable {...dragProps}>
+                                <DraggableComponent key={student.id} draggableId={student.id} index={index}>
                                   {(p: any, s: any) => renderListItem(student, index, p, s)}
-                                </Draggable>
+                                </DraggableComponent>
                               );
                             })}
                             {provided.placeholder}
@@ -410,41 +441,38 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
         )}
       </AnimatePresence>
 
-      {/* Delete Confirmation Modal */}
-      {confirmDeleteId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sky-950/20 backdrop-blur-sm">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }} 
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-3xl shadow-xl max-w-md w-full p-6 border border-sky-100"
-          >
-            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-rose-100 mx-auto mb-4">
-              <AlertTriangle className="w-6 h-6 text-rose-600" />
-            </div>
-            <h3 className="text-xl font-bold text-sky-950 text-center mb-2">Xác nhận xóa</h3>
-            <p className="text-sky-700/80 text-center mb-8">
-              Bạn có chắc chắn muốn xóa học viên này? Hành động này không thể hoàn tác và sẽ xóa toàn bộ lịch sử học tập, thanh toán liên quan.
-            </p>
-            <div className="flex gap-3">
-              <button 
-                onClick={() => setConfirmDeleteId(null)}
-                className="flex-1 py-2.5 px-4 rounded-xl text-sky-700 font-medium bg-sky-50 hover:bg-sky-100 transition-colors"
-              >
-                Hủy
-              </button>
-              <button 
-                onClick={() => {
-                  onDelete(confirmDeleteId);
-                  setConfirmDeleteId(null);
-                }}
-                className="flex-1 py-2.5 px-4 rounded-xl text-white font-medium bg-rose-600 hover:bg-rose-700 transition-colors shadow-sm"
-              >
-                Xóa gốc rễ
-              </button>
-            </div>
-          </motion.div>
+      <Modal
+        isOpen={!!confirmDeleteId}
+        onClose={() => setConfirmDeleteId(null)}
+        maxWidth="sm"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setConfirmDeleteId(null)} className="flex-1">
+              Hủy
+            </Button>
+            <Button 
+              variant="danger" 
+              onClick={() => {
+                if (confirmDeleteId) onDelete(confirmDeleteId);
+                setConfirmDeleteId(null);
+              }}
+              className="flex-1"
+            >
+              Xóa gốc rễ
+            </Button>
+          </>
+        }
+      >
+        <div className="flex flex-col items-center pt-2">
+          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-rose-100 mb-4">
+            <AlertTriangle className="w-6 h-6 text-rose-600" />
+          </div>
+          <h3 className="text-xl font-bold text-sky-950 text-center mb-2">Xác nhận xóa</h3>
+          <p className="text-sky-700/80 text-center text-sm">
+            Bạn có chắc chắn muốn xóa học viên này? Hành động này không thể hoàn tác và sẽ xóa toàn bộ lịch sử học tập, thanh toán liên quan.
+          </p>
         </div>
-      )}
+      </Modal>
     </div>
   );
 }

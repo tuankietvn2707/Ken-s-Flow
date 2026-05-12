@@ -5,6 +5,8 @@ import { GoogleGenAI } from '@google/genai';
 import OpenAI from 'openai';
 import { Transaction, Goal, TransactionType } from '../types';
 import { formatNumber } from './PersonalFinance';
+import { Button } from './ui/Button';
+import { Input } from './ui/Input';
 
 interface Props {
   transactions: Transaction[];
@@ -265,9 +267,9 @@ QUY TẮC QUAN TRỌNG:
                 <Bot className="w-6 h-6" />
                 <span className="font-semibold">Trợ lý Tài chính AI</span>
               </div>
-              <button onClick={() => setIsOpen(false)} className="hover:bg-white/20 p-1 rounded-full transition-colors">
+              <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="hover:bg-white/20 h-8 w-8 text-white rounded-full transition-colors">
                 <X className="w-5 h-5" />
-              </button>
+              </Button>
             </div>
 
             {/* Messages */}
@@ -310,32 +312,33 @@ QUY TẮC QUAN TRỌNG:
             </div>
 
             {/* Quick Actions */}
-            <div className="px-4 py-2 glass-panel border-t border-sky-300/30 flex gap-2 overflow-x-auto custom-scrollbar">
-              <button onClick={() => handleQuickAction('Báo cáo tuần')} className="whitespace-nowrap px-3 py-1.5 bg-cyan-50 text-cyan-600 text-xs font-medium rounded-full hover:bg-cyan-100 transition-colors flex items-center gap-1">
-                <FileText className="w-3 h-3" /> Báo cáo tuần
-              </button>
-              <button onClick={() => handleQuickAction('Xuất CSV')} className="whitespace-nowrap px-3 py-1.5 bg-blue-50 text-blue-600 text-xs font-medium rounded-full hover:bg-blue-100 transition-colors flex items-center gap-1">
-                <Download className="w-3 h-3" /> Xuất CSV
-              </button>
+            <div className="px-4 py-2 bg-white/50 border-t border-sky-100 flex gap-2 overflow-x-auto custom-scrollbar">
+              <Button variant="secondary" size="sm" onClick={() => handleQuickAction('Báo cáo tuần')} className="whitespace-nowrap rounded-full text-xs h-8">
+                <FileText className="w-3 h-3 mr-1" /> Báo cáo tuần
+              </Button>
+              <Button variant="secondary" size="sm" onClick={() => handleQuickAction('Xuất CSV')} className="whitespace-nowrap rounded-full text-xs h-8">
+                <Download className="w-3 h-3 mr-1" /> Xuất CSV
+              </Button>
             </div>
 
             {/* Input */}
-            <div className="p-3 glass-panel border-t border-sky-300/30">
+            <div className="p-3 bg-white border-t border-sky-100 rounded-b-3xl">
               <form onSubmit={(e) => { e.preventDefault(); handleSend(); }} className="flex gap-2">
-                <input
+                <Input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Nhập tin nhắn..."
-                  className="flex-1 px-4 py-2 bg-sky-50/40 rounded-full text-sm outline-none focus:ring-2 focus:ring-cyan-500 transition-all"
+                  className="rounded-full bg-sky-50"
                 />
-                <button 
+                <Button 
                   type="submit" 
+                  size="icon"
                   disabled={!input.trim() || isLoading}
-                  className="w-10 h-10 bg-cyan-500 text-white rounded-full flex items-center justify-center hover:bg-cyan-600 transition-colors disabled:opacity-50"
+                  className="rounded-full w-10 h-10 flex-shrink-0"
                 >
                   <Send className="w-4 h-4 ml-1" />
-                </button>
+                </Button>
               </form>
             </div>
           </motion.div>
@@ -343,12 +346,13 @@ QUY TẮC QUAN TRỌNG:
       </AnimatePresence>
 
       {/* FAB Button */}
-      <button
+      <Button
+        size="icon"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-14 h-14 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform focus:outline-none"
+        className="w-14 h-14 rounded-full shadow-lg hover:scale-110 transition-transform h-14 w-14"
       >
         {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
-      </button>
+      </Button>
     </div>
   );
 }

@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Plus, Minus, Trash2, Download, Archive, Check, X, AlertTriangle } from 'lucide-react';
+import { Button } from './ui/Button';
+import { Input } from './ui/Input';
+import { Modal } from './ui/Modal';
 import { Transaction, PaymentSource, FinanceHistoryRecord } from '../types';
 import { formatNumber, parseNumber } from './PersonalFinance';
 
@@ -75,19 +78,22 @@ export default function TransactionList({
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold">Giao Dịch Hiện Tại</h2>
           <div className="flex items-center gap-2">
-            <button 
+            <Button
               onClick={() => {
                 setConsolidateCashStr(currentCashBalance.toString());
                 setConsolidateBankingStr(currentBankingBalance.toString());
                 setShowConsolidateModal(true);
               }} 
-              className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
+              className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:opacity-90 border-0"
             >
-              <Archive className="w-4 h-4" /> Chốt Sổ
-            </button>
-            <button onClick={exportCSV} className="flex items-center gap-2 px-3 py-1.5 bg-sky-50/40 rounded-xl text-sm font-medium hover:bg-sky-200 transition-colors">
-              <Download className="w-4 h-4" /> Xuất CSV
-            </button>
+              <Archive className="w-4 h-4 mr-2" /> Chốt Sổ
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={exportCSV} 
+            >
+              <Download className="w-4 h-4 mr-2" /> Xuất CSV
+            </Button>
           </div>
         </div>
 
@@ -111,9 +117,14 @@ export default function TransactionList({
                       <span className={`font-bold ${t.type === 'income' ? 'text-emerald-600' : 'text-rose-600'}`}>
                         {t.type === 'income' ? '+' : '-'}{formatNumber(t.amount)}
                       </span>
-                      <button onClick={() => setConfirmDeleteId(t.id)} className="opacity-0 group-hover:opacity-100 text-rose-500 p-1 hover:bg-rose-100 rounded transition-all">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setConfirmDeleteId(t.id)} 
+                        className="opacity-0 group-hover:opacity-100 text-rose-500 hover:text-rose-700 hover:bg-rose-100 transition-all h-8 w-8"
+                      >
                         <Trash2 className="w-4 h-4" />
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 ))}
@@ -124,111 +135,110 @@ export default function TransactionList({
         </div>
       </motion.div>
 
-      <AnimatePresence>
-        {showConsolidateModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-sky-950/40 backdrop-blur-sm"
-              onClick={() => setShowConsolidateModal(false)}
-            />
-            <motion.div 
-              initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="relative w-full max-w-md glass-panel border border-sky-300/30 text-sky-950 rounded-3xl shadow-2xl p-6"
+      <Modal
+        isOpen={showConsolidateModal}
+        onClose={() => setShowConsolidateModal(false)}
+        title="Chốt Sổ Kỳ Này"
+        maxWidth="md"
+        footer={
+          <>
+            <Button variant="outline" disabled={isSubmitting} onClick={() => setShowConsolidateModal(false)} className="flex-1">
+              Hủy
+            </Button>
+            <Button
+              onClick={(e) => {
+                 // The form submits on click since we'll put it in a form outside or just handle it here
+                 // Actually Modal doesn't easily wrap form unless we use a form inside.
+                 // We will need to trigger form submit, so let's adjust it.
+                 const form = document.getElementById('consolidate-form') as HTMLFormElement;
+                 form?.requestSubmit();
+              }}
+              disabled={isSubmitting}
+              className="flex-1"
             >
-              <h3 className="text-xl font-bold mb-2">Chốt Sổ Kỳ Này</h3>
-              <p className="text-sm opacity-70 mb-6">Thao tác này sẽ lưu toàn bộ giao dịch hiện tại vào Lịch sử và reset danh sách để bắt đầu kỳ mới. Vui lòng nhập số dư THỰC TẾ hiện tại của bạn.</p>
-              
-              <form onSubmit={handleConsolidate} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1 opacity-80">Tiền mặt thực tế (VNĐ)</label>
-                  <input
-                    type="text"
-                    value={consolidateCashStr}
-                    onChange={(e) => {
-                      const val = e.target.value.replace(/[^0-9]/g, '');
-                      setConsolidateCashStr(val ? formatNumber(parseInt(val, 10)) : '');
-                    }}
-                    className="w-full px-4 py-2 rounded-xl glass-panel/50 border border-sky-300/30 focus:ring-2 focus:ring-cyan-500 outline-none"
-                    required
-                  />
-                  <div className="flex justify-between text-xs mt-1 px-1">
-                    <span className="opacity-60">Ước tính theo giao dịch:</span>
-                    <span className="font-medium">{formatNumber(currentCashBalance)}đ</span>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1 opacity-80">Số dư ngân hàng thực tế (VNĐ)</label>
-                  <input
-                    type="text"
-                    value={consolidateBankingStr}
-                    onChange={(e) => {
-                      const val = e.target.value.replace(/[^0-9]/g, '');
-                      setConsolidateBankingStr(val ? formatNumber(parseInt(val, 10)) : '');
-                    }}
-                    className="w-full px-4 py-2 rounded-xl glass-panel/50 border border-sky-300/30 focus:ring-2 focus:ring-cyan-500 outline-none"
-                    required
-                  />
-                  <div className="flex justify-between text-xs mt-1 px-1">
-                    <span className="opacity-60">Ước tính theo giao dịch:</span>
-                    <span className="font-medium">{formatNumber(currentBankingBalance)}đ</span>
-                  </div>
-                </div>
-                <div className="pt-4 flex gap-3">
-                  <button type="button" disabled={isSubmitting} onClick={() => setShowConsolidateModal(false)} className="flex-1 py-2.5 rounded-xl border border-sky-300/30 font-medium hover:bg-sky-50 transition-colors disabled:opacity-50">Hủy</button>
-                  <button type="submit" disabled={isSubmitting} className="flex-1 py-2.5 rounded-xl bg-sky-600 text-white font-medium shadow-md hover:bg-sky-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
-                    {isSubmitting && (
-                      <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                    )}
-                    Khóa Sổ
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+              {isSubmitting && (
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              )}
+              Khóa Sổ
+            </Button>
+          </>
+        }
+      >
+        <div className="pt-2">
+          <p className="text-sm opacity-70 mb-6 text-sky-950">Thao tác này sẽ lưu toàn bộ giao dịch hiện tại vào Lịch sử và reset danh sách để bắt đầu kỳ mới. Vui lòng nhập số dư THỰC TẾ hiện tại của bạn.</p>
+          
+          <form id="consolidate-form" onSubmit={handleConsolidate} className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-sky-950">Tiền mặt thực tế (VNĐ)</label>
+              <Input
+                type="text"
+                value={consolidateCashStr}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/[^0-9]/g, '');
+                  setConsolidateCashStr(val ? formatNumber(parseInt(val, 10)) : '');
+                }}
+                required
+              />
+              <div className="flex justify-between text-xs mt-1 px-1 text-sky-950">
+                <span className="opacity-60">Ước tính theo giao dịch:</span>
+                <span className="font-medium">{formatNumber(currentCashBalance)}đ</span>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-sky-950">Số dư ngân hàng thực tế (VNĐ)</label>
+              <Input
+                type="text"
+                value={consolidateBankingStr}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/[^0-9]/g, '');
+                  setConsolidateBankingStr(val ? formatNumber(parseInt(val, 10)) : '');
+                }}
+                required
+              />
+              <div className="flex justify-between text-xs mt-1 px-1 text-sky-950">
+                <span className="opacity-60">Ước tính theo giao dịch:</span>
+                <span className="font-medium">{formatNumber(currentBankingBalance)}đ</span>
+              </div>
+            </div>
+          </form>
+        </div>
+      </Modal>
 
-      <AnimatePresence>
-        {confirmDeleteId && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sky-950/20 backdrop-blur-sm">
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }} 
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-3xl shadow-xl max-w-md w-full p-6 border border-sky-100 relative"
+      <Modal
+        isOpen={!!confirmDeleteId}
+        onClose={() => setConfirmDeleteId(null)}
+        maxWidth="sm"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setConfirmDeleteId(null)} className="flex-1">
+              Hủy
+            </Button>
+            <Button 
+              variant="danger" 
+              onClick={() => {
+                if (confirmDeleteId) deleteTransaction(confirmDeleteId);
+                setConfirmDeleteId(null);
+              }}
+              className="flex-1"
             >
-              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-rose-100 mx-auto mb-4">
-                <AlertTriangle className="w-6 h-6 text-rose-600" />
-              </div>
-              <h3 className="text-xl font-bold text-sky-950 text-center mb-2">Xác nhận xóa giao dịch</h3>
-              <p className="text-sky-700/80 text-center mb-8">
-                Bạn có chắc chắn muốn xóa giao dịch này? Hành động này sẽ thay đổi số dư tài khoản của bạn và không thể hoàn tác.
-              </p>
-              <div className="flex gap-3">
-                <button 
-                  onClick={() => setConfirmDeleteId(null)}
-                  className="flex-1 py-2.5 px-4 rounded-xl text-sky-700 font-medium bg-sky-50 hover:bg-sky-100 transition-colors"
-                >
-                  Hủy
-                </button>
-                <button 
-                  onClick={() => {
-                    deleteTransaction(confirmDeleteId);
-                    setConfirmDeleteId(null);
-                  }}
-                  className="flex-1 py-2.5 px-4 rounded-xl text-white font-medium bg-rose-600 hover:bg-rose-700 transition-colors shadow-sm"
-                >
-                  Xóa
-                </button>
-              </div>
-            </motion.div>
+              Xóa
+            </Button>
+          </>
+        }
+      >
+        <div className="flex flex-col items-center pt-2 pb-4">
+          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-rose-100 mb-4">
+            <AlertTriangle className="w-6 h-6 text-rose-600" />
           </div>
-        )}
-      </AnimatePresence>
+          <h3 className="text-xl font-bold text-sky-950 text-center mb-2">Xác nhận xóa giao dịch</h3>
+          <p className="text-sky-700/80 text-center text-sm">
+            Bạn có chắc chắn muốn xóa giao dịch này? Hành động này sẽ thay đổi số dư tài khoản của bạn và không thể hoàn tác.
+          </p>
+        </div>
+      </Modal>
     </>
   );
 }

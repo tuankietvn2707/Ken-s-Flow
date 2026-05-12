@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Student } from '../types';
-import { User, BookOpen, CreditCard, X, AlertCircle } from 'lucide-react';
+import { User, BookOpen, CreditCard, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
+import { Input } from './ui/Input';
+import { Select } from './ui/Select';
+import { Textarea } from './ui/Textarea';
 
 interface Props {
   editingId: string | null;
@@ -142,20 +147,28 @@ export default function StudentForm({ editingId, initialData, students, onClose,
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-      className="glass rounded-3xl shadow-[0_8px_32px_rgba(14,165,233,0.08)] border border-sky-300/30 p-6 mb-6 relative"
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title={editingId ? 'Sửa thông tin Học viên' : 'Thêm Học viên mới'}
+      maxWidth="2xl"
+      footer={
+        <>
+          <Button variant="ghost" onClick={onClose} disabled={isSubmitting}>
+            Hủy
+          </Button>
+          <Button onClick={handleSubmit} disabled={isSubmitting}>
+            {isSubmitting && (
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            )}
+            {editingId ? 'Lưu thay đổi' : 'Thêm Học viên'}
+          </Button>
+        </>
+      }
     >
-      <button 
-        onClick={onClose}
-        className="absolute top-4 right-4 text-sky-700/80 hover:text-sky-700/80"
-      >
-        <X className="w-5 h-5" />
-      </button>
-      <h2 className="text-xl font-bold text-sky-950 mb-6 pb-2 border-b border-sky-300/30">
-        {editingId ? 'Sửa thông tin Học viên' : 'Thêm Học viên mới'}
-      </h2>
-      
       <AnimatePresence>
         {formError && (
           <motion.div 
@@ -173,7 +186,7 @@ export default function StudentForm({ editingId, initialData, students, onClose,
         )}
       </AnimatePresence>
       
-      <form onSubmit={handleSubmit} className="space-y-8" noValidate>
+      <form id="student-form" onSubmit={handleSubmit} className="space-y-6" noValidate>
         {/* Phần 1: Thông tin cơ bản */}
         <fieldset className="bg-sky-50/40 p-4 rounded-2xl border border-sky-300/30">
           <legend className="text-sm font-semibold text-sky-600 bg-sky-50 px-3 py-1 rounded-full mb-2 flex items-center">
@@ -182,8 +195,8 @@ export default function StudentForm({ editingId, initialData, students, onClose,
           </legend>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-3">
             <div>
-              <label className="block text-sm font-medium text-sky-900">Họ và Tên đệm <span className="text-rose-500">*</span></label>
-              <input
+              <label className="block text-sm font-medium text-sky-900 mb-1">Họ và Tên đệm <span className="text-rose-500">*</span></label>
+              <Input
                 type="text"
                 placeholder="VD: Nguyễn Văn"
                 value={formData.lastName}
@@ -191,13 +204,13 @@ export default function StudentForm({ editingId, initialData, students, onClose,
                   setFormData({...formData, lastName: e.target.value});
                   if (fieldErrors.lastName) setFieldErrors({...fieldErrors, lastName: ''});
                 }}
-                className={`mt-1 block w-full rounded-xl shadow-sm sm:text-sm p-2 border bg-white text-sky-950 focus:ring-sky-500 ${fieldErrors.lastName ? 'border-rose-500 focus:border-rose-500' : 'border-sky-300/30 focus:border-sky-500'}`}
+                className={fieldErrors.lastName ? 'border-rose-500 focus-visible:ring-rose-500' : ''}
               />
               {fieldErrors.lastName && <p className="mt-1 text-xs text-rose-500">{fieldErrors.lastName}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-sky-900">Tên <span className="text-rose-500">*</span></label>
-              <input
+              <label className="block text-sm font-medium text-sky-900 mb-1">Tên <span className="text-rose-500">*</span></label>
+              <Input
                 type="text"
                 placeholder="VD: A"
                 value={formData.firstName}
@@ -205,13 +218,13 @@ export default function StudentForm({ editingId, initialData, students, onClose,
                   setFormData({...formData, firstName: e.target.value});
                   if (fieldErrors.firstName) setFieldErrors({...fieldErrors, firstName: ''});
                 }}
-                className={`mt-1 block w-full rounded-xl shadow-sm sm:text-sm p-2 border bg-white text-sky-950 focus:ring-sky-500 ${fieldErrors.firstName ? 'border-rose-500 focus:border-rose-500' : 'border-sky-300/30 focus:border-sky-500'}`}
+                className={fieldErrors.firstName ? 'border-rose-500 focus-visible:ring-rose-500' : ''}
               />
               {fieldErrors.firstName && <p className="mt-1 text-xs text-rose-500">{fieldErrors.firstName}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-sky-900">Năm sinh</label>
-              <input
+              <label className="block text-sm font-medium text-sky-900 mb-1">Năm sinh</label>
+              <Input
                 type="number"
                 placeholder="VD: 2009"
                 value={formData.birthYear}
@@ -219,29 +232,27 @@ export default function StudentForm({ editingId, initialData, students, onClose,
                   setFormData({...formData, birthYear: e.target.value});
                   if (fieldErrors.birthYear) setFieldErrors({...fieldErrors, birthYear: ''});
                 }}
-                className={`mt-1 block w-full rounded-xl shadow-sm sm:text-sm p-2 border bg-white text-sky-950 focus:ring-sky-500 ${fieldErrors.birthYear ? 'border-rose-500 focus:border-rose-500' : 'border-sky-300/30 focus:border-sky-500'}`}
+                className={fieldErrors.birthYear ? 'border-rose-500 focus-visible:ring-rose-500' : ''}
               />
               {fieldErrors.birthYear && <p className="mt-1 text-xs text-rose-500">{fieldErrors.birthYear}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-sky-900">Giới tính</label>
-              <select
+              <label className="block text-sm font-medium text-sky-900 mb-1">Giới tính</label>
+              <Select
                 value={formData.gender}
                 onChange={e => setFormData({...formData, gender: e.target.value})}
-                className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border glass-panel"
               >
                 <option value="Nam">Nam</option>
                 <option value="Nữ">Nữ</option>
-              </select>
+              </Select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-sky-900">Nghề nghiệp / Bối cảnh</label>
-              <input
+              <label className="block text-sm font-medium text-sky-900 mb-1">Nghề nghiệp / Bối cảnh</label>
+              <Input
                 type="text"
-                placeholder="VD: Học sinh, Nhân viên ngân hàng..."
+                placeholder="VD: Học sinh, Nhân viên..."
                 value={formData.occupation}
                 onChange={e => setFormData({...formData, occupation: e.target.value})}
-                className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2 border glass-panel"
               />
             </div>
           </div>
@@ -255,11 +266,10 @@ export default function StudentForm({ editingId, initialData, students, onClose,
           </legend>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-3">
             <div>
-              <label className="block text-sm font-medium text-sky-900">Trình độ hiện tại</label>
-              <select
+              <label className="block text-sm font-medium text-sky-900 mb-1">Trình độ hiện tại</label>
+              <Select
                 value={formData.currentLevel}
                 onChange={e => setFormData({...formData, currentLevel: e.target.value})}
-                className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm p-2 border glass-panel"
               >
                 <option value="">Chọn trình độ...</option>
                 <option value="Mất gốc">Mất gốc</option>
@@ -269,16 +279,15 @@ export default function StudentForm({ editingId, initialData, students, onClose,
                 <option value="B2">B2</option>
                 <option value="C1">C1</option>
                 <option value="Khác">Khác</option>
-              </select>
+              </Select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-sky-900">Mục tiêu học tập</label>
-              <input
+              <label className="block text-sm font-medium text-sky-900 mb-1">Mục tiêu học tập</label>
+              <Input
                 type="text"
-                placeholder="VD: VSTEP, IELTS 6.5, Giao tiếp..."
+                placeholder="VD: VSTEP, IELTS, Giao tiếp..."
                 value={formData.goal}
                 onChange={e => setFormData({...formData, goal: e.target.value})}
-                className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm p-2 border glass-panel"
               />
               <div className="mt-3">
                 <label className="block text-xs font-medium text-sky-700/80 mb-2">Màu sắc thẻ mục tiêu</label>
@@ -307,9 +316,9 @@ export default function StudentForm({ editingId, initialData, students, onClose,
           </legend>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-3">
             <div>
-              <label className="block text-sm font-medium text-sky-900">Học phí mỗi buổi (VNĐ) <span className="text-rose-500">*</span></label>
-              <div className="mt-1 relative rounded-xl shadow-sm">
-                <input
+              <label className="block text-sm font-medium text-sky-900 mb-1">Học phí mỗi buổi (VNĐ) <span className="text-rose-500">*</span></label>
+              <div className="relative">
+                <Input
                   type="text"
                   placeholder="VD: 200,000"
                   value={formData.fee}
@@ -317,7 +326,7 @@ export default function StudentForm({ editingId, initialData, students, onClose,
                     handleFeeChange(e);
                     if (fieldErrors.fee) setFieldErrors({...fieldErrors, fee: ''});
                   }}
-                  className={`block w-full rounded-xl shadow-sm sm:text-sm p-2 border bg-white text-sky-950 pr-12 focus:ring-amber-500 ${fieldErrors.fee ? 'border-rose-500 focus:border-rose-500' : 'border-sky-300/30 focus:border-amber-500'}`}
+                  className={`pr-12 ${fieldErrors.fee ? 'border-rose-500 focus-visible:ring-rose-500' : ''}`}
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                   <span className="text-sky-700/80 sm:text-sm">VNĐ</span>
@@ -326,74 +335,46 @@ export default function StudentForm({ editingId, initialData, students, onClose,
               {fieldErrors.fee && <p className="mt-1 text-xs text-rose-500">{fieldErrors.fee}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-sky-900">Chu kỳ thu học phí</label>
-              <select
+              <label className="block text-sm font-medium text-sky-900 mb-1">Chu kỳ thu học phí</label>
+              <Select
                 value={formData.feeCycle}
                 onChange={e => setFormData({...formData, feeCycle: e.target.value})}
-                className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2 border glass-panel"
               >
                 <option value="8">8 buổi/lần</option>
                 <option value="12">12 buổi/lần</option>
-              </select>
+              </Select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-sky-900">Lịch học ưu tiên</label>
-              <input
+              <label className="block text-sm font-medium text-sky-900 mb-1">Lịch học ưu tiên</label>
+              <Input
                 type="text"
                 placeholder="VD: Tối Thứ 3/Thứ 5"
                 value={formData.schedule}
                 onChange={e => setFormData({...formData, schedule: e.target.value})}
-                className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2 border glass-panel"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-sky-900">Trạng thái hoạt động</label>
-              <select
+              <label className="block text-sm font-medium text-sky-900 mb-1">Trạng thái hoạt động</label>
+              <Select
                 value={formData.status}
                 onChange={e => setFormData({...formData, status: e.target.value as 'active' | 'inactive'})}
-                className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2 border glass-panel"
               >
                 <option value="active">Đang hoạt động</option>
                 <option value="inactive">Ngưng hoạt động</option>
-              </select>
+              </Select>
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-sky-900">Ghi chú riêng</label>
-              <textarea
+              <label className="block text-sm font-medium text-sky-900 mb-1">Ghi chú riêng</label>
+              <Textarea
                 rows={3}
                 placeholder="Ghi chú về điểm mạnh, điểm yếu, lộ trình học..."
                 value={formData.notes}
                 onChange={e => setFormData({...formData, notes: e.target.value})}
-                className="mt-1 block w-full rounded-xl border-sky-300/30 shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2 border glass-panel"
               />
             </div>
           </div>
         </fieldset>
-
-        <div className="flex justify-end pt-4 border-t border-sky-300/30">
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={isSubmitting}
-            className="mr-3 glass-panel py-2 px-4 border border-sky-300/30 rounded-xl shadow-sm text-sm font-medium text-sky-900 hover:bg-sky-50/40 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Hủy
-          </button>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="bg-sky-600 py-2 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            {isSubmitting && (
-              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-            )}
-            {editingId ? 'Lưu thay đổi' : 'Thêm Học viên'}
-          </button>
-        </div>
       </form>
-    </motion.div>
+    </Modal>
   );
 }

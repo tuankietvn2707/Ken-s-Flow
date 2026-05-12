@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Transaction } from '../types';
 import { formatNumber } from './PersonalFinance';
+import { Input } from './ui/Input';
 
 const COLORS = ['#BAE1FF', '#BAFFC9', '#FFDFBA', '#FFFFBA', '#FFB3BA', '#E0BBE4', '#957DAD', '#D291BC', '#FEC8D8', '#FFDFD3'];
 
@@ -75,9 +76,9 @@ export default function FinanceOverview({
         <div className="flex flex-col items-end">
           <p className="text-sm font-medium mb-1 border-b border-sky-300/30 pb-1">Số dư đầu kỳ</p>
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 glass-panel/50 px-3 py-1.5 rounded-xl border border-white/20">
+            <div className="flex items-center gap-2 bg-sky-50/50 px-3 py-1.5 rounded-xl border border-sky-100">
               <span className="text-sm opacity-70">Tiền mặt:</span>
-              <input 
+              <Input 
                 type="text"
                 value={localCash === '' ? '' : formatNumber(Number(localCash) || 0)}
                 onChange={(e) => {
@@ -95,13 +96,13 @@ export default function FinanceOverview({
                     e.currentTarget.blur();
                   }
                 }}
-                className="w-24 bg-transparent outline-none font-medium text-right"
+                className="w-32 bg-transparent outline-none font-medium text-right border-0 focus-visible:ring-0 shadow-none h-auto py-1 px-2"
               />
               <span className="text-sm opacity-70">đ</span>
             </div>
-            <div className="flex items-center gap-2 glass-panel/50 px-3 py-1.5 rounded-xl border border-white/20">
+            <div className="flex items-center gap-2 bg-sky-50/50 px-3 py-1.5 rounded-xl border border-sky-100">
               <span className="text-sm opacity-70">Ngân hàng:</span>
-              <input 
+              <Input 
                 type="text"
                 value={localBanking === '' ? '' : formatNumber(Number(localBanking) || 0)}
                 onChange={(e) => {
@@ -119,7 +120,7 @@ export default function FinanceOverview({
                     e.currentTarget.blur();
                   }
                 }}
-                className="w-24 bg-transparent outline-none font-medium text-right"
+                className="w-32 bg-transparent outline-none font-medium text-right border-0 focus-visible:ring-0 shadow-none h-auto py-1 px-2"
               />
               <span className="text-sm opacity-70">đ</span>
             </div>

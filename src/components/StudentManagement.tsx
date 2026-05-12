@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 import StudentForm from './StudentForm';
 import StudentList from './StudentList';
 import StudentDetail from './StudentDetail';
+import { Button } from './ui/Button';
 
 interface Props {
   students: Student[];
@@ -46,13 +47,12 @@ export default function StudentManagement({ students, addStudent, updateStudent,
         className="flex justify-between items-center"
       >
         <h1 className="text-2xl font-bold text-sky-950">Quản lý Học viên</h1>
-        <button
+        <Button
           onClick={() => setIsFormOpen(true)}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500"
         >
           <Plus className="w-4 h-4 mr-2" />
           Thêm Học viên
-        </button>
+        </Button>
       </motion.div>
 
       {isFormOpen && (
