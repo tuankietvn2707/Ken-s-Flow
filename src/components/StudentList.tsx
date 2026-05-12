@@ -27,7 +27,7 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
     
     students.forEach(s => {
       const studentClasses = classes.filter(c => c.studentId === s.id);
-      const unpaidCount = studentClasses.filter(c => c.status === 'unpaid').length;
+      const unpaidCount = studentClasses.filter(c => !c.isPaid).length;
       const hasUpcoming = studentClasses.some(c => c.date >= today);
       stats[s.id] = { unpaidCount, hasUpcoming };
     });
@@ -95,7 +95,7 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
     const destinationIndex = result.destination.index;
     if (sourceIndex === destinationIndex) return;
 
-    const newStudents = Array.from(filteredAndSortedStudents);
+    const newStudents = [...filteredAndSortedStudents];
     const [reorderedItem] = newStudents.splice(sourceIndex, 1);
     newStudents.splice(destinationIndex, 0, reorderedItem);
 
@@ -381,11 +381,14 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
                       <Droppable droppableId="student-list">
                         {(provided) => (
                           <tbody {...provided.droppableProps} ref={provided.innerRef}>
-                            {filteredAndSortedStudents.map((student, index) => (
-                              <Draggable key={student.id} draggableId={student.id} index={index}>
-                                {(p, s) => renderListItem(student, index, p, s)}
-                              </Draggable>
-                            ))}
+                            {filteredAndSortedStudents.map((student, index) => {
+                              const dragProps: any = { key: student.id, draggableId: student.id, index };
+                              return (
+                                <Draggable {...dragProps}>
+                                  {(p: any, s: any) => renderListItem(student, index, p, s)}
+                                </Draggable>
+                              );
+                            })}
                             {provided.placeholder}
                           </tbody>
                         )}

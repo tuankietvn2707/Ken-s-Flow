@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Student, ClassSession, parseDateSafe } from '../types';
-import { Plus, X, Edit2, Trash2 } from 'lucide-react';
+import { Plus, X, Edit2, Trash2, AlertTriangle } from 'lucide-react';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface Props {
   students: Student[];
   classes: ClassSession[];
-  addClass: (cls: ClassSession) => void;
-  updateClass: (cls: ClassSession) => void;
-  deleteClass: (id: string) => void;
+  addClass: (cls: ClassSession) => Promise<void> | void;
+  updateClass: (cls: ClassSession) => Promise<void> | void;
+  deleteClass: (id: string) => Promise<void> | void;
 }
 
 export default function ClassTracker({ students, classes, addClass, updateClass, deleteClass }: Props) {
@@ -21,6 +21,8 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
   const timeInputRef = useRef<HTMLInputElement>(null);
+
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     if (isFormOpen && timeInputRef.current) {
@@ -169,8 +171,16 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
   };
 
   const handleDelete = (id: string) => {
-    // Removed window.confirm due to iframe restrictions
-    deleteClass(id);
+    setConfirmDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!confirmDeleteId) return;
+    try {
+      await deleteClass(confirmDeleteId);
+    } finally {
+      setConfirmDeleteId(null);
+    }
   };
 
   const closeForm = () => {
@@ -382,9 +392,15 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
               <button
                 type="submit"
                 disabled={students.length === 0 || isSubmitting}
-                className="bg-sky-600 py-2 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-sky-600 py-2 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                {isSubmitting ? 'Đang lưu... ⏳' : (editingId ? 'Lưu thay đổi' : 'Lưu')}
+                {isSubmitting && (
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                )}
+                {editingId ? 'Lưu thay đổi' : 'Lưu'}
               </button>
             </div>
           </form>
@@ -495,6 +511,42 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
           </table>
         </div>
       </motion.div>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {confirmDeleteId && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sky-950/20 backdrop-blur-sm">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }} 
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-3xl shadow-xl max-w-md w-full p-6 border border-sky-100"
+            >
+              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-rose-100 mx-auto mb-4">
+                <AlertTriangle className="w-6 h-6 text-rose-600" />
+              </div>
+              <h3 className="text-xl font-bold text-sky-950 text-center mb-2">Xác nhận xóa lớp học</h3>
+              <p className="text-sky-700/80 text-center mb-8">
+                Bạn có chắc chắn muốn xóa đánh giá và ghi nhận buổi học này? Hành động này không thể hoàn tác.
+              </p>
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => setConfirmDeleteId(null)}
+                  className="flex-1 py-2.5 px-4 rounded-xl text-sky-700 font-medium bg-sky-50 hover:bg-sky-100 transition-colors"
+                >
+                  Hủy
+                </button>
+                <button 
+                  onClick={confirmDelete}
+                  className="flex-1 py-2.5 px-4 rounded-xl text-white font-medium bg-rose-600 hover:bg-rose-700 transition-colors shadow-sm"
+                >
+                  Xóa
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

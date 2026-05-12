@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Minus, Trash2, Download, Archive, Check, X } from 'lucide-react';
+import { Plus, Minus, Trash2, Download, Archive, Check, X, AlertTriangle } from 'lucide-react';
 import { Transaction, PaymentSource, FinanceHistoryRecord } from '../types';
 import { formatNumber, parseNumber } from './PersonalFinance';
 
@@ -18,6 +18,8 @@ export default function TransactionList({
   const [showConsolidateModal, setShowConsolidateModal] = useState(false);
   const [consolidateCashStr, setConsolidateCashStr] = useState('');
   const [consolidateBankingStr, setConsolidateBankingStr] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const exportCSV = () => {
     const headers = ['Ngày', 'Loại', 'Số tiền', 'Danh mục', 'Mô tả'];
@@ -50,11 +52,18 @@ export default function TransactionList({
 
   const handleConsolidate = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     const cash = parseNumber(consolidateCashStr);
     const banking = parseNumber(consolidateBankingStr);
     if (cash < 0 || banking < 0) return;
-    await consolidateAndResetBalance({ cash, banking });
-    setShowConsolidateModal(false);
+    
+    setIsSubmitting(true);
+    try {
+      await consolidateAndResetBalance({ cash, banking });
+      setShowConsolidateModal(false);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -102,7 +111,7 @@ export default function TransactionList({
                       <span className={`font-bold ${t.type === 'income' ? 'text-emerald-600' : 'text-rose-600'}`}>
                         {t.type === 'income' ? '+' : '-'}{formatNumber(t.amount)}
                       </span>
-                      <button onClick={() => deleteTransaction(t.id)} className="opacity-0 group-hover:opacity-100 text-rose-500 p-1 hover:bg-rose-100 rounded transition-all">
+                      <button onClick={() => setConfirmDeleteId(t.id)} className="opacity-0 group-hover:opacity-100 text-rose-500 p-1 hover:bg-rose-100 rounded transition-all">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -166,10 +175,56 @@ export default function TransactionList({
                   </div>
                 </div>
                 <div className="pt-4 flex gap-3">
-                  <button type="button" onClick={() => setShowConsolidateModal(false)} className="flex-1 py-2.5 rounded-xl border border-sky-300/30 font-medium hover:bg-sky-50 transition-colors">Hủy</button>
-                  <button type="submit" className="flex-1 py-2.5 rounded-xl bg-sky-600 text-white font-medium shadow-md hover:bg-sky-700 transition-colors">Khóa Sổ</button>
+                  <button type="button" disabled={isSubmitting} onClick={() => setShowConsolidateModal(false)} className="flex-1 py-2.5 rounded-xl border border-sky-300/30 font-medium hover:bg-sky-50 transition-colors disabled:opacity-50">Hủy</button>
+                  <button type="submit" disabled={isSubmitting} className="flex-1 py-2.5 rounded-xl bg-sky-600 text-white font-medium shadow-md hover:bg-sky-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                    {isSubmitting && (
+                      <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                    )}
+                    Khóa Sổ
+                  </button>
                 </div>
               </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {confirmDeleteId && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sky-950/20 backdrop-blur-sm">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }} 
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-3xl shadow-xl max-w-md w-full p-6 border border-sky-100 relative"
+            >
+              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-rose-100 mx-auto mb-4">
+                <AlertTriangle className="w-6 h-6 text-rose-600" />
+              </div>
+              <h3 className="text-xl font-bold text-sky-950 text-center mb-2">Xác nhận xóa giao dịch</h3>
+              <p className="text-sky-700/80 text-center mb-8">
+                Bạn có chắc chắn muốn xóa giao dịch này? Hành động này sẽ thay đổi số dư tài khoản của bạn và không thể hoàn tác.
+              </p>
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => setConfirmDeleteId(null)}
+                  className="flex-1 py-2.5 px-4 rounded-xl text-sky-700 font-medium bg-sky-50 hover:bg-sky-100 transition-colors"
+                >
+                  Hủy
+                </button>
+                <button 
+                  onClick={() => {
+                    deleteTransaction(confirmDeleteId);
+                    setConfirmDeleteId(null);
+                  }}
+                  className="flex-1 py-2.5 px-4 rounded-xl text-white font-medium bg-rose-600 hover:bg-rose-700 transition-colors shadow-sm"
+                >
+                  Xóa
+                </button>
+              </div>
             </motion.div>
           </div>
         )}

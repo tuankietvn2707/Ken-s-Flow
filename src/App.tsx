@@ -4,6 +4,7 @@ import { Users, BookOpen, LayoutDashboard, LogOut, Wallet } from 'lucide-react';
 import { auth, db } from './firebase';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { collection, getDocs, doc, setDoc, deleteDoc, writeBatch, deleteField, getDoc } from 'firebase/firestore';
+import { Toaster, toast } from 'sonner';
 
 // Components
 import Dashboard from './components/Dashboard';
@@ -164,8 +165,10 @@ export default function App() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      toast.success('Đã đăng xuất');
     } catch (error) {
       console.error("Error signing out:", error);
+      toast.error('Có lỗi xảy ra khi đăng xuất');
     }
   };
 
@@ -175,8 +178,10 @@ export default function App() {
     try {
       await setDoc(doc(db, `users/${user.uid}/students`, student.id), student);
       setStudents(prev => [...prev, student]);
+      toast.success('Thêm học viên thành công');
     } catch (error) {
       console.error("Error adding student:", error);
+      toast.error('Có lỗi xảy ra khi thêm học viên');
     }
   };
 
@@ -185,8 +190,10 @@ export default function App() {
     try {
       await setDoc(doc(db, `users/${user.uid}/students`, student.id), student);
       setStudents(prev => prev.map(s => s.id === student.id ? student : s));
+      toast.success('Cập nhật học viên thành công');
     } catch (error) {
       console.error("Error updating student:", error);
+      toast.error('Có lỗi xảy ra khi cập nhật học viên');
     }
   };
 
@@ -195,8 +202,10 @@ export default function App() {
     try {
       await deleteDoc(doc(db, `users/${user.uid}/students`, id));
       setStudents(prev => prev.filter(s => s.id !== id));
+      toast.success('Đã xóa học viên');
     } catch (error) {
       console.error("Error deleting student:", error);
+      toast.error('Có lỗi xảy ra khi xóa học viên');
     }
   };
 
@@ -206,8 +215,10 @@ export default function App() {
     try {
       await setDoc(doc(db, `users/${user.uid}/classes`, cls.id), cls);
       setClasses(prev => [cls, ...prev]);
+      toast.success('Thêm lớp học thành công');
     } catch (error) {
       console.error("Error adding class:", error);
+      toast.error('Có lỗi xảy ra khi thêm lớp học');
       throw error;
     }
   };
@@ -217,8 +228,10 @@ export default function App() {
     try {
       await setDoc(doc(db, `users/${user.uid}/classes`, cls.id), cls);
       setClasses(prev => prev.map(c => c.id === cls.id ? cls : c));
+      toast.success('Cập nhật lớp học thành công');
     } catch (error) {
       console.error("Error updating class:", error);
+      toast.error('Có lỗi xảy ra khi cập nhật lớp học');
       throw error;
     }
   };
@@ -228,8 +241,10 @@ export default function App() {
     try {
       await deleteDoc(doc(db, `users/${user.uid}/classes`, id));
       setClasses(prev => prev.filter(c => c.id !== id));
+      toast.success('Đã xóa lớp học');
     } catch (error) {
       console.error("Error deleting class:", error);
+      toast.error('Có lỗi xảy ra khi xóa lớp học');
     }
   };
 
@@ -245,8 +260,10 @@ export default function App() {
       });
       await batch.commit();
       setClasses(prev => prev.map(c => classIds.includes(c.id) ? { ...c, isPaid: true, paymentBatchId: batchId } : c));
+      toast.success('Đã xác nhận thanh toán');
     } catch (error) {
       console.error("Error marking classes as paid:", error);
+      toast.error('Có lỗi xảy ra khi xác nhận thanh toán');
     }
   };
 
@@ -270,8 +287,10 @@ export default function App() {
       setClasses(prev => prev.map(c =>
         c.paymentBatchId === latestBatchId ? { ...c, isPaid: false, paymentBatchId: undefined } : c
       ));
+      toast.success('Đã hoàn tác thanh toán gần nhất');
     } catch (error) {
       console.error("Error undoing payment:", error);
+      toast.error('Có lỗi xảy ra khi hoàn tác');
     } finally {
       hideLoading();
     }
@@ -283,8 +302,10 @@ export default function App() {
     try {
       await setDoc(doc(db, `users/${user.uid}/transactions`, tx.id), tx);
       setTransactions(prev => [tx, ...prev]);
+      toast.success('Thêm giao dịch thành công');
     } catch (error) {
       console.error("Error adding transaction:", error);
+      toast.error('Có lỗi xảy ra khi thêm giao dịch');
     }
   };
 
@@ -293,8 +314,10 @@ export default function App() {
     try {
       await deleteDoc(doc(db, `users/${user.uid}/transactions`, id));
       setTransactions(prev => prev.filter(t => t.id !== id));
+      toast.success('Đã xóa giao dịch');
     } catch (error) {
       console.error("Error deleting transaction:", error);
+      toast.error('Có lỗi xảy ra khi xóa giao dịch');
     }
   };
 
@@ -303,8 +326,10 @@ export default function App() {
     try {
       await setDoc(doc(db, `users/${user.uid}/goals`, goal.id), goal);
       setGoals(prev => [...prev, goal]);
+      toast.success('Thêm mục tiêu thành công');
     } catch (error) {
       console.error("Error adding goal:", error);
+      toast.error('Có lỗi xảy ra khi thêm mục tiêu');
     }
   };
 
@@ -313,8 +338,10 @@ export default function App() {
     try {
       await setDoc(doc(db, `users/${user.uid}/goals`, goal.id), goal);
       setGoals(prev => prev.map(g => g.id === goal.id ? goal : g));
+      toast.success('Cập nhật mục tiêu thành công');
     } catch (error) {
       console.error("Error updating goal:", error);
+      toast.error('Có lỗi xảy ra khi cập nhật mục tiêu');
     }
   };
 
@@ -323,8 +350,10 @@ export default function App() {
     try {
       await deleteDoc(doc(db, `users/${user.uid}/goals`, id));
       setGoals(prev => prev.filter(g => g.id !== id));
+      toast.success('Đã xóa mục tiêu');
     } catch (error) {
       console.error("Error deleting goal:", error);
+      toast.error('Có lỗi xảy ra khi xóa mục tiêu');
     }
   };
 
@@ -333,8 +362,10 @@ export default function App() {
     try {
       await setDoc(doc(db, `users/${user.uid}/settings/finance`), { initialBalance: balance });
       setInitialBalance(balance);
+      toast.success('Cập nhật số dư thành công');
     } catch (error) {
       console.error("Error updating initial balance:", error);
+      toast.error('Có lỗi xảy ra khi cập nhật số dư');
     }
   };
 
@@ -364,9 +395,11 @@ export default function App() {
       setFinanceHistory(prev => [newHistoryRecord, ...prev].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()));
       setTransactions([]);
       setInitialBalance(newBalances);
+      toast.success('Đã chốt sổ và lưu lịch sử thành công');
       
     } catch (error) {
       console.error("Error consolidating finance:", error);
+      toast.error('Có lỗi xảy ra khi chốt sổ');
     } finally {
       hideLoading();
     }
@@ -401,6 +434,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen text-sky-950 font-sans">
+      <Toaster position="top-center" richColors theme="light" />
       <nav className="glass-panel border-b border-sky-300/30 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
@@ -511,8 +545,19 @@ export default function App() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {loadingData ? (
-          <div className="flex justify-center py-20">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+          <div className="py-20 animate-pulse">
+            <div className="max-w-4xl mx-auto space-y-6">
+              <div className="h-10 bg-sky-100 rounded-xl w-1/3"></div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div className="h-32 bg-sky-50 rounded-2xl border border-sky-100"></div>
+                <div className="h-32 bg-sky-50 rounded-2xl border border-sky-100"></div>
+                <div className="h-32 bg-sky-50 rounded-2xl border border-sky-100"></div>
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
+                <div className="h-96 bg-sky-50 rounded-2xl border border-sky-100"></div>
+                <div className="h-96 bg-sky-50 rounded-2xl border border-sky-100"></div>
+              </div>
+            </div>
           </div>
         ) : (
           <>
