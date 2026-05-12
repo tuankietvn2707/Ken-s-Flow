@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Student, ClassSession, Transaction, Goal, FinanceHistoryRecord } from './types';
 import { Users, BookOpen, LayoutDashboard, LogOut, Wallet } from 'lucide-react';
 import { auth, db } from './firebase';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { collection, getDocs, doc, setDoc, deleteDoc, writeBatch, deleteField, getDoc } from 'firebase/firestore';
 import { Toaster, toast } from 'sonner';
+import { motion, AnimatePresence } from 'motion/react';
 
 // Components
 import Dashboard from './components/Dashboard';
@@ -455,7 +456,7 @@ export default function App() {
                   </div>
                 </Button>
               </div>
-              <div className="hidden sm:ml-6 sm:flex sm:space-x-2">
+              <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-2">
                 <TabButton 
                   active={activeTab === 'dashboard'} 
                   onClick={() => setActiveTab('dashboard')}
@@ -499,15 +500,7 @@ export default function App() {
               </div>
             </div>
             <div className="flex items-center">
-              <span className="text-sm text-sky-700/80 mr-4 hidden sm:block">{user.email}</span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleLogout}
-              >
-                <LogOut className="w-4 h-4 sm:mr-2" />
-                <span className="hidden sm:inline">Đăng xuất</span>
-              </Button>
+              <UserMenu user={user} handleLogout={handleLogout} />
             </div>
           </div>
         </div>
@@ -608,7 +601,7 @@ function TabButton({ active, onClick, icon, label, colorClass, hoverClass }: { a
     <Button
       variant="ghost"
       onClick={onClick}
-      className={`inline-flex items-center px-4 py-2 my-2 rounded-xl text-sm font-medium transition-all duration-300 border ${
+      className={`inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 border h-auto ${
         active 
           ? `${colorClass} shadow-md transform -translate-y-0.5` 
           : `border-transparent text-sky-700/80 ${hoverClass} hover:shadow-md hover:-translate-y-0.5`
@@ -696,6 +689,66 @@ function Onboarding({ onSave }: { onSave: (name: string) => void }) {
           </Button>
         </form>
       </div>
+    </div>
+  );
+}
+
+function UserMenu({ user, handleLogout }: { user: User, handleLogout: () => void }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const firstLetter = user.email ? user.email.charAt(0).toUpperCase() : 'U';
+
+  return (
+    <div className="relative" ref={menuRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-10 h-10 rounded-full bg-sky-100 text-sky-700 font-bold flex items-center justify-center hover:bg-sky-200 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+        title={user.email || ''}
+      >
+        {firstLetter}
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
+            className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-sky-100 overflow-hidden z-50 flex flex-col origin-top-right transform"
+          >
+            <div className="px-4 py-4 border-b border-sky-100 bg-sky-50/50 text-center">
+              <div className="w-14 h-14 rounded-full bg-sky-100 text-sky-700 font-bold flex items-center justify-center text-2xl mx-auto mb-3 shadow-inner">
+                {firstLetter}
+              </div>
+              <p className="text-sm font-semibold text-sky-900 truncate px-2" title={user.email || ''}>
+                {user.email}
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                handleLogout();
+              }}
+              className="flex items-center w-full px-5 py-3.5 text-sm text-rose-600 hover:bg-rose-50 transition-colors gap-3 justify-center font-medium"
+            >
+              <LogOut className="w-4 h-4" />
+              Đăng xuất
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
