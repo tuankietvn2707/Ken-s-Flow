@@ -82,20 +82,20 @@ const CustomAreaTooltip = ({ active, payload, label }: any) => {
     const remaining = potential - actual;
 
     return (
-      <div className="glass-panel p-3 border border-sky-300/30 text-sky-950 rounded-xl">
-        <p className="font-semibold text-sky-950 mb-3">{`Tháng ${label.replace('T', '')}`}</p>
-        <div className="space-y-2">
-          <p className="text-sm flex justify-between items-center gap-4">
-            <span className="text-sky-700/80">Tổng số tiền có thể thu:</span>
-            <span className="font-medium text-sky-600">{formatVND(potential)}</span>
+      <div className="bg-white/95 backdrop-blur-md p-4 border border-sky-100 shadow-xl rounded-2xl">
+        <p className="font-bold text-sky-950 mb-4">{`Tháng ${label.replace('T', '')}`}</p>
+        <div className="space-y-3">
+          <p className="text-sm flex justify-between items-center gap-6">
+            <span className="text-sky-700 font-medium">Tổng thu kỳ vọng:</span>
+            <span className="font-bold text-sky-950">{formatVND(potential)}</span>
           </p>
-          <p className="text-sm flex justify-between items-center gap-4">
-            <span className="text-sky-700/80">Đã thanh toán:</span>
-            <span className="font-semibold text-emerald-500">{formatVND(actual)}</span>
+          <p className="text-sm flex justify-between items-center gap-6">
+            <span className="text-emerald-600 font-medium tracking-wide">Đã thanh toán:</span>
+            <span className="font-bold text-emerald-600">{formatVND(actual)}</span>
           </p>
-          <p className="text-sm flex justify-between items-center gap-4 pt-2 border-t border-sky-300/30">
-            <span className="text-sky-700/80">Chờ thanh toán:</span>
-            <span className="font-medium text-amber-500">{formatVND(remaining)}</span>
+          <p className="text-sm flex justify-between items-center gap-6 pt-3 border-t border-sky-100">
+            <span className="text-amber-600 font-medium tracking-wide">Chờ thanh toán:</span>
+            <span className="font-bold text-amber-600">{formatVND(remaining)}</span>
           </p>
         </div>
       </div>
@@ -149,9 +149,9 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
   const soTienCoTheThuConLai = tongTienCoTheThu - soTienThanhToan - choThanhToan;
 
   const donutData = [
-    { name: 'Số tiền thanh toán', value: soTienThanhToan > 0 ? soTienThanhToan : 0, fill: '#BAFFC9' }, // Green Pastel
-    { name: 'Chờ thanh toán', value: choThanhToan > 0 ? choThanhToan : 0, fill: '#FFB3BA' }, // Red Pastel
-    { name: 'Số tiền có thể thu còn lại', value: soTienCoTheThuConLai > 0 ? soTienCoTheThuConLai : 0, fill: '#BDE0FE' } // Blue Pastel
+    { name: 'Số tiền thanh toán', value: soTienThanhToan > 0 ? soTienThanhToan : 0, fill: '#10b981' }, // Emerald 500
+    { name: 'Chờ thanh toán', value: choThanhToan > 0 ? choThanhToan : 0, fill: '#f59e0b' }, // Amber 500
+    { name: 'Số tiền có thể thu còn lại', value: soTienCoTheThuConLai > 0 ? soTienCoTheThuConLai : 0, fill: '#38bdf8' } // Sky 400
   ];
 
   // Calculate classes this week
@@ -214,34 +214,40 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-8 pb-10">
+      <div className="flex flex-col gap-1 items-start">
         <motion.h1 
-          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-          className="text-2xl font-bold text-sky-950"
+          initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, ease: 'easeOut' }}
+          className="text-3xl sm:text-4xl font-extrabold text-sky-950 tracking-tight"
         >
           {getGreeting()}
         </motion.h1>
+        <motion.p
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
+          className="text-sky-700/80 font-medium text-lg"
+        >
+          Dưới đây là tình hình hoạt động trung tâm của bạn
+        </motion.p>
       </div>
       
       <motion.div 
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-        className="grid grid-cols-1 gap-5 sm:grid-cols-3"
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, ease: 'easeOut' }}
+        className="grid grid-cols-1 md:grid-cols-3 gap-6"
       >
         <div 
           onClick={() => setActiveTab && setActiveTab('students')}
-          className="glass-panel border-sky-300/30 overflow-hidden rounded-3xl shadow-[0_8px_32px_rgba(14,165,233,0.08)] cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(14,165,233,0.15)] hover:ring-2 hover:ring-sky-100"
+          className="bg-white/80 backdrop-blur-xl border border-white shadow-sm overflow-hidden rounded-3xl cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-sky-200 group"
         >
-          <div className="p-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0 bg-[#BAE1FF] rounded-xl p-3">
-                <Users className="h-6 w-6 text-sky-600" />
+          <div className="p-8">
+            <div className="flex flex-col gap-4">
+              <div className="flex justify-between items-start">
+                <div className="bg-sky-50 text-sky-600 rounded-2xl p-4 ring-1 ring-sky-100 group-hover:bg-sky-100 group-hover:scale-110 transition-all duration-300">
+                  <Users className="h-7 w-7" />
+                </div>
               </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-sky-700/80 truncate">Học viên đang hoạt động</dt>
-                  <dd className="text-3xl font-bold text-sky-950 mt-1">{students.filter(s => s.status !== 'inactive').length}</dd>
-                </dl>
+              <div>
+                <dt className="text-xs font-bold text-sky-600 uppercase tracking-widest mb-1">Học viên hoạt động</dt>
+                <dd className="text-5xl font-black text-sky-950 tracking-tighter">{students.filter(s => s.status !== 'inactive').length}</dd>
               </div>
             </div>
           </div>
@@ -249,18 +255,18 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
 
         <div 
           onClick={() => setActiveTab && setActiveTab('classes')}
-          className="glass-panel border-sky-300/30 overflow-hidden rounded-3xl shadow-[0_8px_32px_rgba(14,165,233,0.08)] cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(14,165,233,0.15)] hover:ring-2 hover:ring-sky-100"
+          className="bg-white/80 backdrop-blur-xl border border-white shadow-sm overflow-hidden rounded-3xl cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-emerald-200 group"
         >
-          <div className="p-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0 bg-[#BAFFC9] rounded-xl p-3">
-                <Calendar className="h-6 w-6 text-emerald-500" />
+          <div className="p-8">
+            <div className="flex flex-col gap-4">
+              <div className="flex justify-between items-start">
+                <div className="bg-emerald-50 text-emerald-600 rounded-2xl p-4 ring-1 ring-emerald-100 group-hover:bg-emerald-100 group-hover:scale-110 transition-all duration-300">
+                  <Calendar className="h-7 w-7" />
+                </div>
               </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-sky-700/80 truncate">Lớp học tuần này</dt>
-                  <dd className="text-3xl font-bold text-sky-950 mt-1">{classesThisWeek}</dd>
-                </dl>
+              <div>
+                <dt className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-1">Lớp học tuần này</dt>
+                <dd className="text-5xl font-black text-sky-950 tracking-tighter">{classesThisWeek}</dd>
               </div>
             </div>
           </div>
@@ -268,18 +274,18 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
 
         <div 
           onClick={() => setActiveTab && setActiveTab('finances')}
-          className="glass-panel border-sky-300/30 overflow-hidden rounded-3xl shadow-[0_8px_32px_rgba(14,165,233,0.08)] cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(14,165,233,0.15)] hover:ring-2 hover:ring-sky-100"
+          className="bg-white/80 backdrop-blur-xl border border-white shadow-sm overflow-hidden rounded-3xl cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-amber-200 group"
         >
-          <div className="p-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0 bg-[#FFDFBA] rounded-xl p-3">
-                <DongSign className="h-6 w-6 text-amber-500" />
+          <div className="p-8">
+            <div className="flex flex-col gap-4">
+              <div className="flex justify-between items-start">
+                <div className="bg-amber-50 text-amber-600 rounded-2xl p-4 ring-1 ring-amber-100 group-hover:bg-amber-100 group-hover:scale-110 transition-all duration-300">
+                  <DongSign className="h-7 w-7" />
+                </div>
               </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-sky-700/80 truncate">Chờ thanh toán</dt>
-                  <dd className="text-2xl font-bold text-sky-950 mt-1">{formatVND(choThanhToan)}</dd>
-                </dl>
+              <div>
+                <dt className="text-xs font-bold text-amber-600 uppercase tracking-widest mb-1">Chờ thanh toán</dt>
+                <dd className="text-4xl font-black text-sky-950 tracking-tight leading-tight mt-1 truncate">{formatVND(choThanhToan)}</dd>
               </div>
             </div>
           </div>
@@ -287,49 +293,50 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
       </motion.div>
 
       <motion.div 
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-        className="grid grid-cols-1 gap-5 lg:grid-cols-2"
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, ease: 'easeOut' }}
+        className="grid grid-cols-1 lg:grid-cols-2 gap-8"
       >
         {/* Revenue Trend Chart (50%) */}
-        <div className="glass-panel border-sky-300/30 rounded-3xl shadow-[0_8px_32px_rgba(14,165,233,0.08)] lg:col-span-1 flex flex-col">
-          <div className="p-6 border-b border-sky-300/30">
-            <h3 className="text-lg font-bold text-sky-900">Xu hướng doanh thu</h3>
-          </div>
-          <div className="p-6 flex-1 min-h-[450px]">
-            <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
-              <BarChart data={dynamicRevenueTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 500 }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 500 }} tickFormatter={formatYAxisCurrency} />
-                <RechartsTooltip content={<CustomAreaTooltip />} cursor={{ fill: '#f8fafc' }} />
-                <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ paddingBottom: '20px', fontSize: '13px', fontWeight: 500, color: '#64748B' }} />
-                <Bar dataKey="potential" name="Tổng số tiền có thể thu" fill="#BAE1FF" radius={[4, 4, 0, 0]} maxBarSize={40} />
-                <Bar dataKey="actual" name="Đã thanh toán" fill="#BAFFC9" radius={[4, 4, 0, 0]} maxBarSize={40} />
-                <Bar dataKey="remaining" name="Chờ thanh toán" fill="#FFDFBA" radius={[4, 4, 0, 0]} maxBarSize={40} />
-              </BarChart>
-            </ResponsiveContainer>
+        <div className="bg-white/70 backdrop-blur-xl border border-white shadow-sm rounded-3xl lg:col-span-1 flex flex-col hover:shadow-md transition-shadow duration-300">
+          <div className="p-8 flex flex-col h-full min-h-[500px]">
+            <h3 className="text-xl font-extrabold text-sky-950 tracking-tight mb-8">Xu hướng doanh thu</h3>
+            <div className="flex-1 w-full min-h-0">
+              <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+                <BarChart data={dynamicRevenueTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" opacity={0.5} />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 13, fontWeight: 500 }} dy={15} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 13, fontWeight: 500 }} tickFormatter={formatYAxisCurrency} dx={-10} />
+                  <RechartsTooltip content={<CustomAreaTooltip />} cursor={{ fill: '#f8fafc', opacity: 0.6 }} />
+                  <Legend verticalAlign="top" height={40} iconType="circle" wrapperStyle={{ paddingBottom: '24px', fontSize: '13px', fontWeight: 600, color: '#475569' }} />
+                  <Bar dataKey="potential" name="Tổng thu kỳ vọng" fill="#bae6fd" radius={[6, 6, 0, 0]} maxBarSize={45} />
+                  <Bar dataKey="actual" name="Đã thanh toán" fill="#10b981" radius={[6, 6, 0, 0]} maxBarSize={45} />
+                  <Bar dataKey="remaining" name="Chờ thanh toán" fill="#f59e0b" radius={[6, 6, 0, 0]} maxBarSize={45} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
 
         {/* Tỷ lệ thu hồi học phí (Donut Chart) (50%) */}
-        <div className="glass-panel border-sky-300/30 rounded-3xl shadow-[0_8px_32px_rgba(14,165,233,0.08)] lg:col-span-1 flex flex-col">
-          <div className="p-6 border-b border-sky-300/30 flex justify-between items-center">
-            <h3 className="text-lg font-bold text-sky-900 font-sans">Tỷ lệ thu hồi học phí</h3>
-            <div className="relative">
-              <input
-                type="month"
-                id="financialMonthFilter"
-                value={selectedMonth}
-                onChange={(e) => {
-                  if (e.target.value) {
-                    setSelectedMonth(e.target.value);
-                  }
-                }}
-                className="text-sm border border-sky-300/30 rounded-xl px-3 py-1.5 text-sky-900 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 glass-panel shadow-sm w-40 cursor-pointer hover:border-sky-300 transition-colors"
-              />
+        <div className="bg-white/70 backdrop-blur-xl border border-white shadow-sm rounded-3xl lg:col-span-1 flex flex-col hover:shadow-md transition-shadow duration-300">
+          <div className="p-8 flex-1 min-h-[500px] flex flex-col">
+            <div className="flex justify-between items-start mb-8 gap-4">
+              <h3 className="text-xl font-extrabold text-sky-950 tracking-tight">Thu hồi học phí</h3>
+              <div className="relative shrink-0">
+                <input
+                  type="month"
+                  id="financialMonthFilter"
+                  value={selectedMonth}
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      setSelectedMonth(e.target.value);
+                    }
+                  }}
+                  className="text-sm font-medium border-0 ring-1 ring-sky-200 rounded-2xl px-4 py-2 text-sky-900 focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white/80 shadow-sm cursor-pointer hover:ring-sky-300 transition-all"
+                />
+              </div>
             </div>
-          </div>
-          <div className="p-6 py-10 flex-1 min-h-[450px] flex flex-col">
+            
             <div className="flex-1 relative min-h-0 min-w-0">
               <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                 <PieChart>
@@ -337,69 +344,54 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
                     data={donutData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={55}
-                    outerRadius={75}
-                    paddingAngle={2}
+                    innerRadius="65%"
+                    outerRadius="85%"
+                    paddingAngle={3}
                     dataKey="value"
-                    stroke="#FFFFFF"
-                    strokeWidth={2}
+                    stroke="none"
                   >
                     {donutData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.fill} />
                     ))}
                   </Pie>
-                  <Pie
-                    data={[{ name: 'Tổng số tiền có thể thu', value: tongTienCoTheThu, fill: '#FFB7B2' }]}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={80}
-                    outerRadius={100}
-                    dataKey="value"
-                    stroke="none"
-                  >
-                    <Cell fill="#FFB7B2" />
-                  </Pie>
                   <RechartsTooltip 
                     formatter={(value: number) => formatVND(value)}
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.08)' }}
+                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', padding: '12px 16px', fontWeight: 600 }}
                   />
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-3xl font-bold text-sky-950">{(tongTienCoTheThu > 0 ? (soTienThanhToan / tongTienCoTheThu) * 100 : 0).toFixed(1)}%</span>
-                <span className="text-xs font-medium text-sky-700/80 mt-1">Đã hoàn thành</span>
+                <span className="text-4xl font-black text-sky-950 tracking-tighter">{(tongTienCoTheThu > 0 ? (soTienThanhToan / tongTienCoTheThu) * 100 : 0).toFixed(0)}%</span>
+                <span className="text-xs font-bold text-sky-500 uppercase tracking-wider mt-1">Hoàn thành</span>
               </div>
             </div>
             
-            <div className="mt-4 space-y-3">
-              <div className="flex justify-center">
-                <div className="flex items-center gap-2 bg-sky-50/40 px-4 py-2 rounded-xl border border-sky-300/30">
-                  <div className="w-3 h-3 rounded-full bg-[#FFB7B2]"></div>
-                  <span className="text-sm text-pink-400 font-bold">Tổng số tiền có thể thu: </span>
-                  <span className="font-bold text-sky-900">{formatVND(tongTienCoTheThu)}</span>
-                </div>
+            <div className="mt-8 bg-sky-50/50 rounded-2xl p-5 ring-1 ring-sky-100">
+              <div className="flex justify-between items-center pb-4 border-b border-sky-100 mb-4">
+                <span className="text-sm font-bold text-sky-900 uppercase tracking-wider">Tổng thu kỳ vọng</span>
+                <span className="font-black text-lg text-sky-950">{formatVND(tongTienCoTheThu)}</span>
               </div>
-              <div className="flex flex-col gap-2 px-4 max-w-md mx-auto w-full">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#BDE0FE]"></div>
-                    <span className="text-sm text-sky-700/80">Số tiền có thể thu còn lại:</span>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#10b981]"></div>
+                    <span className="text-sm font-medium text-sky-800">Đã thanh toán</span>
                   </div>
-                  <span className="font-semibold text-sky-900">{formatVND(soTienCoTheThuConLai)}</span>
+                  <span className="font-bold text-sky-950">{formatVND(soTienThanhToan)}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#BAFFC9]"></div>
-                    <span className="text-sm text-sky-700/80">Số tiền thanh toán:</span>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#f59e0b]"></div>
+                    <span className="text-sm font-medium text-sky-800">Chờ thanh toán</span>
                   </div>
-                  <span className="font-semibold text-sky-900">{formatVND(soTienThanhToan)}</span>
+                  <span className="font-bold text-sky-950">{formatVND(choThanhToan)}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#FFB3BA]"></div>
-                    <span className="text-sm text-sky-700/80">Chờ thanh toán:</span>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#38bdf8]"></div>
+                    <span className="text-sm font-medium text-sky-800">Có thể thu thêm</span>
                   </div>
-                  <span className="font-semibold text-sky-900">{formatVND(choThanhToan)}</span>
+                  <span className="font-bold text-sky-950">{formatVND(soTienCoTheThuConLai)}</span>
                 </div>
               </div>
             </div>

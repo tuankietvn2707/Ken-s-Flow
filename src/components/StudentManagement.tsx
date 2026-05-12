@@ -68,6 +68,7 @@ export default function StudentManagement({ students, addStudent, updateStudent,
 
       <StudentList 
         students={students}
+        classes={classes}
         onUpdate={updateStudent}
         onDelete={handleDelete}
         onSelect={setSelectedStudent}

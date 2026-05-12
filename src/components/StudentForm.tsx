@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Student } from '../types';
-import { User, BookOpen, CreditCard, X } from 'lucide-react';
-import { motion } from 'motion/react';
+import { User, BookOpen, CreditCard, X, AlertCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface Props {
   editingId: string | null;
@@ -148,11 +148,22 @@ export default function StudentForm({ editingId, initialData, students, onClose,
         {editingId ? 'Sửa thông tin Học viên' : 'Thêm Học viên mới'}
       </h2>
       
-      {formError && (
-        <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-xl border border-red-200">
-          {formError}
-        </div>
-      )}
+      <AnimatePresence>
+        {formError && (
+          <motion.div 
+            initial={{ opacity: 0, height: 0, scale: 0.95 }}
+            animate={{ opacity: 1, height: 'auto', scale: 1 }}
+            exit={{ opacity: 0, height: 0, scale: 0.95 }}
+            className="mb-4 p-3 bg-rose-50 text-rose-700 text-sm rounded-xl border border-rose-200 flex items-start gap-2"
+          >
+            <AlertCircle className="w-5 h-5 shrink-0" />
+            <div>
+              <p className="font-semibold">Có lỗi xảy ra</p>
+              <p>{formError}</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       
       <form onSubmit={handleSubmit} className="space-y-8" noValidate>
         {/* Phần 1: Thông tin cơ bản */}
