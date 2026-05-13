@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Student, ClassSession, parseDateSafe } from '../types';
-import { Plus, X, Edit2, Trash2, AlertTriangle } from 'lucide-react';
+import { Plus, X, Edit2, Trash2, AlertTriangle, Calendar, CheckCircle2, AlertCircle } from 'lucide-react';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import { motion, AnimatePresence } from 'motion/react';
@@ -59,20 +59,20 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
   }, [isFormOpen]);
   
   const avatarColors = [
-    'bg-red-100 text-red-600',
-    'bg-orange-100 text-orange-600',
-    'bg-amber-100 text-amber-600',
-    'bg-green-100 text-green-600',
-    'bg-emerald-100 text-emerald-600',
-    'bg-teal-100 text-teal-600',
-    'bg-cyan-100 text-cyan-600',
-    'bg-blue-100 text-blue-600',
-    'bg-indigo-100 text-sky-600',
-    'bg-violet-100 text-violet-600',
-    'bg-purple-100 text-purple-600',
-    'bg-fuchsia-100 text-fuchsia-600',
-    'bg-pink-100 text-pink-600',
-    'bg-rose-100 text-rose-600'
+    'bg-red-50/80 text-red-600',
+    'bg-orange-50/80 text-orange-600',
+    'bg-amber-50/80 text-amber-600',
+    'bg-green-50/80 text-green-600',
+    'bg-emerald-50/80 text-emerald-600',
+    'bg-teal-50/80 text-teal-600',
+    'bg-cyan-50/80 text-cyan-600',
+    'bg-blue-50/80 text-blue-600',
+    'bg-indigo-50/80 text-indigo-600',
+    'bg-violet-50/80 text-violet-600',
+    'bg-purple-50/80 text-purple-600',
+    'bg-fuchsia-50/80 text-fuchsia-600',
+    'bg-pink-50/80 text-pink-600',
+    'bg-rose-50/80 text-rose-600'
   ];
 
   const getStudentColor = (id: string) => {
@@ -241,53 +241,62 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 pb-10">
       <motion.div 
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-        className="flex justify-between items-center"
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, ease: 'easeOut' }}
+        className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
       >
-        <h1 className="text-2xl font-bold text-sky-950">Theo dõi Lớp học</h1>
+        <div className="flex flex-col gap-1 items-start">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-sky-950 tracking-tight">Theo dõi Lớp học</h1>
+          <p className="text-sky-700/80 font-medium text-lg">Quản lý lịch học và trạng thái thanh toán học viên</p>
+        </div>
         <Button
           onClick={() => setIsFormOpen(true)}
-          className="bg-sky-200 text-sky-900 border border-sky-300 hover:bg-sky-300 shadow-sm"
+          className="bg-gradient-to-r from-sky-400 to-sky-500 hover:from-sky-500 hover:to-sky-600 text-white border border-white/40 shadow-[0_4px_16px_rgba(56,189,248,0.3)] hover:shadow-[0_8px_24px_rgba(56,189,248,0.4)] hover:-translate-y-0.5 transition-all duration-300 rounded-[20px] h-12 px-6 backdrop-blur-md group"
         >
-          <Plus className="w-4 h-4 mr-2" />
-          Ghi nhận Lớp học
+          <Plus className="w-5 h-5 mr-2 group-hover:scale-110 group-hover:rotate-90 transition-all duration-300" />
+          <span className="font-semibold text-[15px]">Ghi nhận Lớp học</span>
         </Button>
       </motion.div>
 
       {isFormOpen && (
         <motion.div 
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-          className="mb-6 relative"
+          className="mb-8 relative"
         >
-          <Card>
+          <div className="bg-white/60 backdrop-blur-2xl border border-white shadow-[0_8px_32px_rgba(0,0,0,0.06)] rounded-[32px] overflow-hidden p-8 relative">
             <Button 
               variant="ghost"
               size="icon"
               onClick={closeForm}
-              className="absolute top-4 right-4 text-sky-400 hover:text-sky-600 hover:bg-sky-50 z-10"
+              className="absolute top-6 right-6 text-sky-400 hover:text-sky-600 hover:bg-white border border-transparent hover:border-sky-100 hover:shadow-sm rounded-2xl w-10 h-10 transition-all duration-300 z-10"
             >
               <X className="w-5 h-5" />
             </Button>
-            <CardHeader className="pt-6">
-              <CardTitle>
+            
+            <div className="mb-6">
+              <h2 className="text-xl font-extrabold text-sky-950 tracking-tight">
                 {editingId ? 'Sửa thông tin Lớp học' : 'Ghi nhận Lớp học mới'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+              </h2>
+            </div>
+            
+            <div>
               {formError && (
-                <div className="mb-4 p-3 bg-rose-50 text-rose-700 text-sm rounded-xl border border-rose-200">
-                  {formError}
+                <div className="mb-6 p-4 bg-rose-50/80 backdrop-blur-sm text-rose-700 text-sm rounded-2xl border border-rose-200/60 shadow-sm animate-pulse-once">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4" />
+                    <span className="font-semibold">{formError}</span>
+                  </div>
                 </div>
               )}
-              <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div className="space-y-1">
-                    <label className="block text-sm font-medium text-sky-900">Học viên <span className="text-rose-500">*</span></label>
+              <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <label className="block text-sm font-bold text-sky-900/90 tracking-wide">Học viên <span className="text-rose-500">*</span></label>
                     <Select
                       value={formData.studentId}
                       onChange={e => setFormData({...formData, studentId: e.target.value})}
+                      className="rounded-[16px] bg-white/70 border-sky-100 hover:border-sky-200 focus:border-sky-400 focus:ring-sky-200/50 shadow-[0_2px_8px_rgba(14,165,233,0.04)] h-11"
                     >
                       <option value="">Chọn học viên...</option>
                       {students.filter(s => s.status !== 'inactive').map(s => (
@@ -295,106 +304,117 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                       ))}
                     </Select>
                   </div>
-                  <div className="space-y-1">
-                    <label className="block text-sm font-medium text-sky-900">Ngày học <span className="text-rose-500">*</span></label>
+                  <div className="space-y-1.5">
+                    <label className="block text-sm font-bold text-sky-900/90 tracking-wide">Ngày học <span className="text-rose-500">*</span></label>
                     <Input
                       type="date"
                       value={formData.date}
                       onChange={e => setFormData({...formData, date: e.target.value})}
+                      className="rounded-[16px] bg-white/70 border-sky-100 hover:border-sky-200 focus:border-sky-400 focus:ring-sky-200/50 shadow-[0_2px_8px_rgba(14,165,233,0.04)] h-11"
                     />
                   </div>
-                  <div className="space-y-1">
-                    <label className="block text-sm font-medium text-sky-900">Khung giờ (Tùy chọn)</label>
+                  <div className="space-y-1.5">
+                    <label className="block text-sm font-bold text-sky-900/90 tracking-wide">Khung giờ (Tùy chọn)</label>
                     <Input
                       type="text"
                       ref={timeInputRef}
                       value={formData.time}
                       onChange={e => setFormData({...formData, time: e.target.value})}
                       placeholder="Chọn giờ..."
+                      className="rounded-[16px] bg-white/70 border-sky-100 hover:border-sky-200 focus:border-sky-400 focus:ring-sky-200/50 shadow-[0_2px_8px_rgba(14,165,233,0.04)] h-11"
                     />
                   </div>
-                  <div className="sm:col-span-2 space-y-1">
-                    <label className="block text-sm font-medium text-sky-900">Chủ đề bài học <span className="text-rose-500">*</span></label>
+                  <div className="sm:col-span-2 space-y-1.5">
+                    <label className="block text-sm font-bold text-sky-900/90 tracking-wide">Chủ đề bài học <span className="text-rose-500">*</span></label>
                     <Input
                       type="text"
                       placeholder="VD: Thì hiện tại hoàn thành, Luyện nói..."
                       value={formData.topic}
                       onChange={e => setFormData({...formData, topic: e.target.value})}
+                      className="rounded-[16px] bg-white/70 border-sky-100 hover:border-sky-200 focus:border-sky-400 focus:ring-sky-200/50 shadow-[0_2px_8px_rgba(14,165,233,0.04)] h-11"
                     />
                   </div>
-                  <div className="space-y-1">
-                    <label className="block text-sm font-medium text-sky-900">Thời lượng (1 buổi = 1h30 phút) <span className="text-rose-500">*</span></label>
+                  <div className="space-y-1.5">
+                    <label className="block text-sm font-bold text-sky-900/90 tracking-wide">Thời lượng (1 buổi = 1h30 phút) <span className="text-rose-500">*</span></label>
                     <Input
                       type="number"
                       min="0.5"
                       step="0.5"
                       value={formData.duration}
                       onChange={e => setFormData({...formData, duration: e.target.value})}
+                      className="rounded-[16px] bg-white/70 border-sky-100 hover:border-sky-200 focus:border-sky-400 focus:ring-sky-200/50 shadow-[0_2px_8px_rgba(14,165,233,0.04)] h-11"
                     />
                   </div>
                   
-                  <div className="sm:col-span-2 mt-2 pt-4 border-t border-sky-100">
-                    <h4 className="text-sm font-medium text-sky-600 mb-3">Đánh giá chi tiết buổi học</h4>
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                      <div className="space-y-1">
-                        <label className="block text-sm font-medium text-sky-900">Điểm mạnh</label>
+                  <div className="sm:col-span-2 mt-4 pt-6 border-t border-sky-100/60">
+                    <h4 className="text-sm font-extrabold text-sky-600/90 uppercase tracking-widest mb-4">Đánh giá chi tiết buổi học</h4>
+                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                      <div className="space-y-1.5">
+                        <label className="block text-sm font-bold text-sky-900/90 tracking-wide">Điểm mạnh</label>
                         <Textarea
                           rows={2}
                           placeholder="Những điểm học viên làm tốt..."
                           value={formData.strengths}
                           onChange={e => setFormData({...formData, strengths: e.target.value})}
+                          className="rounded-[20px] bg-white/70 border-sky-100 hover:border-sky-200 focus:border-sky-400 focus:ring-sky-200/50 shadow-[0_2px_8px_rgba(14,165,233,0.04)] resize-none"
                         />
                       </div>
-                      <div className="space-y-1">
-                        <label className="block text-sm font-medium text-sky-900">Điểm yếu</label>
+                      <div className="space-y-1.5">
+                        <label className="block text-sm font-bold text-sky-900/90 tracking-wide">Điểm yếu</label>
                         <Textarea
                           rows={2}
                           placeholder="Những điểm học viên cần cải thiện..."
                           value={formData.weaknesses}
                           onChange={e => setFormData({...formData, weaknesses: e.target.value})}
+                          className="rounded-[20px] bg-white/70 border-sky-100 hover:border-sky-200 focus:border-sky-400 focus:ring-sky-200/50 shadow-[0_2px_8px_rgba(14,165,233,0.04)] resize-none"
                         />
                       </div>
-                      <div className="space-y-1">
-                        <label className="block text-sm font-medium text-sky-900">Các lỗi sai</label>
+                      <div className="space-y-1.5">
+                        <label className="block text-sm font-bold text-sky-900/90 tracking-wide">Các lỗi sai</label>
                         <Textarea
                           rows={2}
                           placeholder="Các lỗi sai thường gặp..."
                           value={formData.mistakes}
                           onChange={e => setFormData({...formData, mistakes: e.target.value})}
+                          className="rounded-[20px] bg-white/70 border-sky-100 hover:border-sky-200 focus:border-sky-400 focus:ring-sky-200/50 shadow-[0_2px_8px_rgba(14,165,233,0.04)] resize-none"
                         />
                       </div>
-                      <div className="space-y-1">
-                        <label className="block text-sm font-medium text-sky-900">Cách khắc phục</label>
+                      <div className="space-y-1.5">
+                        <label className="block text-sm font-bold text-sky-900/90 tracking-wide">Cách khắc phục</label>
                         <Textarea
                           rows={2}
                           placeholder="Giải pháp hoặc bài tập để khắc phục..."
                           value={formData.remedies}
                           onChange={e => setFormData({...formData, remedies: e.target.value})}
+                          className="rounded-[20px] bg-white/70 border-sky-100 hover:border-sky-200 focus:border-sky-400 focus:ring-sky-200/50 shadow-[0_2px_8px_rgba(14,165,233,0.04)] resize-none"
                         />
                       </div>
-                      <div className="sm:col-span-2 space-y-1">
-                        <label className="block text-sm font-medium text-sky-900">Soạn bài cho buổi sau</label>
+                      <div className="sm:col-span-2 space-y-1.5">
+                        <label className="block text-sm font-bold text-sky-900/90 tracking-wide">Soạn bài cho buổi sau</label>
                         <Textarea
                           rows={2}
                           placeholder="Nội dung cần chuẩn bị cho buổi học tiếp theo..."
                           value={formData.nextLessonPrep}
                           onChange={e => setFormData({...formData, nextLessonPrep: e.target.value})}
+                          className="rounded-[20px] bg-white/70 border-sky-100 hover:border-sky-200 focus:border-sky-400 focus:ring-sky-200/50 shadow-[0_2px_8px_rgba(14,165,233,0.04)] resize-none"
                         />
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="flex justify-end pt-4 gap-3">
+                <div className="flex justify-end pt-6 gap-3 border-t border-sky-100/60">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={closeForm}
+                    className="rounded-[16px] border-sky-200 hover:bg-sky-50 font-semibold px-6"
                   >
                     Hủy
                   </Button>
                   <Button
                     type="submit"
                     disabled={students.length === 0 || isSubmitting}
+                    className="rounded-[16px] bg-gradient-to-r from-sky-400 to-sky-500 hover:from-sky-500 hover:to-sky-600 text-white shadow-[0_4px_16px_rgba(56,189,248,0.3)] hover:shadow-[0_8px_24px_rgba(56,189,248,0.4)] font-semibold px-8"
                   >
                     {isSubmitting && (
                       <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -406,32 +426,39 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                   </Button>
                 </div>
               </form>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </motion.div>
       )}
 
       <motion.div 
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, ease: 'easeOut' }}
+        className="bg-white/60 backdrop-blur-2xl border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] overflow-hidden"
       >
-        <Card className="overflow-hidden">
-          <div className="px-6 py-5 border-b border-sky-100 bg-sky-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <h3 className="text-lg leading-6 font-medium text-sky-950">Các buổi học gần đây</h3>
-            <div className="flex items-center gap-3">
+        <div className="flex flex-col">
+          <div className="px-8 py-6 border-b border-sky-100/60 bg-gradient-to-b from-white/40 to-transparent flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <h3 className="text-xl font-extrabold text-sky-950 tracking-tight">Các buổi học gần đây</h3>
+            <div className="flex items-center gap-3 bg-white/50 backdrop-blur-md rounded-[20px] p-1.5 border border-white shadow-[0_4px_16px_rgba(14,165,233,0.03)] focus-within:ring-2 focus-within:ring-sky-200 focus-within:shadow-[0_8px_24px_rgba(14,165,233,0.08)] transition-all duration-300">
+              <div className="flex items-center pl-3">
+                <Calendar className="w-4 h-4 text-sky-500" />
+              </div>
               <Select
                 value={filterMonth}
                 onChange={(e) => setFilterMonth(e.target.value)}
-                className="w-32 bg-white"
+                className="w-[130px] border-none bg-transparent hover:bg-sky-50/50 focus:ring-0 cursor-pointer !h-9 text-sm font-semibold text-sky-950 transition-colors"
+                style={{ WebkitAppearance: 'none' }}
               >
                 <option value="all">Tất cả tháng</option>
                 {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
                   <option key={month} value={month.toString()}>Tháng {month}</option>
                 ))}
               </Select>
+              <div className="w-px h-5 bg-sky-200/50 mx-1"></div>
               <Select
                 value={filterYear}
                 onChange={(e) => setFilterYear(e.target.value)}
-                className="w-28 bg-white"
+                className="w-[110px] border-none bg-transparent hover:bg-sky-50/50 focus:ring-0 cursor-pointer !h-9 text-sm font-semibold text-sky-950 transition-colors"
+                style={{ WebkitAppearance: 'none' }}
               >
                 <option value="all">Tất cả năm</option>
                 {availableYears.map(year => (
@@ -441,70 +468,78 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
             </div>
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full">
-              <thead className="bg-sky-50/30 border-b border-sky-100">
+            <table className="min-w-full border-collapse">
+              <thead className="bg-white/40 border-b border-sky-100/50 backdrop-blur-md sticky top-0 z-10">
                 <tr>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-sky-600 uppercase tracking-wider">Ngày/Giờ</th>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-sky-600 uppercase tracking-wider">Học viên</th>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-sky-600 uppercase tracking-wider">Chủ đề</th>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-sky-600 uppercase tracking-wider">Thời lượng</th>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-sky-600 uppercase tracking-wider">Trạng thái</th>
-                  <th scope="col" className="relative px-6 py-4"><span className="sr-only">Thao tác</span></th>
+                  <th scope="col" className="px-8 py-5 text-left text-[0.7rem] font-bold text-sky-600/80 uppercase tracking-widest">Ngày/Giờ</th>
+                  <th scope="col" className="px-8 py-5 text-left text-[0.7rem] font-bold text-sky-600/80 uppercase tracking-widest">Học viên</th>
+                  <th scope="col" className="px-8 py-5 text-left text-[0.7rem] font-bold text-sky-600/80 uppercase tracking-widest">Chủ đề</th>
+                  <th scope="col" className="px-8 py-5 text-left text-[0.7rem] font-bold text-sky-600/80 uppercase tracking-widest">Thời lượng</th>
+                  <th scope="col" className="px-8 py-5 text-left text-[0.7rem] font-bold text-sky-600/80 uppercase tracking-widest">Trạng thái</th>
+                  <th scope="col" className="relative px-8 py-5"><span className="sr-only">Thao tác</span></th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-sky-50">
+              <tbody className="divide-y divide-sky-50/50">
                 {sortedClasses.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-10 text-center text-sm text-sky-700/80" >
+                    <td colSpan={6} className="px-8 py-16 text-center text-sm font-medium text-sky-700/60" >
                       Chưa có lớp học nào được ghi nhận trong thời gian này.
                     </td>
                   </tr>
                 ) : (
                   sortedClasses.map((cls) => (
-                    <tr key={cls.id} className="hover:bg-sky-50/50 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-sky-950 font-medium">
+                    <tr key={cls.id} className="group hover:bg-white/80 hover:shadow-[0_4px_24px_rgba(14,165,233,0.06)] transition-all duration-300 relative z-0 hover:z-10 bg-transparent">
+                      <td className="px-8 py-5 whitespace-nowrap text-sm text-sky-950 font-bold tracking-tight">
                         {!isNaN(parseDateSafe(cls.date).getTime()) 
                           ? parseDateSafe(cls.date).toLocaleDateString('vi-VN') 
                           : 'Ngày không hợp lệ'}
-                        {cls.time && <span className="text-sky-600 ml-2 text-xs font-normal bg-sky-100 px-2 py-0.5 rounded-full">{cls.time}</span>}
+                        {cls.time && <span className="text-sky-600 ml-3 text-[11px] font-semibold bg-sky-50 border border-sky-100/60 px-2.5 py-1 rounded-full drop-shadow-sm">{cls.time}</span>}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStudentColor(cls.studentId)}`}>
+                      <td className="px-8 py-5 whitespace-nowrap">
+                        <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold backdrop-blur-md border border-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-transform group-hover:scale-105 duration-300 ${getStudentColor(cls.studentId)}`}>
                           {getStudentName(cls.studentId)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-sky-700 font-medium max-w-xs truncate">
+                      <td className="px-8 py-5 text-sm text-sky-800 font-semibold max-w-xs truncate">
                         {cls.topic}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-sky-600">
-                        {cls.duration} buổi
+                      <td className="px-8 py-5 whitespace-nowrap text-sm text-sky-600 font-semibold">
+                        {cls.duration} <span className="text-sky-500/80 font-medium">buổi</span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-8 py-5 whitespace-nowrap">
                         {cls.isPaid ? (
-                          <Badge variant="success">Đã thanh toán</Badge>
+                          <span className="inline-flex items-center px-3 py-1.5 rounded-full text-[11px] font-bold bg-emerald-50/90 text-emerald-600 border border-emerald-100 shadow-sm backdrop-blur-sm gap-1.5 tracking-wide">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            Đã thanh toán
+                          </span>
                         ) : (
-                          <Badge variant="warning">Chưa thanh toán</Badge>
+                          <span className="inline-flex items-center px-3 py-1.5 rounded-full text-[11px] font-bold bg-orange-50/90 text-orange-600 border border-orange-100 shadow-sm backdrop-blur-sm gap-1.5 tracking-wide">
+                            <AlertCircle className="w-3.5 h-3.5" />
+                            Chưa thanh toán
+                          </span>
                         )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => editClass(cls)} 
-                          className="mr-2 text-sky-600 hover:text-sky-800 hover:bg-sky-100"
-                          title="Sửa"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(cls.id)} 
-                          className="text-rose-500 hover:text-rose-700 hover:bg-rose-100"
-                          title="Xóa"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                      <td className="px-8 py-5 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => editClass(cls)} 
+                            className="h-9 w-9 text-sky-500 hover:text-sky-600 hover:bg-sky-50 bg-white/50 backdrop-blur-sm border border-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-all duration-300 rounded-[14px]"
+                            title="Sửa"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(cls.id)} 
+                            className="h-9 w-9 text-rose-500 hover:text-rose-600 hover:bg-rose-50 bg-white/50 backdrop-blur-sm border border-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-all duration-300 rounded-[14px]"
+                            title="Xóa"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -512,7 +547,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
               </tbody>
             </table>
           </div>
-        </Card>
+        </div>
       </motion.div>
 
       {/* Delete Confirmation Modal */}
@@ -523,13 +558,13 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
         title="Xác nhận xóa lớp học"
         footer={
           <>
-            <Button variant="outline" onClick={() => setConfirmDeleteId(null)} className="flex-1">
+            <Button variant="outline" onClick={() => setConfirmDeleteId(null)} className="flex-1 font-semibold rounded-[16px]">
               Hủy
             </Button>
             <Button 
               variant="danger" 
               onClick={confirmDelete}
-              className="flex-1"
+              className="flex-1 font-semibold rounded-[16px]"
             >
               Xóa
             </Button>
@@ -537,11 +572,12 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
         }
       >
         <div className="flex flex-col items-center pt-2 pb-6">
-          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-rose-100 mb-4">
-            <AlertTriangle className="w-6 h-6 text-rose-600" />
+          <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-rose-50 to-red-50 border border-white shadow-[0_4px_16px_rgba(244,63,94,0.1)] ring-1 ring-rose-100 mb-6 relative">
+            <div className="absolute inset-0 bg-rose-400/20 rounded-full animate-ping opacity-50"></div>
+            <AlertTriangle className="w-8 h-8 text-rose-500 relative z-10" />
           </div>
-          <p className="text-sky-700/80 text-center text-sm">
-            Bạn có chắc chắn muốn xóa đánh giá và ghi nhận buổi học này? Hành động này không thể hoàn tác.
+          <p className="text-sky-800/90 text-center text-[15px] leading-relaxed max-w-[260px]">
+            Bạn có chắc chắn muốn xóa lớp học này? Hành động này <span className="font-bold text-rose-600">không thể hoàn tác</span>.
           </p>
         </div>
       </Modal>

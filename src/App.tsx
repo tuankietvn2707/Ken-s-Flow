@@ -436,9 +436,16 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen text-sky-950 font-sans">
+    <div className="min-h-screen text-sky-950 font-sans relative overflow-x-hidden">
+      {/* Premium Glassmorphism Background */}
+      <div className="fixed inset-0 z-[-1] bg-gradient-to-br from-[#f8fafc] via-[#e8f4fd] to-[#f0f9ff]">
+        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-sky-200/40 blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-blue-200/30 blur-[120px]" />
+        <div className="absolute top-[40%] left-[20%] w-[30%] h-[30%] rounded-full bg-indigo-100/30 blur-[100px]" />
+      </div>
+
       <Toaster position="top-center" richColors theme="light" />
-      <nav className="glass-panel border-b border-sky-300/30 sticky top-0 z-10">
+      <nav className="bg-white/60 backdrop-blur-2xl border-b border-white/60 sticky top-0 z-10 shadow-[0_4px_16px_rgba(14,165,233,0.05)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex">
@@ -585,10 +592,10 @@ export default function App() {
 
       {/* Global Loading Overlay */}
       {isProcessing && (
-        <div id="loading-overlay" className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50 backdrop-blur-sm">
-          <div className="flex flex-col items-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mb-4"></div>
-            <span className="text-white font-medium">Đang xử lý...</span>
+        <div id="loading-overlay" className="fixed inset-0 z-[120] flex items-center justify-center bg-sky-900/20 backdrop-blur-md">
+          <div className="flex flex-col items-center bg-white/80 p-8 rounded-3xl shadow-2xl border border-white/60 backdrop-blur-xl">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-sky-200 border-b-sky-600 mb-4"></div>
+            <span className="text-sky-950 font-bold tracking-tight">Đang xử lý...</span>
           </div>
         </div>
       )}

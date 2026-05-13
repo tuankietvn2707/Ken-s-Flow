@@ -36,27 +36,35 @@ export function Modal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-sky-950/20 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-hidden">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="absolute inset-0 bg-sky-900/10 backdrop-blur-sm"
+            onClick={onClose}
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className={cn(
-              "bg-white rounded-3xl shadow-xl w-full flex flex-col border border-sky-100 relative max-h-[90vh]",
+              "bg-white/80 backdrop-blur-2xl rounded-[32px] w-full flex flex-col border border-white/60 relative max-h-[90vh] shadow-[0_24px_64px_rgba(14,165,233,0.12)] ring-1 ring-sky-100/50 object-contain z-10",
               maxWidthClasses[maxWidth],
               className
             )}
           >
             {(title || description) && (
-              <div className="p-6 pb-4 border-b border-sky-50 flex justify-between items-start">
+              <div className="px-8 py-6 border-b border-sky-100/50 flex justify-between items-start bg-gradient-to-b from-white/60 to-transparent rounded-t-[32px]">
                 <div>
-                  {title && <h2 className="text-xl font-bold text-sky-950">{title}</h2>}
-                  {description && <p className="text-sm text-sky-700/70 mt-1">{description}</p>}
+                  {title && <h2 className="text-[22px] font-extrabold text-sky-950 tracking-tight">{title}</h2>}
+                  {description && <p className="text-[15px] font-medium text-sky-700/70 mt-1.5">{description}</p>}
                 </div>
                 <button
                   onClick={onClose}
-                  className="p-2 -mr-2 -mt-2 text-sky-400 hover:text-sky-600 hover:bg-sky-50 rounded-full transition-colors"
+                  className="p-2 -mr-2 -mt-2 text-sky-400 hover:text-sky-600 hover:bg-white border border-transparent hover:border-sky-100 hover:shadow-sm rounded-2xl transition-all duration-300"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -65,18 +73,18 @@ export function Modal({
             {!title && !description && (
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 p-2 text-sky-400 hover:text-sky-600 hover:bg-sky-50 rounded-full transition-colors z-10"
+                className="absolute top-6 right-6 p-2 text-sky-400 hover:text-sky-600 hover:bg-white border border-transparent hover:border-sky-100 hover:shadow-sm rounded-2xl transition-all duration-300 z-10"
               >
                 <X className="w-5 h-5" />
               </button>
             )}
             
-            <div className="p-6 overflow-y-auto min-h-0">
+            <div className="px-8 py-6 overflow-y-auto min-h-0 bg-transparent flex-1 scrollbar-hide">
               {children}
             </div>
 
             {footer && (
-              <div className="p-6 pt-4 border-t border-sky-50 flex justify-end gap-3 rounded-b-3xl bg-sky-50/50">
+              <div className="px-8 py-5 border-t border-sky-100/50 flex justify-end gap-3 rounded-b-[32px] bg-white/40 backdrop-blur-md">
                 {footer}
               </div>
             )}

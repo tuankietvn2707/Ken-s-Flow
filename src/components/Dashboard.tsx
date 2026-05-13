@@ -237,18 +237,19 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
       >
         <div 
           onClick={() => setActiveTab && setActiveTab('students')}
-          className="bg-white/80 backdrop-blur-xl border border-white shadow-sm overflow-hidden rounded-3xl cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-sky-200 group"
+          className="bg-white/60 backdrop-blur-2xl border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] overflow-hidden rounded-[32px] cursor-pointer transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(14,165,233,0.12)] group relative"
         >
-          <div className="p-8">
-            <div className="flex flex-col gap-4">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="p-8 relative z-10">
+            <div className="flex flex-col gap-6">
               <div className="flex justify-between items-start">
-                <div className="bg-sky-50 text-sky-600 rounded-2xl p-4 ring-1 ring-sky-100 group-hover:bg-sky-100 group-hover:scale-110 transition-all duration-300">
+                <div className="bg-gradient-to-br from-sky-50 to-white text-sky-500 rounded-[20px] p-4 shadow-sm ring-1 ring-white/80 group-hover:scale-110 group-hover:shadow-md group-hover:text-sky-600 transition-all duration-300">
                   <Users className="h-7 w-7" />
                 </div>
               </div>
               <div>
-                <dt className="text-xs font-bold text-sky-600 uppercase tracking-widest mb-1">Học viên hoạt động</dt>
-                <dd className="text-5xl font-black text-sky-950 tracking-tighter">{students.filter(s => s.status !== 'inactive').length}</dd>
+                <dt className="text-xs font-bold text-sky-600/80 uppercase tracking-[0.15em] mb-2">Học viên hoạt động</dt>
+                <dd className="text-5xl font-black text-sky-950 tracking-tighter drop-shadow-sm">{students.filter(s => s.status !== 'inactive').length}</dd>
               </div>
             </div>
           </div>
@@ -256,18 +257,19 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
 
         <div 
           onClick={() => setActiveTab && setActiveTab('classes')}
-          className="bg-white/80 backdrop-blur-xl border border-white shadow-sm overflow-hidden rounded-3xl cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-emerald-200 group"
+          className="bg-white/60 backdrop-blur-2xl border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] overflow-hidden rounded-[32px] cursor-pointer transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(16,185,129,0.12)] group relative"
         >
-          <div className="p-8">
-            <div className="flex flex-col gap-4">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="p-8 relative z-10">
+            <div className="flex flex-col gap-6">
               <div className="flex justify-between items-start">
-                <div className="bg-emerald-50 text-emerald-600 rounded-2xl p-4 ring-1 ring-emerald-100 group-hover:bg-emerald-100 group-hover:scale-110 transition-all duration-300">
+                <div className="bg-gradient-to-br from-emerald-50 to-white text-emerald-500 rounded-[20px] p-4 shadow-sm ring-1 ring-white/80 group-hover:scale-110 group-hover:shadow-md group-hover:text-emerald-600 transition-all duration-300">
                   <Calendar className="h-7 w-7" />
                 </div>
               </div>
               <div>
-                <dt className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-1">Lớp học tuần này</dt>
-                <dd className="text-5xl font-black text-sky-950 tracking-tighter">{classesThisWeek}</dd>
+                <dt className="text-xs font-bold text-emerald-600/80 uppercase tracking-[0.15em] mb-2">Lớp học tuần này</dt>
+                <dd className="text-5xl font-black text-sky-950 tracking-tighter drop-shadow-sm">{classesThisWeek}</dd>
               </div>
             </div>
           </div>
@@ -275,18 +277,19 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
 
         <div 
           onClick={() => setActiveTab && setActiveTab('finances')}
-          className="bg-white/80 backdrop-blur-xl border border-white shadow-sm overflow-hidden rounded-3xl cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-amber-200 group"
+          className="bg-white/60 backdrop-blur-2xl border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] overflow-hidden rounded-[32px] cursor-pointer transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(245,158,11,0.12)] group relative"
         >
-          <div className="p-8">
-            <div className="flex flex-col gap-4">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="p-8 relative z-10">
+            <div className="flex flex-col gap-6">
               <div className="flex justify-between items-start">
-                <div className="bg-amber-50 text-amber-600 rounded-2xl p-4 ring-1 ring-amber-100 group-hover:bg-amber-100 group-hover:scale-110 transition-all duration-300">
+                <div className="bg-gradient-to-br from-amber-50 to-white text-amber-500 rounded-[20px] p-4 shadow-sm ring-1 ring-white/80 group-hover:scale-110 group-hover:shadow-md group-hover:text-amber-600 transition-all duration-300">
                   <DongSign className="h-7 w-7" />
                 </div>
               </div>
               <div>
-                <dt className="text-xs font-bold text-amber-600 uppercase tracking-widest mb-1">Chờ thanh toán</dt>
-                <dd className="text-4xl font-black text-sky-950 tracking-tight leading-tight mt-1 truncate">{formatVND(choThanhToan)}</dd>
+                <dt className="text-xs font-bold text-amber-600/80 uppercase tracking-[0.15em] mb-2">Chờ thanh toán</dt>
+                <dd className="text-4xl font-black text-sky-950 tracking-tight leading-tight mt-1 truncate drop-shadow-sm">{formatVND(choThanhToan)}</dd>
               </div>
             </div>
           </div>
@@ -298,7 +301,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
         className="grid grid-cols-1 lg:grid-cols-2 gap-8"
       >
         {/* Revenue Trend Chart (50%) */}
-        <div className="bg-white/70 backdrop-blur-xl border border-white shadow-sm rounded-3xl lg:col-span-1 flex flex-col hover:shadow-md transition-shadow duration-300">
+        <div className="bg-white/60 backdrop-blur-2xl border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] lg:col-span-1 flex flex-col hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(14,165,233,0.1)] transition-all duration-300">
           <div className="p-8 flex flex-col h-full min-h-[500px]">
             <h3 className="text-xl font-extrabold text-sky-950 tracking-tight mb-8">Xu hướng doanh thu</h3>
             <div className="flex-1 w-full min-h-0">
@@ -319,80 +322,95 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
         </div>
 
         {/* Tỷ lệ thu hồi học phí (Donut Chart) (50%) */}
-        <div className="bg-white/70 backdrop-blur-xl border border-white shadow-sm rounded-3xl lg:col-span-1 flex flex-col hover:shadow-md transition-shadow duration-300">
+        <div className="bg-white/60 backdrop-blur-2xl border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] lg:col-span-1 flex flex-col hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(14,165,233,0.1)] transition-all duration-300">
           <div className="p-8 flex-1 min-h-[500px] flex flex-col">
-            <div className="flex justify-between items-start mb-8 gap-4">
+            <div className="flex justify-between items-center mb-8 gap-4">
               <h3 className="text-xl font-extrabold text-sky-950 tracking-tight">Thu hồi học phí</h3>
-              <div className="relative shrink-0">
-                <Input
-                  type="month"
-                  id="financialMonthFilter"
-                  value={selectedMonth}
-                  onChange={(e) => {
-                    if (e.target.value) {
-                      setSelectedMonth(e.target.value);
-                    }
-                  }}
-                  className="rounded-2xl cursor-pointer w-[150px]"
-                />
-              </div>
-            </div>
-            
-            <div className="flex-1 relative min-h-0 min-w-0">
-              <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
-                <PieChart>
-                  <Pie
-                    data={donutData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius="65%"
-                    outerRadius="100%"
-                    paddingAngle={3}
-                    dataKey="value"
-                    stroke="none"
-                  >
-                    {donutData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.fill} />
-                    ))}
-                  </Pie>
-                  <RechartsTooltip 
-                    formatter={(value: number) => formatVND(value)}
-                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', padding: '12px 16px', fontWeight: 600 }}
+              <div className="relative shrink-0 group">
+                <div className="flex items-center gap-2 bg-white/60 backdrop-blur-md border border-white shadow-[0_4px_16px_rgba(14,165,233,0.05)] hover:shadow-[0_8px_24px_rgba(14,165,233,0.1)] hover:bg-white/90 transition-all duration-300 rounded-[20px] px-4 py-2 ring-1 ring-sky-100/50 group-hover:ring-sky-200">
+                  <Calendar className="w-5 h-5 text-sky-500 group-hover:text-sky-600 transition-colors" />
+                  <input
+                    type="month"
+                    id="financialMonthFilter"
+                    value={selectedMonth}
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        setSelectedMonth(e.target.value);
+                      }
+                    }}
+                    className="bg-transparent border-none p-0 text-sky-950 font-semibold focus:ring-0 cursor-pointer outline-none w-[110px] text-sm"
+                    style={{ WebkitAppearance: 'none' }}
                   />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-4xl font-black text-sky-950 tracking-tighter">{(tongTienCoTheThu > 0 ? (soTienThanhToan / tongTienCoTheThu) * 100 : 0).toFixed(0)}%</span>
-                <span className="text-xs font-bold text-sky-500 uppercase tracking-wider mt-1">Hoàn thành</span>
+                </div>
               </div>
             </div>
             
-            <div className="mt-8 bg-sky-50/50 rounded-2xl p-5 ring-1 ring-sky-100">
-              <div className="flex justify-between items-center pb-4 border-b border-sky-100 mb-4">
-                <span className="text-sm font-bold text-sky-900 uppercase tracking-wider">Tổng thu kỳ vọng</span>
-                <span className="font-black text-lg text-sky-950">{formatVND(tongTienCoTheThu)}</span>
+            <div className="flex-1 relative flex justify-center items-center py-6 min-h-[260px]">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }} // smooth spring-like
+                whileHover={{ scale: 1.02 }}
+                className="w-[220px] h-[220px] relative cursor-pointer"
+              >
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={donutData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius="72%"
+                      outerRadius="100%"
+                      paddingAngle={4}
+                      dataKey="value"
+                      stroke="none"
+                      cornerRadius={6}
+                      className="drop-shadow-sm"
+                    >
+                      {donutData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Pie>
+                    <RechartsTooltip 
+                      formatter={(value: number) => formatVND(value)}
+                      contentStyle={{ borderRadius: '20px', border: '1px solid rgba(255,255,255,0.6)', backgroundColor: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(10px)', boxShadow: '0 12px 40px rgba(14,165,233,0.15)', padding: '12px 16px', fontWeight: 600 }}
+                      itemStyle={{ color: '#0c4a6e' }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <span className="text-5xl leading-none font-extrabold text-sky-950 tracking-tighter drop-shadow-sm">{(tongTienCoTheThu > 0 ? (soTienThanhToan / tongTienCoTheThu) * 100 : 0).toFixed(0)}%</span>
+                  <span className="text-[0.65rem] font-bold text-sky-500 uppercase tracking-[0.25em] mt-3 opacity-60">Hoàn thành</span>
+                </div>
+              </motion.div>
+            </div>
+            
+            <div className="mt-8 bg-white/40 backdrop-blur-md rounded-[24px] p-6 ring-1 ring-white/60 shadow-[0_4px_24px_rgba(14,165,233,0.03)] border border-sky-100/50">
+              <div className="flex justify-between items-center pb-5 border-b border-sky-100/60 mb-5">
+                <span className="text-[0.8rem] font-bold text-sky-900/80 uppercase tracking-widest">Tổng thu kỳ vọng</span>
+                <span className="font-extrabold text-xl text-sky-950 tracking-tight">{formatVND(tongTienCoTheThu)}</span>
               </div>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#10b981]"></div>
-                    <span className="text-sm font-medium text-sky-800">Đã thanh toán</span>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between group/item">
+                  <div className="flex items-center gap-3 w-1/2">
+                    <div className="w-3 h-3 rounded-full bg-[#10b981] shadow-[0_0_8px_rgba(16,185,129,0.4)]"></div>
+                    <span className="text-sm font-semibold text-sky-800/90 truncate">Đã thanh toán</span>
                   </div>
-                  <span className="font-bold text-sky-950">{formatVND(soTienThanhToan)}</span>
+                  <span className="font-bold text-sky-950 text-right w-1/2">{formatVND(soTienThanhToan)}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#f59e0b]"></div>
-                    <span className="text-sm font-medium text-sky-800">Chờ thanh toán</span>
+                <div className="flex items-center justify-between group/item">
+                  <div className="flex items-center gap-3 w-1/2">
+                    <div className="w-3 h-3 rounded-full bg-[#f59e0b] shadow-[0_0_8px_rgba(245,158,11,0.4)]"></div>
+                    <span className="text-sm font-semibold text-sky-800/90 truncate">Chờ thanh toán</span>
                   </div>
-                  <span className="font-bold text-sky-950">{formatVND(choThanhToan)}</span>
+                  <span className="font-bold text-sky-950 text-right w-1/2">{formatVND(choThanhToan)}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#38bdf8]"></div>
-                    <span className="text-sm font-medium text-sky-800">Có thể thu thêm</span>
+                <div className="flex items-center justify-between group/item">
+                  <div className="flex items-center gap-3 w-1/2">
+                    <div className="w-3 h-3 rounded-full bg-[#38bdf8] shadow-[0_0_8px_rgba(56,189,248,0.4)]"></div>
+                    <span className="text-sm font-semibold text-sky-800/90 truncate">Có thể thu thêm</span>
                   </div>
-                  <span className="font-bold text-sky-950">{formatVND(soTienCoTheThuConLai)}</span>
+                  <span className="font-bold text-sky-950 text-right w-1/2">{formatVND(soTienCoTheThuConLai)}</span>
                 </div>
               </div>
             </div>
