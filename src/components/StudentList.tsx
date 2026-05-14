@@ -207,9 +207,9 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
 
   const renderListItem = (student: Student, index: number, provided?: any, snapshot?: any) => {
     const isInactive = student.status === 'inactive';
-    const rowClass = `bg-white hover:bg-sky-50/50 transition-colors border-b border-sky-50 last:border-0 group cursor-pointer
-      ${snapshot && snapshot.isDragging ? 'shadow-lg ring-1 ring-sky-300' : ''}
-      ${isInactive ? 'opacity-70 bg-gray-50' : ''}
+    const rowClass = `group hover:bg-white/80 hover:shadow-[0_4px_24px_rgba(14,165,233,0.06)] transition-all duration-300 relative z-0 hover:z-10 bg-transparent
+      ${snapshot && snapshot.isDragging ? 'shadow-lg ring-1 ring-sky-300 bg-white/90' : ''}
+      ${isInactive ? 'opacity-70 bg-gray-50/30' : ''}
     `;
 
     return (
@@ -219,62 +219,62 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
         className={rowClass}
         onClick={() => onSelect(student)}
       >
-        <td className="px-4 py-4 whitespace-nowrap w-12">
+        <td className="px-6 py-5 whitespace-nowrap w-12 border-b border-sky-50/50">
           {provided && filter === 'active' && sortBy === 'order' && !searchQuery ? (
-            <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing p-1.5 hover:bg-sky-100 text-sky-300 hover:text-sky-600 rounded-lg transition-colors inline-flex">
+            <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing p-1.5 hover:bg-sky-100/80 text-sky-300 hover:text-sky-600 rounded-xl transition-colors inline-flex">
               <GripVertical className="w-5 h-5" />
             </div>
           ) : (
             <div className="w-8"></div> // spacer
           )}
         </td>
-        <td className="px-4 py-4 whitespace-nowrap">
-          <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm shadow-sm ${getAvatarColor(student.id)}`}>
+        <td className="px-6 py-5 whitespace-nowrap border-b border-sky-50/50">
+          <div className="flex items-center gap-4">
+            <div className={`w-11 h-11 rounded-[16px] flex items-center justify-center font-bold text-sm shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-white/60 backdrop-blur-sm transition-transform group-hover:scale-105 duration-300 ${getAvatarColor(student.id)}`}>
               {student.firstName ? student.firstName.charAt(0).toUpperCase() : student.name.charAt(0).toUpperCase()}
             </div>
             <div>
-              <div className="font-bold text-sky-950 group-hover:text-sky-700 transition-colors">
+              <div className="font-extrabold text-sky-950 group-hover:text-sky-700 transition-colors tracking-tight text-[15px]">
                 {student.lastName} {student.firstName}
               </div>
-              <div className="text-xs text-sky-700/70 mt-0.5">
+              <div className="text-[13px] font-medium text-sky-600/70 mt-0.5">
                 {student.occupation || 'Chưa cập nhật'}
               </div>
             </div>
           </div>
         </td>
-        <td className="px-4 py-4 whitespace-nowrap">
+        <td className="px-6 py-5 whitespace-nowrap border-b border-sky-50/50">
           <div className="flex items-center gap-2">
             <StatusBadgeItem student={student} />
           </div>
         </td>
-        <td className="px-4 py-4 whitespace-nowrap">
+        <td className="px-6 py-5 whitespace-nowrap border-b border-sky-50/50">
           <span 
-            className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-lg text-gray-900 border border-black/5"
+            className="px-3 py-1.5 inline-flex text-[11px] leading-5 font-bold rounded-full text-sky-900 border border-white shadow-sm backdrop-blur-sm"
             style={{ backgroundColor: student.targetColor || '#f1f5f9' }}
           >
             {student.goal || 'Chưa cập nhật'}
           </span>
         </td>
-        <td className="px-4 py-4 whitespace-nowrap text-sm text-sky-950 font-semibold">
+        <td className="px-6 py-5 whitespace-nowrap text-sm text-sky-950 font-bold border-b border-sky-50/50">
           {formatVND(student.fee)}
         </td>
-        <td className="px-4 py-4 whitespace-nowrap text-right">
-          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <td className="px-6 py-5 whitespace-nowrap text-right border-b border-sky-50/50">
+          <div className="flex items-center justify-end gap-2 opacity-100 transition-opacity duration-300">
             <Button 
-              variant="outline"
+              variant="ghost"
               size="icon"
               onClick={(e) => { e.stopPropagation(); onEdit(student); }} 
-              className="w-8 h-8 rounded-lg"
+              className="h-9 w-9 text-sky-500 hover:text-sky-600 hover:bg-sky-50 bg-white/50 backdrop-blur-sm border border-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-all duration-300 rounded-[14px]"
               title="Sửa"
             >
               <Edit2 className="w-4 h-4" />
             </Button>
             <Button
-              variant="danger"
+              variant="ghost"
               size="icon" 
               onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(student.id); }} 
-              className="w-8 h-8 rounded-lg"
+              className="h-9 w-9 text-rose-500 hover:text-rose-600 hover:bg-rose-50 bg-white/50 backdrop-blur-sm border border-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-all duration-300 rounded-[14px]"
               title="Xóa"
             >
               <Trash2 className="w-4 h-4" />
@@ -392,19 +392,19 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
           ) : (
             <motion.div 
               key="list"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="bg-white rounded-2xl shadow-sm border border-sky-100 overflow-hidden"
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="bg-white/40 backdrop-blur-2xl rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white/60 overflow-hidden"
             >
               <div className="overflow-x-auto">
-                <table className="min-w-full">
-                  <thead className="bg-sky-50/80 border-b border-sky-100">
+                <table className="min-w-full border-collapse">
+                  <thead className="bg-white/40 border-b border-sky-100/50 backdrop-blur-md sticky top-0 z-10">
                     <tr>
-                      <th scope="col" className="w-10 px-4 py-3"></th>
-                      <th scope="col" className="px-4 py-3 text-left text-xs font-bold text-sky-800 uppercase tracking-wider">Học sinh</th>
-                      <th scope="col" className="px-4 py-3 text-left text-xs font-bold text-sky-800 uppercase tracking-wider">Trạng thái</th>
-                      <th scope="col" className="px-4 py-3 text-left text-xs font-bold text-sky-800 uppercase tracking-wider">Mục tiêu</th>
-                      <th scope="col" className="px-4 py-3 text-left text-xs font-bold text-sky-800 uppercase tracking-wider">Học phí/buổi</th>
-                      <th scope="col" className="relative px-4 py-3"><span className="sr-only">Thao tác</span></th>
+                      <th scope="col" className="w-10 px-6 py-5"></th>
+                      <th scope="col" className="px-6 py-5 text-left text-[0.7rem] font-bold text-sky-600/80 uppercase tracking-widest">Học sinh</th>
+                      <th scope="col" className="px-6 py-5 text-left text-[0.7rem] font-bold text-sky-600/80 uppercase tracking-widest">Trạng thái</th>
+                      <th scope="col" className="px-6 py-5 text-left text-[0.7rem] font-bold text-sky-600/80 uppercase tracking-widest">Mục tiêu</th>
+                      <th scope="col" className="px-6 py-5 text-left text-[0.7rem] font-bold text-sky-600/80 uppercase tracking-widest">Học phí/buổi</th>
+                      <th scope="col" className="relative px-6 py-5"><span className="sr-only">Thao tác</span></th>
                     </tr>
                   </thead>
                   {filter === 'active' && sortBy === 'order' && !searchQuery ? (

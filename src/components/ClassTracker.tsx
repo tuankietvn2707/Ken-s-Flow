@@ -243,7 +243,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
   return (
     <div className="space-y-8 pb-10">
       <motion.div 
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, ease: 'easeOut' }}
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
         className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
       >
         <div className="flex flex-col gap-1 items-start">
@@ -261,7 +261,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
 
       {isFormOpen && (
         <motion.div 
-          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
           className="mb-8 relative"
         >
           <div className="bg-white/60 backdrop-blur-2xl border border-white shadow-[0_8px_32px_rgba(0,0,0,0.06)] rounded-[32px] overflow-hidden p-8 relative">
@@ -432,7 +432,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
       )}
 
       <motion.div 
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, ease: 'easeOut' }}
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
         className="bg-white/60 backdrop-blur-2xl border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] overflow-hidden"
       >
         <div className="flex flex-col">
@@ -520,7 +520,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                         )}
                       </td>
                       <td className="px-8 py-5 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="flex items-center justify-end gap-2 opacity-100 transition-opacity duration-300">
                           <Button
                             variant="ghost"
                             size="icon"

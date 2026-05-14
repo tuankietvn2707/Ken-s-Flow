@@ -110,94 +110,96 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
   const totalPotentialRevenue = allFinancials.reduce((sum, f) => sum + f.potentialRevenue, 0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 pb-10">
       <motion.div 
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-        className="flex justify-between items-center"
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+        className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
       >
-        <h1 className="text-2xl font-bold text-sky-950">Quản lý Tài chính</h1>
-        <div className="flex gap-4">
-          <Card className="px-4 py-2 flex items-center border border-sky-100 flex-row">
-            <span className="text-sm text-sky-700/80 mr-2">Số tiền có thể thu:</span>
-            <span className="text-lg font-bold text-emerald-600">{formatVND(totalPotentialRevenue)}</span>
-          </Card>
-          <Card className="px-4 py-2 flex items-center border border-sky-100 flex-row">
-            <span className="text-sm text-sky-700/80 mr-2">Chờ Thanh Toán:</span>
-            <span className="text-lg font-bold text-rose-600">{formatVND(totalOutstanding)}</span>
-          </Card>
+        <div className="flex flex-col gap-1 items-start">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-sky-950 tracking-tight">Quản lý Tài chính</h1>
+          <p className="text-sky-700/80 font-medium text-lg">Theo dõi công nợ và thu học phí</p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-2 sm:mt-0">
+          <div className="px-5 py-3 bg-white/60 backdrop-blur-md rounded-[20px] shadow-[0_4px_16px_rgba(14,165,233,0.04)] border border-white flex flex-col items-start min-w-[200px]">
+            <span className="text-[11px] font-bold text-emerald-600/80 uppercase tracking-widest mb-1">Số tiền có thể thu</span>
+            <span className="text-2xl font-extrabold text-emerald-600 tracking-tight">{formatVND(totalPotentialRevenue)}</span>
+          </div>
+          <div className="px-5 py-3 bg-white/60 backdrop-blur-md rounded-[20px] shadow-[0_4px_16px_rgba(244,63,94,0.04)] border border-white flex flex-col items-start min-w-[200px]">
+            <span className="text-[11px] font-bold text-rose-600/80 uppercase tracking-widest mb-1">Chờ Thanh Toán</span>
+            <span className="text-2xl font-extrabold text-rose-600 tracking-tight">{formatVND(totalOutstanding)}</span>
+          </div>
         </div>
       </motion.div>
 
       <motion.div 
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-        className="glass rounded-3xl border overflow-hidden bg-white"
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+        className="bg-white/40 backdrop-blur-2xl rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white/60 overflow-hidden"
         
       >
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-sky-100">
-            <thead className="bg-sky-50/50">
+          <table className="min-w-full border-collapse">
+            <thead className="bg-white/40 border-b border-sky-100/50 backdrop-blur-md sticky top-0 z-10">
               <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-sky-600 uppercase tracking-wider">Học viên</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-sky-600 uppercase tracking-wider">Học phí/Buổi</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-sky-600 uppercase tracking-wider">Số buổi chưa thu</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-sky-600 uppercase tracking-wider">Số tiền có thể thu</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-sky-600 uppercase tracking-wider">Chờ Thanh Toán</th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-sky-600 uppercase tracking-wider">Thao tác</th>
+                <th scope="col" className="px-6 py-5 text-left text-[0.7rem] font-bold text-sky-600/80 uppercase tracking-widest">Học viên</th>
+                <th scope="col" className="px-6 py-5 text-left text-[0.7rem] font-bold text-sky-600/80 uppercase tracking-widest">Học phí/Buổi</th>
+                <th scope="col" className="px-6 py-5 text-left text-[0.7rem] font-bold text-sky-600/80 uppercase tracking-widest">Số buổi chưa thu</th>
+                <th scope="col" className="px-6 py-5 text-left text-[0.7rem] font-bold text-sky-600/80 uppercase tracking-widest">Số tiền có thể thu</th>
+                <th scope="col" className="px-6 py-5 text-left text-[0.7rem] font-bold text-sky-600/80 uppercase tracking-widest">Chờ Thanh Toán</th>
+                <th scope="col" className="px-6 py-5 text-right text-[0.7rem] font-bold text-sky-600/80 uppercase tracking-widest">Thao tác</th>
               </tr>
             </thead>
-            <tbody 
-              className="bg-white divide-y divide-sky-50">
+            <tbody className="divide-y divide-sky-50/50">
               {allFinancials.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-10 text-center text-sm text-sky-700/80" >
+                  <td colSpan={6} className="px-6 py-10 text-center text-sm font-medium text-sky-700/60" >
                     Chưa có học viên nào. Vui lòng thêm học viên để theo dõi tài chính.
                   </td>
                 </tr>
               ) : (
                 allFinancials.map(({ student, totalUnpaidSessions, totalOwed, potentialRevenue, unpaidClassIds, unpaidClasses, hasPaidClasses }) => (
-                  <tr key={student.id} className="hover:bg-sky-50/40">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-sky-950">{student.name}</div>
+                  <tr key={student.id} className="group hover:bg-white/80 hover:shadow-[0_4px_24px_rgba(14,165,233,0.06)] transition-all duration-300 relative z-0 hover:z-10 bg-transparent">
+                    <td className="px-6 py-5 whitespace-nowrap border-b border-sky-50/50">
+                      <div className="text-[15px] font-extrabold text-sky-950 tracking-tight">{student.name}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-sky-700/80">
+                    <td className="px-6 py-5 whitespace-nowrap text-[14px] font-semibold text-sky-700/80 border-b border-sky-50/50">
                       {formatVND(student.fee)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        totalUnpaidSessions > 0 ? 'bg-rose-100 text-rose-800' : 'bg-sky-100 text-sky-800'
+                    <td className="px-6 py-5 whitespace-nowrap border-b border-sky-50/50">
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border shadow-sm backdrop-blur-sm ${
+                        totalUnpaidSessions > 0 ? 'bg-rose-50 text-rose-700 border-rose-200/50' : 'bg-sky-50 text-sky-700 border-sky-200/50'
                       }`}>
                         {totalUnpaidSessions} / {student.feeCycle} buổi
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <Badge variant="success">
+                    <td className="px-6 py-5 whitespace-nowrap border-b border-sky-50/50">
+                      <div className="bg-emerald-50 text-emerald-700 border-emerald-200/50 border px-3 py-1 rounded-full text-xs font-bold shadow-sm inline-flex items-center">
                         {formatVND(potentialRevenue)}
-                      </Badge>
+                      </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <Badge variant={totalOwed > 0 ? 'danger' : 'secondary'}>
+                    <td className="px-6 py-5 whitespace-nowrap border-b border-sky-50/50">
+                       <div className={`${totalOwed > 0 ? 'bg-rose-50 text-rose-700 border-rose-200/50' : 'bg-gray-100/80 text-gray-700 font-semibold border-gray-200/50'} border px-3 py-1 rounded-full text-xs font-bold shadow-sm inline-flex items-center`}>
                         {formatVND(totalOwed)}
-                      </Badge>
+                      </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex justify-end gap-2">
+                    <td className="px-6 py-5 whitespace-nowrap text-right text-sm font-medium border-b border-sky-50/50">
+                      <div className="flex items-center justify-end gap-2 opacity-100 transition-opacity duration-300">
                         <Button
-                          variant="outline"
-                          size="sm"
+                          variant="ghost"
+                          size="icon"
                           onClick={() => undoLastPayment(student.id)}
                           disabled={!hasPaidClasses}
                           title="Hoàn tác lần thanh toán gần nhất"
-                          className="px-2"
+                          className="h-9 w-9 text-sky-500 hover:text-sky-600 hover:bg-sky-50 bg-white/50 backdrop-blur-sm border border-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-all duration-300 rounded-[14px]"
                         >
-                          <RotateCcw className="w-3.5 h-3.5" />
+                          <RotateCcw className="w-4 h-4" />
                         </Button>
                         <Button
                           variant={totalOwed > 0 ? 'default' : 'secondary'}
-                          size="sm"
                           onClick={() => handleMarkAsPaid(student, unpaidClassIds, totalUnpaidSessions, potentialRevenue, totalOwed, unpaidClasses)}
                           disabled={totalOwed === 0}
+                          className={`rounded-[14px] shadow-[0_4px_16px_rgba(14,165,233,0.3)] hover:shadow-[0_8px_24px_rgba(14,165,233,0.4)] ${totalOwed > 0 ? 'bg-sky-500 hover:bg-sky-600 text-white' : 'bg-white/50 text-sky-800'}`}
                         >
-                          <CheckCircle className="w-3.5 h-3.5 mr-1.5" />
+                          <CheckCircle className="w-4 h-4 mr-1.5" />
                           Đã thanh toán
                         </Button>
                       </div>

@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Target, Plus, Trash2, Check, X, AlertTriangle } from 'lucide-react';
+import { Target, Plus, Trash2, Check, X, AlertTriangle, ArrowRight, Wallet } from 'lucide-react';
 import { Goal, Transaction } from '../types';
 import { formatNumber, parseNumber } from './PersonalFinance';
-import { Card, CardHeader, CardTitle, CardContent } from './ui/Card';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 import { Modal } from './ui/Modal';
@@ -85,23 +84,28 @@ export default function FinanceGoals({ goals, addGoal, updateGoal, deleteGoal, a
 
   return (
     <motion.div 
-      initial={{ y: 20, opacity: 0 }} 
-      animate={{ y: 0, opacity: 1 }} 
-      transition={{ delay: 0.3 }}
+      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+      className="bg-white/60 backdrop-blur-2xl border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] overflow-hidden"
     >
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <CardTitle>Mục Tiêu Tiết Kiệm</CardTitle>
+      <div className="flex flex-col">
+        <div className="px-8 py-6 border-b border-white/40 flex justify-between items-center bg-white/40">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-sky-50 text-sky-600 border border-sky-100 shadow-sm">
+              <Target className="w-5 h-5" />
+            </div>
+            <h2 className="text-xl font-extrabold text-sky-950 tracking-tight">Mục Tiêu Tiết Kiệm</h2>
+          </div>
           <Button 
             variant="ghost" 
             size="icon" 
             onClick={() => setShowGoalForm(!showGoalForm)}
-            className="h-8 w-8 text-sky-600 bg-sky-50 hover:bg-sky-100 hover:text-sky-700"
+            className="h-9 w-9 rounded-full text-sky-600 hover:text-sky-700 bg-sky-50 shadow-sm border border-sky-100 transition-all hover:scale-105 hover:bg-sky-100"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-5 h-5" />
           </Button>
-        </CardHeader>
-        <CardContent>
+        </div>
+
+        <div className="p-8">
           <AnimatePresence>
             {showGoalForm && (
               <motion.form 
@@ -109,29 +113,37 @@ export default function FinanceGoals({ goals, addGoal, updateGoal, deleteGoal, a
                 animate={{ height: 'auto', opacity: 1 }} 
                 exit={{ height: 0, opacity: 0 }}
                 onSubmit={handleAddGoal} 
-                className="mb-6 space-y-3 overflow-hidden"
+                className="mb-6 space-y-4 overflow-hidden border-b border-sky-100 pb-6"
               >
-                <Input
-                  type="text" 
-                  placeholder="Tên mục tiêu" 
-                  value={goalName} 
-                  onChange={e => setGoalName(e.target.value)}
-                  required
-                />
-                <Input
-                  type="text" 
-                  placeholder="Số tiền mục tiêu (VNĐ)" 
-                  value={goalTargetStr} 
-                  onChange={e => {
-                    const val = e.target.value.replace(/[^0-9]/g, '');
-                    setGoalTargetStr(val ? formatNumber(parseInt(val, 10)) : '');
-                  }}
-                  required
-                />
+                <div>
+                  <label className="block text-xs font-bold text-sky-950/60 uppercase tracking-widest mb-1.5 pl-1">Tên mục tiêu</label>
+                  <Input
+                    type="text" 
+                    placeholder="VD: Mua Macbook mới..." 
+                    value={goalName} 
+                    onChange={e => setGoalName(e.target.value)}
+                    className="bg-white/80 border-sky-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-sky-950/60 uppercase tracking-widest mb-1.5 pl-1">Số tiền mục tiêu (VNĐ)</label>
+                  <Input
+                    type="text" 
+                    placeholder="0 đ" 
+                    value={goalTargetStr} 
+                    onChange={e => {
+                      const val = e.target.value.replace(/[^0-9]/g, '');
+                      setGoalTargetStr(val ? formatNumber(parseInt(val, 10)) : '');
+                    }}
+                    className="bg-white/80 border-sky-200/60 focus:border-sky-400 focus:ring-sky-400/20 font-semibold"
+                    required
+                  />
+                </div>
                 <Button 
                   type="submit" 
                   disabled={isSubmitting} 
-                  className="w-full"
+                  className="w-full bg-sky-500 hover:bg-sky-600 text-white rounded-xl shadow-[0_4px_16px_rgba(14,165,233,0.3)] hover:shadow-[0_8px_24px_rgba(14,165,233,0.4)] transition-all duration-300"
                 >
                   {isSubmitting && (
                     <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -139,49 +151,53 @@ export default function FinanceGoals({ goals, addGoal, updateGoal, deleteGoal, a
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                   )}
-                  {isSubmitting ? 'Đang thêm...' : 'Thêm Mục Tiêu'}
+                  {isSubmitting ? 'Đang thêm...' : 'Lưu Mục Tiêu'}
                 </Button>
               </motion.form>
             )}
           </AnimatePresence>
 
           <div className="space-y-4">
-            {goals.map(goal => {
+            {goals.map((goal, idx) => {
               const percentage = Math.min((goal.currentAmount / goal.targetAmount) * 100, 100);
               const isCompleted = goal.currentAmount >= goal.targetAmount;
               return (
-                <div key={goal.id} className="p-4 bg-sky-50/50 rounded-2xl border border-sky-100 group relative overflow-hidden transition-all hover:shadow-md">
-                  <div className="flex justify-between items-start mb-2">
+                <motion.div 
+                  initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.1, duration: 0.3 }}
+                  key={goal.id} 
+                  className="p-5 bg-white/70 backdrop-blur-md rounded-[20px] border border-white shadow-[0_4px_16px_rgba(0,0,0,0.03)] group relative overflow-hidden transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:-translate-y-0.5"
+                >
+                  <div className="flex justify-between items-start mb-3">
                     <div className="flex items-center gap-2">
-                      <div className={`p-1.5 rounded-lg ${isCompleted ? 'bg-emerald-100 text-emerald-600' : 'bg-blue-100 text-blue-600'}`}>
-                        {isCompleted ? <Check className="w-4 h-4" /> : <Target className="w-4 h-4" />}
-                      </div>
-                      <h3 className="font-semibold text-sky-950">{goal.name}</h3>
+                       <div className={`w-8 h-8 flex items-center justify-center rounded-xl bg-gradient-to-br border shadow-sm ${isCompleted ? 'from-emerald-100 to-emerald-50 border-emerald-200 text-emerald-600' : 'from-sky-100 to-sky-50 border-sky-200 text-sky-600'}`}>
+                          {isCompleted ? <Check className="w-4 h-4" /> : <Target className="w-4 h-4" />}
+                       </div>
+                      <h3 className="font-extrabold text-[15px] text-sky-950 tracking-tight">{goal.name}</h3>
                     </div>
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => setConfirmDeleteId(goal.id)}
-                      className="opacity-0 group-hover:opacity-100 text-rose-500 hover:text-rose-700 hover:bg-rose-100 transition-all h-8 w-8"
+                      className="opacity-0 group-hover:opacity-100 text-rose-500 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 shadow-none transition-all h-8 w-8 ml-2 flex-shrink-0 rounded-[12px]"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
                   
-                  <div className="flex justify-between text-sm mb-1.5">
-                    <span className="font-medium text-sky-900">{formatNumber(goal.currentAmount)}đ</span>
-                    <span className="text-sky-600/70">{formatNumber(goal.targetAmount)}đ</span>
+                  <div className="flex justify-between text-[13px] mb-2 font-bold whitespace-nowrap">
+                    <span className="text-sky-950">{formatNumber(goal.currentAmount)} đ</span>
+                    <span className="text-sky-900/50">{formatNumber(goal.targetAmount)} đ</span>
                   </div>
                   
-                  <div className="w-full bg-sky-200/50 rounded-full h-2 mb-3">
+                  <div className="w-full bg-sky-100/50 rounded-full h-2.5 mb-4 inset-shadow-sm overflow-hidden border border-sky-200/30">
                     <div 
-                      className={`h-2 rounded-full transition-all duration-1000 ${isCompleted ? 'bg-emerald-500' : 'bg-blue-500'}`}
+                      className={`h-full rounded-full transition-all duration-1000 bg-gradient-to-r shadow-sm ${isCompleted ? 'from-emerald-400 to-emerald-500' : 'from-sky-400 to-cyan-500'}`}
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
 
                   {depositGoalId === goal.id ? (
-                    <form onSubmit={handleDeposit} className="flex gap-2">
+                    <form onSubmit={handleDeposit} className="flex gap-2 bg-sky-50/50 p-1.5 rounded-2xl border border-sky-100/50">
                       <div className="relative flex-1">
                         <Input
                           type="text" 
@@ -192,18 +208,18 @@ export default function FinanceGoals({ goals, addGoal, updateGoal, deleteGoal, a
                             const val = e.target.value.replace(/[^0-9]/g, '');
                             setDepositAmountStr(val ? formatNumber(parseInt(val, 10)) : '');
                           }}
-                          className="h-8 text-sm"
+                          className="h-9 text-sm bg-white/80 border-transparent focus:border-sky-300 font-semibold"
                         />
                       </div>
                       <Button 
                         type="submit" 
                         disabled={isSubmitting} 
-                        variant="success"
+                        variant="ghost"
                         size="icon"
-                        className="h-8 w-8 flex-shrink-0"
+                        className="h-9 w-9 flex-shrink-0 bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm rounded-xl"
                       >
                         {isSubmitting ? (
-                          <svg className="animate-spin h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                           </svg>
@@ -215,7 +231,7 @@ export default function FinanceGoals({ goals, addGoal, updateGoal, deleteGoal, a
                         onClick={() => setDepositGoalId(null)} 
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 flex-shrink-0 text-rose-500 hover:text-rose-600 hover:bg-rose-50"
+                        className="h-9 w-9 flex-shrink-0 text-sky-500 hover:text-sky-700 hover:bg-sky-100/80 rounded-xl"
                       >
                         <X className="w-4 h-4" />
                       </Button>
@@ -225,22 +241,28 @@ export default function FinanceGoals({ goals, addGoal, updateGoal, deleteGoal, a
                       <Button 
                         onClick={() => setDepositGoalId(goal.id)}
                         variant="ghost"
-                        className="w-full text-sm font-medium text-sky-700 bg-sky-100 hover:bg-sky-200"
-                        size="sm"
+                        className="w-full text-sm font-bold text-sky-700 bg-sky-50/50 hover:bg-sky-100 hover:text-sky-800 border border-sky-100 shadow-sm rounded-xl py-2 h-auto hover:shadow-md transition-all group/btn flex items-center justify-center gap-1.5"
                       >
                         Nạp Tiết Kiệm
+                        <ArrowRight className="w-3.5 h-3.5 opacity-50 group-hover/btn:opacity-100 transition-opacity" />
                       </Button>
                     )
                   )}
-                </div>
+                </motion.div>
               );
             })}
             {goals.length === 0 && !showGoalForm && (
-              <p className="text-center text-sky-600/70 py-4 text-sm mt-2">Chưa có mục tiêu. Hãy thêm một mục tiêu để tiết kiệm hiệu quả hơn!</p>
+               <div className="flex flex-col items-center justify-center py-10 px-4 text-center">
+                  <div className="w-16 h-16 bg-sky-50 rounded-full flex items-center justify-center mb-3">
+                     <Target className="w-7 h-7 text-sky-300" />
+                  </div>
+                  <p className="text-[15px] font-semibold text-sky-900 mb-1">Chưa có mục tiêu nào</p>
+                  <p className="text-[13px] text-sky-600/70 max-w-[250px]">Hãy thêm mục tiêu để bắt đầu hành trình tiết kiệm của bạn nhé.</p>
+               </div>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <Modal
         isOpen={!!confirmDeleteId}
@@ -248,7 +270,7 @@ export default function FinanceGoals({ goals, addGoal, updateGoal, deleteGoal, a
         maxWidth="sm"
         footer={
           <>
-            <Button variant="outline" onClick={() => setConfirmDeleteId(null)} className="flex-1">
+            <Button variant="outline" onClick={() => setConfirmDeleteId(null)} className="flex-1 rounded-xl">
               Hủy
             </Button>
             <Button 
@@ -257,7 +279,7 @@ export default function FinanceGoals({ goals, addGoal, updateGoal, deleteGoal, a
                 if (confirmDeleteId) await deleteGoal(confirmDeleteId);
                 setConfirmDeleteId(null);
               }}
-              className="flex-1"
+              className="flex-1 rounded-xl"
             >
               Xóa
             </Button>
@@ -265,12 +287,12 @@ export default function FinanceGoals({ goals, addGoal, updateGoal, deleteGoal, a
         }
       >
         <div className="flex flex-col items-center pt-2">
-          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-rose-100 mb-4">
-            <AlertTriangle className="w-6 h-6 text-rose-600" />
+          <div className="flex items-center justify-center w-14 h-14 rounded-[20px] bg-rose-50 border border-rose-100 mb-5 shadow-sm">
+            <AlertTriangle className="w-7 h-7 text-rose-500" />
           </div>
-          <h3 className="text-xl font-bold text-sky-950 text-center mb-2">Xác nhận xóa</h3>
-          <p className="text-sky-700/80 text-center text-sm">
-            Bạn có chắc chắn muốn xóa mục tiêu này? Hành động này không thể hoàn tác, nhưng các giao dịch đã nạp sẽ được giữ lại.
+          <h3 className="text-xl font-extrabold text-sky-950 text-center mb-2 tracking-tight">Xóa mục tiêu</h3>
+          <p className="text-sky-700/80 text-center text-[15px] leading-relaxed">
+            Bạn có muốn xóa mục tiêu này? Các giao dịch đã nạp trước đó sẽ được giữ lại.
           </p>
         </div>
       </Modal>

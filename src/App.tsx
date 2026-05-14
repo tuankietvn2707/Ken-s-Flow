@@ -445,23 +445,22 @@ export default function App() {
       </div>
 
       <Toaster position="top-center" richColors theme="light" />
-      <nav className="bg-white/60 backdrop-blur-2xl border-b border-white/60 sticky top-0 z-10 shadow-[0_4px_16px_rgba(14,165,233,0.05)]">
+      <nav className="bg-white/80 backdrop-blur-3xl border-b border-white sticky top-0 z-50 shadow-[0_12px_40px_rgba(14,165,233,0.12)] transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex">
               <div className="flex-shrink-0 flex items-center">
-                <Button 
-                  variant="ghost"
+                <button 
                   onClick={() => window.location.reload()}
-                  className="animated-border-box cursor-pointer hover:opacity-80 transition-opacity h-auto py-2 px-3"
+                  className="animated-border-box cursor-pointer hover:opacity-80 transition-opacity flex bg-transparent outline-none border-none p-0"
                 >
-                  <div className="animated-border-inner flex items-center gap-2">
+                  <div className="animated-border-inner flex items-center gap-2 m-0 p-2 px-3 bg-white/80 rounded-[10px]">
                     <Wallet className="w-6 h-6 text-sky-600" />
                     <span className="text-xl font-bold text-sky-600">
                       TutorFlow
                     </span>
                   </div>
-                </Button>
+                </button>
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-2">
                 <TabButton 
