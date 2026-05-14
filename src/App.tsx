@@ -445,7 +445,7 @@ export default function App() {
       </div>
 
       <Toaster position="top-center" richColors theme="light" />
-      <nav className="bg-white/80 backdrop-blur-3xl border-b border-white sticky top-0 z-50 shadow-[0_12px_40px_rgba(14,165,233,0.12)] transition-all">
+      <nav className="bg-white/80 backdrop-blur-3xl border-b border-white fixed w-full top-0 z-50 shadow-[0_12px_40px_rgba(14,165,233,0.12)] transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex">
@@ -546,7 +546,7 @@ export default function App() {
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8">
         {loadingData ? (
           <div className="py-20 animate-pulse">
             <div className="max-w-4xl mx-auto space-y-6">
