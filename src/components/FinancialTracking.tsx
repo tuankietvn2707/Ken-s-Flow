@@ -11,7 +11,7 @@ import { Badge } from './ui/Badge';
 interface Props {
   students: Student[];
   classes: ClassSession[];
-  markClassesAsPaid: (studentId: string, classIds: string[]) => void;
+  markClassesAsPaid: (studentId: string, classIds: string[], studentName: string, amount: number, unpaidSessions: number) => void;
   undoLastPayment: (studentId: string) => void;
 }
 
@@ -76,7 +76,7 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
     }
     
     // 1. Cập nhật dữ liệu Firestore
-    markClassesAsPaid(student.id, unpaidClassIds);
+    markClassesAsPaid(student.id, unpaidClassIds, student.name, totalOwed, totalUnpaidSessions);
 
     // 2. Mở Modal Biên lai
     setReceiptData({
@@ -194,10 +194,15 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
                           <RotateCcw className="w-4 h-4" />
                         </Button>
                         <Button
-                          variant={totalOwed > 0 ? 'default' : 'secondary'}
-                          onClick={() => handleMarkAsPaid(student, unpaidClassIds, totalUnpaidSessions, potentialRevenue, totalOwed, unpaidClasses)}
-                          disabled={totalOwed === 0}
-                          className={`rounded-[14px] shadow-[0_4px_16px_rgba(14,165,233,0.3)] hover:shadow-[0_8px_24px_rgba(14,165,233,0.4)] ${totalOwed > 0 ? 'bg-sky-500 hover:bg-sky-600 text-white' : 'bg-white/50 text-sky-800'}`}
+                          variant={unpaidClasses.length > 0 ? 'default' : 'secondary'}
+                          onClick={() => {
+                            if (unpaidClasses.length === 0) {
+                              return;
+                            }
+                            handleMarkAsPaid(student, unpaidClassIds, totalUnpaidSessions, potentialRevenue, totalOwed, unpaidClasses);
+                          }}
+                          disabled={unpaidClasses.length === 0}
+                          className={`rounded-[14px] shadow-[0_4px_16px_rgba(14,165,233,0.3)] hover:shadow-[0_8px_24px_rgba(14,165,233,0.4)] ${unpaidClasses.length > 0 ? 'bg-sky-500 hover:bg-sky-600 text-white' : 'bg-white/50 text-sky-800'}`}
                         >
                           <CheckCircle className="w-4 h-4 mr-1.5" />
                           Đã thanh toán

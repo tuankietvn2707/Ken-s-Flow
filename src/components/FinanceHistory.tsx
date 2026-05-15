@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronRight, Plus, Minus, X, Clock, FileSpreadsheet } from 'lucide-react';
-import { FinanceHistoryRecord } from '../types';
-import { formatNumber } from './PersonalFinance';
+import { ChevronRight, Clock, FileSpreadsheet, CheckCircle, Trash2, AlertTriangle } from 'lucide-react';
+import { FinanceHistoryRecord, formatVND } from '../types';
 import { Button } from './ui/Button';
 import { Modal } from './ui/Modal';
 
 interface Props {
   financeHistory: FinanceHistoryRecord[];
+  deleteFinanceHistory: (batchIdStr: string) => Promise<void>;
 }
 
-export default function FinanceHistory({ financeHistory }: Props) {
+export default function FinanceHistory({ financeHistory, deleteFinanceHistory }: Props) {
   const [selectedHistoryRecord, setSelectedHistoryRecord] = useState<FinanceHistoryRecord | null>(null);
+  const [deletingRecordId, setDeletingRecordId] = useState<string | null>(null);
 
   const groupedHistory = financeHistory.reduce((acc, record) => {
     const dateStr = new Date(record.timestamp).toISOString().split('T')[0];
@@ -20,6 +21,15 @@ export default function FinanceHistory({ financeHistory }: Props) {
     acc[month].push(record);
     return acc;
   }, {} as Record<string, FinanceHistoryRecord[]>);
+
+  const handleDelete = async () => {
+    if (!deletingRecordId) return;
+    await deleteFinanceHistory(deletingRecordId);
+    setDeletingRecordId(null);
+    if (selectedHistoryRecord?.id === deletingRecordId) {
+      setSelectedHistoryRecord(null);
+    }
+  };
 
   return (
     <>
@@ -34,7 +44,7 @@ export default function FinanceHistory({ financeHistory }: Props) {
           </div>
           <div>
             <h2 className="text-2xl font-extrabold text-sky-950 tracking-tight">Lịch Sử Giao Dịch</h2>
-            <p className="text-[15px] font-medium text-sky-900/60 mt-1">Các kỳ đã chốt sổ</p>
+            <p className="text-[15px] font-medium text-sky-900/60 mt-1">Các phiên thu học phí</p>
           </div>
         </div>
         
@@ -53,8 +63,6 @@ export default function FinanceHistory({ financeHistory }: Props) {
                 <div className="space-y-4">
                   {groupedHistory[month].map(record => {
                     const date = new Date(record.timestamp);
-                    const income = record.transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-                    const expense = record.transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
                     return (
                       <div 
                         key={record.id} 
@@ -66,26 +74,35 @@ export default function FinanceHistory({ financeHistory }: Props) {
                         <div className="flex items-start justify-between relative z-10 w-full">
                           <div>
                             <div className="flex items-center gap-2 mb-1.5">
-                              <span className="font-extrabold text-sky-950 text-[15px]">Chốt sổ</span>
+                              <span className="font-extrabold text-sky-950 text-[15px] max-w-[150px] truncate">{record.studentName}</span>
                               <span className="text-[11px] font-bold text-sky-600 bg-sky-50 px-2.5 py-1 rounded-full border border-sky-100 shadow-sm">{date.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})}</span>
                             </div>
                             <p className="text-[13px] font-medium text-sky-900/50">{date.toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
                           </div>
-                          <div className="w-8 h-8 rounded-full bg-white border border-sky-100 shadow-sm flex items-center justify-center text-sky-400 group-hover:text-sky-600 group-hover:bg-sky-50 transition-colors">
-                            <ChevronRight className="w-4 h-4 transform group-hover:translate-x-0.5 transition-transform" />
+                          
+                          <div className="flex items-center gap-2">
+                             <button
+                               onClick={(e) => {
+                                 e.stopPropagation();
+                                 setDeletingRecordId(record.id);
+                               }}
+                               className="w-8 h-8 rounded-full bg-white border border-rose-100 shadow-sm flex items-center justify-center text-rose-400 group-hover:text-rose-600 group-hover:bg-rose-50 transition-colors z-20 hover:scale-110"
+                               title="Xóa giao dịch"
+                             >
+                               <Trash2 className="w-4 h-4" />
+                             </button>
+                             <div className="w-8 h-8 rounded-full bg-white border border-sky-100 shadow-sm flex items-center justify-center text-sky-400 group-hover:text-sky-600 group-hover:bg-sky-50 transition-colors">
+                               <ChevronRight className="w-4 h-4 transform group-hover:translate-x-0.5 transition-transform" />
+                             </div>
                           </div>
                         </div>
                         
-                        <div className="flex gap-4 pt-4 border-t border-sky-100/50 relative z-10 w-full justify-between">
-                          <div className="flex flex-col">
-                            <span className="text-[11px] font-bold text-sky-950/40 uppercase tracking-widest mb-1 pl-0.5">Tổng thu</span>
-                            <span className="text-[15px] font-extrabold text-emerald-600">+{formatNumber(income)}</span>
-                          </div>
-                          <div className="w-px bg-sky-100/50"></div>
-                          <div className="flex flex-col">
-                            <span className="text-[11px] font-bold text-sky-950/40 uppercase tracking-widest mb-1 pl-0.5">Tổng chi</span>
-                            <span className="text-[15px] font-extrabold text-rose-600">-{formatNumber(expense)}</span>
-                          </div>
+                        <div className="flex gap-4 pt-4 border-t border-sky-100/50 relative z-10 w-full justify-between items-center">
+                           <div className="flex items-center gap-1.5 text-sky-700/80 bg-sky-50/80 px-2 py-1 rounded-lg">
+                             <CheckCircle className="w-3.5 h-3.5 text-sky-500" />
+                             <span className="text-[12px] font-bold">{record.unpaidSessions} buổi</span>
+                           </div>
+                           <span className="text-[16px] font-extrabold text-emerald-600">+{formatVND(record.amount)}</span>
                         </div>
                       </div>
                     );
@@ -100,77 +117,75 @@ export default function FinanceHistory({ financeHistory }: Props) {
       <Modal
         isOpen={!!selectedHistoryRecord}
         onClose={() => setSelectedHistoryRecord(null)}
-        maxWidth="2xl"
+        maxWidth="lg"
         title={
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-[16px] bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shadow-sm">
+            <div className="w-12 h-12 rounded-[16px] bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shadow-sm">
               <FileSpreadsheet className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-2xl font-extrabold text-sky-950 tracking-tight">Chi Tiết Kỳ Giao Dịch</h3>
-              <p className="text-[14px] font-medium text-sky-900/60 mt-1">Chốt sổ: {selectedHistoryRecord ? new Date(selectedHistoryRecord.timestamp).toLocaleString('vi-VN') : ''}</p>
+              <h3 className="text-2xl font-extrabold text-sky-950 tracking-tight">Chi Tiết Biên Lai</h3>
+              <p className="text-[14px] font-medium text-sky-900/60 mt-1">{selectedHistoryRecord ? new Date(selectedHistoryRecord.timestamp).toLocaleString('vi-VN') : ''}</p>
             </div>
           </div>
         }
       >
         {selectedHistoryRecord && (
-          <div className="pt-6 max-h-[65vh] overflow-y-auto custom-scrollbar">
-            <div className="grid grid-cols-2 gap-4 mb-8">
-              <div className="p-6 bg-gradient-to-br from-white to-sky-50 rounded-[24px] border border-sky-100 shadow-[0_4px_16px_rgba(0,0,0,0.02)]">
-                <p className="text-[12px] font-bold text-sky-950/50 uppercase tracking-widest mb-2">Số dư tiền mặt</p>
-                <div className="flex items-baseline gap-1">
-                  <p className="text-2xl font-black text-sky-950">{formatNumber(selectedHistoryRecord.balancesSnapshot.cash)}</p>
-                  <span className="font-bold text-sm text-sky-950/50">VNĐ</span>
-                </div>
-              </div>
-              <div className="p-6 bg-gradient-to-br from-white to-blue-50 rounded-[24px] border border-blue-100 shadow-[0_4px_16px_rgba(0,0,0,0.02)]">
-                <p className="text-[12px] font-bold text-sky-950/50 uppercase tracking-widest mb-2">Số dư ngân hàng</p>
-                <div className="flex items-baseline gap-1">
-                  <p className="text-2xl font-black text-blue-950">{formatNumber(selectedHistoryRecord.balancesSnapshot.banking)}</p>
-                  <span className="font-bold text-sm text-blue-950/50">VNĐ</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <h4 className="font-extrabold text-sky-950 text-base">Chi tiết giao dịch</h4>
-                <span className="bg-sky-100 text-sky-700 px-2.5 py-0.5 rounded-full text-[13px] font-bold">{selectedHistoryRecord.transactions.length}</span>
-                <div className="flex-1 h-px bg-sky-100"></div>
-              </div>
-              
-              <div className="space-y-3 pt-2">
-                {selectedHistoryRecord.transactions.map(t => (
-                  <div key={t.id} className="flex items-center justify-between p-4 rounded-[20px] bg-white border border-sky-100 shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.04)] transition-all">
-                    <div className="flex items-center gap-4">
-                      <div className={`w-12 h-12 rounded-[16px] flex items-center justify-center border shadow-sm ${t.type === 'income' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'}`}>
-                        {t.type === 'income' ? <Plus className="w-5 h-5" /> : <Minus className="w-5 h-5" />}
-                      </div>
-                      <div>
-                        <p className="font-extrabold text-[15px] text-sky-950 mb-1">{t.description}</p>
-                        <p className="text-[13px] font-medium text-sky-900/50 flex items-center gap-2">
-                          <span className="bg-sky-50 px-2 py-0.5 rounded-lg border border-sky-100/50">{t.category || 'Khác'}</span>
-                          <span className="opacity-70">{t.date}</span>
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className={`font-black text-[16px] ${t.type === 'income' ? 'text-emerald-500' : 'text-rose-500'}`}>
-                        {t.type === 'income' ? '+' : '-'}{formatNumber(t.amount)}
-                      </span>
-                      <span className="text-[12px] font-bold opacity-50">đ</span>
-                    </div>
-                  </div>
-                ))}
-                {selectedHistoryRecord.transactions.length === 0 && (
-                  <div className="flex flex-col items-center justify-center py-10 opacity-60">
-                    <p className="text-[15px] font-medium text-sky-800">Không có giao dịch nào trong kỳ này.</p>
-                  </div>
-                )}
-              </div>
-            </div>
+          <div className="pt-4 space-y-6">
+             <div className="p-6 bg-gradient-to-br from-white to-emerald-50 rounded-[24px] border border-emerald-100 shadow-[0_4px_16px_rgba(0,0,0,0.02)] text-center">
+               <p className="text-[13px] font-bold text-sky-950/50 uppercase tracking-widest mb-1">{selectedHistoryRecord.studentName}</p>
+               <h4 className="text-3xl font-black text-emerald-600">{formatVND(selectedHistoryRecord.amount)}</h4>
+             </div>
+             <div>
+               <h4 className="font-extrabold text-sky-950 text-base mb-3 border-b border-sky-100 pb-2">Thông tin thanh toán</h4>
+               <div className="space-y-3">
+                 <div className="flex justify-between items-center text-[14px]">
+                   <span className="text-sky-700/70 font-medium">Học viên</span>
+                   <span className="font-bold text-sky-950">{selectedHistoryRecord.studentName}</span>
+                 </div>
+                 <div className="flex justify-between items-center text-[14px]">
+                   <span className="text-sky-700/70 font-medium">Số buổi đã thu</span>
+                   <span className="font-bold text-sky-950">{selectedHistoryRecord.unpaidSessions} buổi</span>
+                 </div>
+                 <div className="flex justify-between items-center text-[14px]">
+                   <span className="text-sky-700/70 font-medium">Mã giao dịch</span>
+                   <span className="font-bold text-sky-950">{selectedHistoryRecord.id}</span>
+                 </div>
+               </div>
+             </div>
           </div>
         )}
+      </Modal>
+
+      <Modal
+        isOpen={!!deletingRecordId}
+        onClose={() => setDeletingRecordId(null)}
+        maxWidth="sm"
+        title="Xóa lịch sử giao dịch"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setDeletingRecordId(null)} className="flex-1 font-semibold rounded-[16px]">
+              Hủy
+            </Button>
+            <Button 
+              variant="danger" 
+              onClick={handleDelete}
+              className="flex-1 font-semibold rounded-[16px]"
+            >
+              Xóa lịch sử
+            </Button>
+          </>
+        }
+      >
+        <div className="flex flex-col items-center pt-2 pb-6">
+          <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-rose-50 to-red-50 border border-white shadow-[0_4px_16px_rgba(244,63,94,0.1)] ring-1 ring-rose-100 mb-6 relative">
+            <div className="absolute inset-0 bg-rose-400/20 rounded-full animate-ping opacity-50"></div>
+            <AlertTriangle className="w-8 h-8 text-rose-500 relative z-10" />
+          </div>
+          <p className="text-sky-800/90 text-center text-[15px] leading-relaxed max-w-[260px]">
+            Bạn có chắc muốn xoá lịch sử giao dịch này? Hành động này sẽ hoàn tác cả các buổi học đã được đánh dấu là <span className="font-bold text-emerald-600">Đã thanh toán</span>.
+          </p>
+        </div>
       </Modal>
     </>
   );

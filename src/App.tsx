@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Student, ClassSession, Transaction, Goal, FinanceHistoryRecord } from './types';
-import { Users, BookOpen, LayoutDashboard, LogOut, Wallet } from 'lucide-react';
+import { Users, BookOpen, LayoutDashboard, LogOut, Wallet, History } from 'lucide-react';
 import { auth, db } from './firebase';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { collection, getDocs, doc, setDoc, deleteDoc, writeBatch, deleteField, getDoc } from 'firebase/firestore';
@@ -17,6 +17,8 @@ import Login from './components/Login';
 import FloatingActionButton from './components/FloatingActionButton';
 import { Button } from './components/ui/Button';
 import { Input } from './components/ui/Input';
+import { Modal } from './components/ui/Modal';
+import FinanceHistory from './components/FinanceHistory';
 
 const DongSign = ({ className }: { className?: string }) => (
   <svg
@@ -51,6 +53,7 @@ export default function App() {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [initialBalance, setInitialBalance] = useState<{ cash: number; banking: number }>({ cash: 0, banking: 0 });
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [isGlobalHistoryOpen, setIsGlobalHistoryOpen] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -252,7 +255,7 @@ export default function App() {
   };
 
   // Financial
-  const markClassesAsPaid = async (studentId: string, classIds: string[]) => {
+  const markClassesAsPaid = async (studentId: string, classIds: string[], studentName: string, amount: number, unpaidSessions: number) => {
     if (!user || classIds.length === 0) return;
     const batchId = Date.now();
     try {
@@ -261,12 +264,58 @@ export default function App() {
         const classRef = doc(db, `users/${user.uid}/classes`, id);
         batch.update(classRef, { isPaid: true, paymentBatchId: batchId });
       });
+
+      const newHistoryRecord: FinanceHistoryRecord = {
+        id: batchId.toString(),
+        timestamp: new Date().toISOString(),
+        studentId,
+        studentName,
+        amount,
+        unpaidSessions,
+        classIds
+      };
+      
+      batch.set(doc(db, `users/${user.uid}/financeHistory`, newHistoryRecord.id), newHistoryRecord);
+
       await batch.commit();
       setClasses(prev => prev.map(c => classIds.includes(c.id) ? { ...c, isPaid: true, paymentBatchId: batchId } : c));
+      setFinanceHistory(prev => [newHistoryRecord, ...prev].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()));
       toast.success('Đã xác nhận thanh toán');
     } catch (error) {
       console.error("Error marking classes as paid:", error);
       toast.error('Có lỗi xảy ra khi xác nhận thanh toán');
+    }
+  };
+
+  const deleteFinanceHistory = async (batchIdStr: string) => {
+    if (!user) return;
+    showLoading();
+    try {
+      const batchId = Number(batchIdStr);
+      const classesToUndo = classes.filter(c => c.paymentBatchId === batchId);
+
+      const batch = writeBatch(db);
+      classesToUndo.forEach(c => {
+        const classRef = doc(db, `users/${user.uid}/classes`, c.id);
+        batch.update(classRef, { isPaid: false, paymentBatchId: deleteField() });
+      });
+      
+      const historyRef = doc(db, `users/${user.uid}/financeHistory`, batchIdStr);
+      batch.delete(historyRef);
+
+      await batch.commit();
+
+      setClasses(prev => prev.map(c =>
+        c.paymentBatchId === batchId ? { ...c, isPaid: false, paymentBatchId: undefined } : c
+      ));
+      
+      setFinanceHistory(prev => prev.filter(h => h.id !== batchIdStr));
+      toast.success('Đã xóa lịch sử giao dịch và hoàn tác thanh toán liên quan');
+    } catch (error) {
+      console.error("Error deleting finance history:", error);
+      toast.error('Có lỗi xảy ra khi xóa lịch sử giao dịch');
+    } finally {
+      hideLoading();
     }
   };
 
@@ -285,11 +334,17 @@ export default function App() {
         const classRef = doc(db, `users/${user.uid}/classes`, c.id);
         batch.update(classRef, { isPaid: false, paymentBatchId: deleteField() });
       });
+      
+      const historyRef = doc(db, `users/${user.uid}/financeHistory`, latestBatchId.toString());
+      batch.delete(historyRef);
+
       await batch.commit();
 
       setClasses(prev => prev.map(c =>
         c.paymentBatchId === latestBatchId ? { ...c, isPaid: false, paymentBatchId: undefined } : c
       ));
+      
+      setFinanceHistory(prev => prev.filter(h => h.id !== latestBatchId.toString()));
       toast.success('Đã hoàn tác thanh toán gần nhất');
     } catch (error) {
       console.error("Error undoing payment:", error);
@@ -378,15 +433,6 @@ export default function App() {
       showLoading();
       const batch = writeBatch(db);
       
-      const newHistoryRecord: FinanceHistoryRecord = {
-        id: Date.now().toString(),
-        timestamp: new Date().toISOString(),
-        initialBalances: initialBalance,
-        transactions: [...transactions]
-      };
-
-      batch.set(doc(db, `users/${user.uid}/financeHistory`, newHistoryRecord.id), newHistoryRecord);
-      
       transactions.forEach(tx => {
         batch.delete(doc(db, `users/${user.uid}/transactions`, tx.id));
       });
@@ -395,10 +441,9 @@ export default function App() {
       
       await batch.commit();
 
-      setFinanceHistory(prev => [newHistoryRecord, ...prev].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()));
       setTransactions([]);
       setInitialBalance(newBalances);
-      toast.success('Đã chốt sổ và lưu lịch sử thành công');
+      toast.success('Đã chốt sổ thành công');
       
     } catch (error) {
       console.error("Error consolidating finance:", error);
@@ -506,7 +551,7 @@ export default function App() {
               </div>
             </div>
             <div className="flex items-center">
-              <UserMenu user={user} handleLogout={handleLogout} />
+              <UserMenu user={user} handleLogout={handleLogout} onViewHistory={() => setIsGlobalHistoryOpen(true)} />
             </div>
           </div>
         </div>
@@ -586,6 +631,25 @@ export default function App() {
           </>
         )}
       </main>
+
+      <Modal 
+        isOpen={isGlobalHistoryOpen} 
+        onClose={() => setIsGlobalHistoryOpen(false)} 
+        maxWidth="5xl" 
+        title="Lịch sử giao dịch"
+      >
+        <div className="mb-4">
+          {financeHistory.length > 0 ? (
+            <FinanceHistory financeHistory={financeHistory} deleteFinanceHistory={deleteFinanceHistory} />
+          ) : (
+            <div className="text-center py-20 bg-sky-50/50 rounded-[32px] border border-sky-100/50 shadow-inner">
+              <History className="w-16 h-16 text-sky-200 mx-auto mb-4" />
+              <p className="text-sky-800 font-medium text-lg">Chưa có lịch sử giao dịch nào.</p>
+              <p className="text-sky-600/70 mt-1">Lịch sử sẽ xuất hiện khi bạn xác nhận thu học phí của học viên.</p>
+            </div>
+          )}
+        </div>
+      </Modal>
 
       {activeTab !== 'personal_finance' && <FloatingActionButton setActiveTab={setActiveTab} />}
 
@@ -699,7 +763,7 @@ function Onboarding({ onSave }: { onSave: (name: string) => void }) {
   );
 }
 
-function UserMenu({ user, handleLogout }: { user: User, handleLogout: () => void }) {
+function UserMenu({ user, handleLogout, onViewHistory }: { user: User, handleLogout: () => void, onViewHistory: () => void }) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -742,6 +806,18 @@ function UserMenu({ user, handleLogout }: { user: User, handleLogout: () => void
                 {user.email}
               </p>
             </div>
+            
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                onViewHistory();
+              }}
+              className="flex items-center w-full px-5 py-3.5 text-sm text-sky-700 hover:bg-sky-50 transition-colors gap-3 font-medium border-b border-sky-50"
+            >
+              <History className="w-4 h-4 text-sky-500" />
+              Lịch sử giao dịch
+            </button>
+
             <button
               onClick={() => {
                 setIsOpen(false);

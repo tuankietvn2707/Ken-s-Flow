@@ -181,12 +181,16 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
     setConfirmDeleteId(id);
   };
 
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const confirmDelete = async () => {
     if (!confirmDeleteId) return;
+    setIsDeleting(true);
     try {
       await deleteClass(confirmDeleteId);
     } finally {
       setConfirmDeleteId(null);
+      setIsDeleting(false);
     }
   };
 
@@ -212,24 +216,39 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
     return students.find(s => s.id === id)?.name || 'Học viên không xác định';
   };
 
-  const sortedClasses = [...classes]
-    .filter(cls => {
-      const classDate = parseDateSafe(cls.date);
-      if (isNaN(classDate.getTime())) return false;
-      
-      const classMonth = (classDate.getMonth() + 1).toString();
-      const classYear = classDate.getFullYear().toString();
-      
-      const matchMonth = filterMonth === 'all' || classMonth === filterMonth;
-      const matchYear = filterYear === 'all' || classYear === filterYear;
-      
-      return matchMonth && matchYear;
-    })
-    .sort((a, b) => {
-      const dateA = parseDateSafe(a.date).getTime();
-      const dateB = parseDateSafe(b.date).getTime();
-      return dateB - dateA;
-    });
+  const sortedClasses = React.useMemo(() => {
+    return [...classes]
+      .filter(cls => {
+        const classDate = parseDateSafe(cls.date);
+        if (isNaN(classDate.getTime())) return false;
+        
+        const classMonth = (classDate.getMonth() + 1).toString();
+        const classYear = classDate.getFullYear().toString();
+        
+        const matchMonth = filterMonth === 'all' || classMonth === filterMonth;
+        const matchYear = filterYear === 'all' || classYear === filterYear;
+        
+        return matchMonth && matchYear;
+      })
+      .sort((a, b) => {
+        const dateA = parseDateSafe(a.date).getTime();
+        const dateB = parseDateSafe(b.date).getTime();
+        return dateB - dateA;
+      });
+  }, [classes, filterMonth, filterYear]);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterMonth, filterYear]);
+
+  const totalPages = Math.max(1, Math.ceil(sortedClasses.length / itemsPerPage));
+  const paginatedClasses = React.useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return sortedClasses.slice(startIndex, startIndex + itemsPerPage);
+  }, [sortedClasses, currentPage, itemsPerPage]);
 
   const availableYears = Array.from(new Set(classes.map(c => {
     const d = parseDateSafe(c.date);
@@ -480,14 +499,14 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                 </tr>
               </thead>
               <tbody className="divide-y divide-sky-50/50">
-                {sortedClasses.length === 0 ? (
+                {paginatedClasses.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-8 py-16 text-center text-sm font-medium text-sky-700/60" >
                       Chưa có lớp học nào được ghi nhận trong thời gian này.
                     </td>
                   </tr>
                 ) : (
-                  sortedClasses.map((cls) => (
+                  paginatedClasses.map((cls) => (
                     <tr key={cls.id} className="group hover:bg-white/80 hover:shadow-[0_4px_24px_rgba(14,165,233,0.06)] transition-all duration-300 relative z-0 hover:z-10 bg-transparent">
                       <td className="px-8 py-5 whitespace-nowrap text-sm text-sky-950 font-bold tracking-tight">
                         {!isNaN(parseDateSafe(cls.date).getTime()) 
@@ -547,6 +566,45 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
               </tbody>
             </table>
           </div>
+          
+          {totalPages > 1 && (
+            <div className="px-8 py-4 border-t border-sky-50 flex items-center justify-between bg-white/50 backdrop-blur-sm rounded-b-3xl">
+              <span className="text-sm font-medium text-sky-900/60">
+                Hiển thị {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, sortedClasses.length)} trong số {sortedClasses.length}
+              </span>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                  className="rounded-xl border-sky-100 text-sky-700 hover:bg-sky-50"
+                  size="sm"
+                >
+                  Trước
+                </Button>
+                <div className="flex bg-white shadow-sm border border-sky-100 rounded-xl overflow-hidden font-medium text-sm">
+                   {Array.from({length: totalPages}, (_, i) => i + 1).map(page => (
+                     <button
+                       key={page}
+                       onClick={() => setCurrentPage(page)}
+                       className={`px-3 py-1.5 transition-colors ${currentPage === page ? 'bg-sky-500 text-white font-bold' : 'text-sky-700 hover:bg-sky-50'}`}
+                     >
+                       {page}
+                     </button>
+                   ))}
+                </div>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                  className="rounded-xl border-sky-100 text-sky-700 hover:bg-sky-50"
+                  size="sm"
+                >
+                  Sau
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </motion.div>
 
@@ -564,9 +622,10 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
             <Button 
               variant="danger" 
               onClick={confirmDelete}
+              disabled={isDeleting}
               className="flex-1 font-semibold rounded-[16px]"
             >
-              Xóa
+              {isDeleting ? 'Đang xóa...' : 'Xóa'}
             </Button>
           </>
         }

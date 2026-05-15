@@ -12,7 +12,7 @@ interface Props {
   classes: ClassSession[];
   onClose: () => void;
   onEdit: (student: Student) => void;
-  markClassesAsPaid?: (studentId: string, classIds: string[]) => void;
+  markClassesAsPaid?: (studentId: string, classIds: string[], studentName: string, amount: number, unpaidSessions: number) => void;
 }
 
 export default function StudentDetail({ student, classes, onClose, onEdit, markClassesAsPaid }: Props) {
@@ -247,9 +247,11 @@ export default function StudentDetail({ student, classes, onClose, onEdit, markC
           {markClassesAsPaid && getUnpaidAmount() > 0 && (
             <Button 
               onClick={() => {
-                const unpaidIds = classes.filter(c => c.studentId === student.id && !c.isPaid).map(c => c.id);
+                const unpaid = classes.filter(c => c.studentId === student.id && !c.isPaid);
+                const unpaidIds = unpaid.map(c => c.id);
                 if (unpaidIds.length > 0) {
-                  markClassesAsPaid(student.id, unpaidIds);
+                  const duration = unpaid.reduce((sum, c) => sum + c.duration, 0);
+                  markClassesAsPaid(student.id, unpaidIds, student.name, duration * student.fee, duration);
                 }
               }}
               className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-[0_8px_24px_rgba(16,185,129,0.3)] hover:shadow-[0_12px_32px_rgba(16,185,129,0.4)] whitespace-nowrap px-8 py-3 rounded-[20px] text-[15px] font-bold transition-all duration-300 hover:scale-105"

@@ -13,7 +13,7 @@ interface Props {
   updateStudent: (student: Student) => void;
   deleteStudent: (id: string) => void;
   classes: ClassSession[];
-  markClassesAsPaid?: (studentId: string, classIds: string[]) => void;
+  markClassesAsPaid?: (studentId: string, classIds: string[], studentName: string, amount: number, unpaidSessions: number) => void;
 }
 
 export default function StudentManagement({ students, addStudent, updateStudent, deleteStudent, classes, markClassesAsPaid }: Props) {

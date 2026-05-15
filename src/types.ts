@@ -35,8 +35,10 @@ export interface ClassSession {
   nextLessonPrep?: string;
 }
 
-export const formatVND = (amount: number) => {
-  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+export const formatVND = (amount: number | string | undefined | null) => {
+  const parsed = Number(amount);
+  const safeAmount = isNaN(parsed) ? 0 : parsed;
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(safeAmount);
 };
 
 export const parseDateSafe = (dateStr?: string): Date => {
@@ -79,11 +81,11 @@ export interface Transaction {
 export interface FinanceHistoryRecord {
   id: string;
   timestamp: string; // ISO String
-  initialBalances: {
-    cash: number;
-    banking: number;
-  };
-  transactions: Transaction[];
+  studentId: string;
+  studentName: string;
+  amount: number;
+  unpaidSessions: number;
+  classIds: string[];
 }
 
 export interface Goal {
