@@ -23,6 +23,7 @@ export interface PersonalFinanceProps {
   deleteGoal: (id: string) => Promise<void>;
   updateInitialBalance: (balance: { cash: number; banking: number }) => Promise<void>;
   consolidateAndResetBalance: (newBalances: { cash: number; banking: number }) => Promise<void>;
+  deleteFinanceHistory: (batchIdStr: string) => Promise<void>;
 }
 
 // Export formatting helpers for sub-components
@@ -46,7 +47,8 @@ export default function PersonalFinance({
   updateGoal,
   deleteGoal,
   updateInitialBalance,
-  consolidateAndResetBalance
+  consolidateAndResetBalance,
+  deleteFinanceHistory
 }: PersonalFinanceProps) {
   // Local state for initial balance inputs to prevent lag
   const [localCash, setLocalCash] = useState((initialBalance?.cash || 0).toString());
@@ -111,7 +113,7 @@ export default function PersonalFinance({
       </div>
       
       {financeHistory.length > 0 && (
-        <FinanceHistory financeHistory={financeHistory} />
+        <FinanceHistory financeHistory={financeHistory} deleteFinanceHistory={deleteFinanceHistory} />
       )}
 
       {/* Floating Chatbot Button */}

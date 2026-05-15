@@ -640,6 +640,7 @@ export default function App() {
                 deleteGoal={deleteGoal}
                 updateInitialBalance={updateInitialBalance}
                 consolidateAndResetBalance={consolidateAndResetBalance}
+                deleteFinanceHistory={deleteFinanceHistory}
               />
             )}
           </>

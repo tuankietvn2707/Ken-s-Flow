@@ -1,12 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { Student, ClassSession, formatVND, parseDateSafe } from '../types';
-import { CheckCircle, X, Download, RotateCcw } from 'lucide-react';
-import { toPng } from 'html-to-image';
+import { CheckCircle, RotateCcw } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Button } from './ui/Button';
-import { Card, CardContent } from './ui/Card';
-import { Modal } from './ui/Modal';
-import { Badge } from './ui/Badge';
+import ReceiptModal from './ReceiptModal';
 
 interface Props {
   students: Student[];
@@ -25,7 +22,6 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
     unpaidClassIds: string[];
     unpaidClasses: ClassSession[];
   } | null>(null);
-  const receiptRef = useRef<HTMLDivElement>(null);
 
   const getPronoun = (birthYear: number | '', gender?: string) => {
     if (!birthYear) return 'bạn';
@@ -88,22 +84,6 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
       unpaidClasses
     });
     setIsReceiptModalOpen(true);
-  };
-
-  const handleDownloadReceipt = async () => {
-    if (receiptRef.current === null || !receiptData) {
-      return;
-    }
-
-    try {
-      const dataUrl = await toPng(receiptRef.current, { cacheBust: true, pixelRatio: 2 });
-      const link = document.createElement('a');
-      link.download = `BienLai_${receiptData.student.name.replace(/\s+/g, '_')}_${new Date().getTime()}.png`;
-      link.href = dataUrl;
-      link.click();
-    } catch (err) {
-      console.error('Lỗi khi tạo ảnh biên lai:', err);
-    }
   };
 
   const totalOutstanding = allFinancials.reduce((sum, f) => sum + f.totalOwed, 0);
@@ -217,112 +197,12 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
         </div>
       </motion.div>
 
-      {/* Receipt Modal */}
-      <Modal
-        isOpen={isReceiptModalOpen && !!receiptData}
+      <ReceiptModal 
+        isOpen={isReceiptModalOpen}
         onClose={() => setIsReceiptModalOpen(false)}
-        title="Biên lai thanh toán"
-        maxWidth="md"
-        footer={
-          <>
-            <Button
-              variant="secondary"
-              onClick={() => setIsReceiptModalOpen(false)}
-            >
-              Đóng
-            </Button>
-            <Button
-              onClick={handleDownloadReceipt}
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Tải xuống biên lai
-            </Button>
-          </>
-        }
-      >
-        {receiptData && (
-          <div className="p-2">
-            <div 
-              ref={receiptRef} 
-              className="glass rounded-3xl p-8 border border-sky-100 shadow-sm relative overflow-hidden"
-            >
-              {/* Decorative top bar */}
-              <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400"></div>
-              
-              <div className="text-center mb-8 mt-2">
-                <h2 className="text-3xl font-black text-sky-900 tracking-tight">English Tutor</h2>
-                <h3 className="text-xl font-bold text-sky-900 mt-1">Receipt</h3>
-                <p className="text-sm text-sky-700/80 italic mt-2">Biên lai thanh toán học phí</p>
-              </div>
-
-              <div className="space-y-6">
-                <div className="flex justify-between items-end border-b border-sky-100 pb-4">
-                  <div className="text-sky-700/80 text-sm">Học viên</div>
-                  <div className="font-bold text-lg text-sky-900">{receiptData.student.name}</div>
-                </div>
-
-                <div className="flex justify-between items-end border-b border-sky-100 pb-4">
-                  <div className="text-sky-700/80 text-sm">Tổng số tiền</div>
-                  <div className="font-black text-2xl text-emerald-600">{formatVND(receiptData.totalOwed)}</div>
-                </div>
-
-                <div className="pt-2 space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-sky-700/80">Số buổi đã học:</span>
-                    <span className="font-medium text-sky-900">{receiptData.totalUnpaidSessions} / {receiptData.student.feeCycle}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-sky-700/80">Đơn giá:</span>
-                    <span className="font-medium text-sky-900">{formatVND(receiptData.student.fee)} / buổi</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-sky-700/80">Ngày thanh toán:</span>
-                    <span className="font-medium text-sky-900">
-                      {new Date().toLocaleDateString('vi-VN', { 
-                        day: '2-digit', month: '2-digit', year: 'numeric',
-                        hour: '2-digit', minute: '2-digit'
-                      })}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Class Dates Details */}
-                <div className="pt-4 border-t border-sky-100">
-                  <h4 className="text-sm font-semibold text-sky-900 mb-3">Chi tiết các buổi học:</h4>
-                  <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
-                    {[...receiptData.unpaidClasses]
-                      .sort((a, b) => {
-                        return parseDateSafe(a.date).getTime() - parseDateSafe(b.date).getTime();
-                      })
-                      .map((c, index) => (
-                      <div key={c.id} className="flex justify-between text-sm">
-                        <span className="text-sky-700/80">Buổi {index + 1}</span>
-                        <span className="font-medium text-sky-900">
-                          {!isNaN(parseDateSafe(c.date).getTime()) 
-                            ? parseDateSafe(c.date).toLocaleDateString('vi-VN', {
-                                day: '2-digit', month: '2-digit', year: 'numeric'
-                              })
-                            : 'Ngày không hợp lệ'}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Footer / Watermark */}
-              <div className="mt-10 pt-6 border-t border-dashed border-sky-100 text-center space-y-2">
-                <p className="text-sm text-sky-700/80 italic">
-                  Chúc {getPronoun(receiptData.student.birthYear, receiptData.student.gender)} luôn giữ vững tinh thần học tập thật tốt nhé!
-                </p>
-                <p className="text-xs text-sky-700/80 italic">
-                  Cảm ơn {getPronoun(receiptData.student.birthYear, receiptData.student.gender)} đã đồng hành cùng Võ Nguyễn Tuấn Kiệt - Your English Tutor.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-      </Modal>
+        receiptData={receiptData}
+        getPronoun={getPronoun}
+      />
     </div>
   );
 }
