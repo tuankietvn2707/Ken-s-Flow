@@ -464,6 +464,20 @@ export default function App() {
     }
   };
 
+  useEffect(() => {
+    // Add global click listener to dismiss toasts
+    const handleGlobalClick = () => {
+      toast.dismiss();
+    };
+    
+    // Use capture phase to ensure it catches all clicks early
+    document.addEventListener('click', handleGlobalClick, { capture: true });
+    
+    return () => {
+      document.removeEventListener('click', handleGlobalClick, { capture: true });
+    };
+  }, []);
+
   if (loadingAuth) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
