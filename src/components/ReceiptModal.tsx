@@ -39,25 +39,11 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, getPronoun 
     }
   };
 
-  const handlePrint = async () => {
-    if (receiptRef.current === null) return;
-    try {
-      const width = receiptRef.current.offsetWidth;
-      const height = receiptRef.current.offsetHeight;
-      
-      const dataUrl = await toPng(receiptRef.current, { cacheBust: true, pixelRatio: 2, backgroundColor: '#ffffff' });
-      
-      const pdf = new jsPDF({
-        orientation: width > height ? 'landscape' : 'portrait',
-        unit: 'px',
-        format: [width, height]
-      });
-      
-      pdf.addImage(dataUrl, 'PNG', 0, 0, width, height);
-      pdf.save(`BienLai_${receiptData.student.name.replace(/\s+/g, '_')}_${new Date().getTime()}.pdf`);
-    } catch (err) {
-      console.error('Lỗi khi tạo PDF:', err);
-    }
+  const handlePrint = () => {
+    // Before printing, add a class to body to hide everything else
+    document.body.classList.add('printing-modal');
+    window.print();
+    document.body.classList.remove('printing-modal');
   };
 
   const handleShare = async () => {
@@ -102,7 +88,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, getPronoun 
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="relative w-full max-w-[720px] bg-white/70 backdrop-blur-2xl rounded-[32px] shadow-[0_24px_80px_-12px_rgba(14,165,233,0.2)] border border-white max-h-[90vh] flex flex-col print:shadow-none print:max-h-none print:h-auto print:border-none print:bg-white"
+            className="relative w-full max-w-[720px] bg-white/70 backdrop-blur-md rounded-[32px] shadow-[0_24px_80px_-12px_rgba(14,165,233,0.2)] border border-white max-h-[90vh] flex flex-col print:shadow-none print:max-h-none print:h-auto print:border-none print:bg-white"
           >
             {/* Close Button */}
             <div className="absolute -top-4 -right-4 z-10 print:hidden">
@@ -116,7 +102,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, getPronoun 
 
             <div className="flex-1 overflow-y-auto p-4 sm:p-8 custom-scrollbar print:overflow-visible print:p-0">
               {/* === RECEIPT CARD === */}
-              <div ref={receiptRef} className="bg-white rounded-[24px] shadow-sm border border-sky-50 overflow-hidden relative print:shadow-none print:border-none">
+              <div ref={receiptRef} className="bg-white rounded-[24px] shadow-sm border border-sky-50 overflow-hidden relative print:shadow-none print:border-none" style={{ fontFamily: 'Inter, sans-serif', fontFeatureSettings: '"kern" 0', letterSpacing: 'normal' }}>
                 {/* Header Gradient Line */}
                 <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-500 via-sky-400 to-indigo-500"></div>
                 
@@ -128,7 +114,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, getPronoun 
                         T
                       </div>
                       <div>
-                        <h2 className="text-xl font-black text-sky-950 tracking-tight">TutorFlow</h2>
+                        <h2 className="text-xl font-black text-sky-950">TutorFlow</h2>
                         <p className="text-sm font-medium text-sky-600/70">English Tutoring Services</p>
                       </div>
                     </div>
@@ -166,20 +152,20 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, getPronoun 
                     
                     <div className="relative z-10 flex items-center gap-2 opacity-90 mb-1">
                       <Wallet className="w-4 h-4" />
-                      <span className="text-sm font-medium uppercase tracking-wider">Tổng Thanh Toán</span>
+                      <span className="text-sm font-medium uppercase">Tổng Thanh Toán</span>
                     </div>
-                    <div className="relative z-10 text-4xl sm:text-5xl font-black tracking-tight drop-shadow-sm">
+                    <div className="relative z-10 text-4xl sm:text-5xl font-black drop-shadow-sm">
                       {formatVND(receiptData.totalOwed)}
                     </div>
                   </div>
 
                   {/* Payment Details Grid */}
-                  <h4 className="text-sm font-extrabold text-sky-900/50 uppercase tracking-widest mb-4">Chi tiết thanh toán</h4>
+                  <h4 className="text-sm font-extrabold text-sky-900/50 uppercase mb-4">Chi tiết thanh toán</h4>
                   <div className="grid grid-cols-2 gap-3 mb-8">
                     <div className="bg-sky-50/50 rounded-xl p-4 border border-sky-100/50 flex flex-col gap-1 hover:bg-sky-50 transition-colors">
                       <div className="flex items-center gap-1.5 text-sky-600/70 mb-1">
                         <CalendarDays className="w-3.5 h-3.5" />
-                        <span className="text-xs font-medium uppercase tracking-wide">Số buổi</span>
+                        <span className="text-xs font-medium uppercase">Số buổi</span>
                       </div>
                       <div className="font-extrabold text-sky-950 text-lg">{receiptData.totalUnpaidSessions} <span className="text-sm font-bold text-sky-900/50">/ {receiptData.student.feeCycle}</span></div>
                     </div>
@@ -187,7 +173,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, getPronoun 
                     <div className="bg-sky-50/50 rounded-xl p-4 border border-sky-100/50 flex flex-col gap-1 hover:bg-sky-50 transition-colors">
                       <div className="flex items-center gap-1.5 text-sky-600/70 mb-1">
                         <Receipt className="w-3.5 h-3.5" />
-                        <span className="text-xs font-medium uppercase tracking-wide">Đơn giá</span>
+                        <span className="text-xs font-medium uppercase">Đơn giá</span>
                       </div>
                       <div className="font-extrabold text-sky-950 text-lg">{formatVND(receiptData.student.fee)}</div>
                     </div>
@@ -195,7 +181,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, getPronoun 
                     <div className="bg-sky-50/50 rounded-xl p-4 border border-sky-100/50 flex flex-col gap-1 mt-1 hover:bg-sky-50 transition-colors">
                       <div className="flex items-center gap-1.5 text-sky-600/70 mb-1">
                         <CreditCard className="w-3.5 h-3.5" />
-                        <span className="text-xs font-medium uppercase tracking-wide">Phương thức</span>
+                        <span className="text-xs font-medium uppercase">Phương thức</span>
                       </div>
                       <div className="font-extrabold text-sky-950 text-md">Chuyển khoản / Tiền mặt</div>
                     </div>
@@ -203,7 +189,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, getPronoun 
                     <div className="bg-sky-50/50 rounded-xl p-4 border border-sky-100/50 flex flex-col gap-1 mt-1 hover:bg-sky-50 transition-colors">
                       <div className="flex items-center gap-1.5 text-sky-600/70 mb-1">
                         <CalendarDays className="w-3.5 h-3.5" />
-                        <span className="text-xs font-medium uppercase tracking-wide">Ngày thu</span>
+                        <span className="text-xs font-medium uppercase">Ngày thu</span>
                       </div>
                       <div className="font-extrabold text-sky-950 text-md">
                         {paymentDate.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}
@@ -212,7 +198,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, getPronoun 
                   </div>
 
                   {/* Sessions Timeline */}
-                  <h4 className="text-sm font-extrabold text-sky-900/50 uppercase tracking-widest mb-4">Các buổi học ({sortedClasses.length})</h4>
+                  <h4 className="text-sm font-extrabold text-sky-900/50 uppercase mb-4">Các buổi học ({sortedClasses.length})</h4>
                   <div className="space-y-3 mb-10">
                     {sortedClasses.map((c, index) => (
                       <div key={c.id} className="flex gap-4 p-3 rounded-xl hover:bg-sky-50/50 transition-colors">
@@ -249,7 +235,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, getPronoun 
                       </p>
                       
                       <div className="mt-2 mb-2 w-32 h-12 bg-[url('https://api.dicebear.com/7.x/initials/svg?seed=Tuấn Kiệt&fontFamily=Brush%20Script%20MT,cursive')] bg-contain bg-center bg-no-repeat opacity-60 mix-blend-multiply"></div>
-                      <p className="text-sm font-extrabold text-sky-950 uppercase tracking-widest mt-1">Võ Nguyễn Tuấn Kiệt</p>
+                      <p className="text-sm font-extrabold text-sky-950 uppercase mt-1">Võ Nguyễn Tuấn Kiệt</p>
                       <p className="text-[11px] font-medium text-sky-900/40 mt-1">Generated at {paymentDate.toLocaleTimeString('vi-VN')} - {paymentDate.toLocaleDateString('vi-VN')}</p>
                     </div>
                   </div>

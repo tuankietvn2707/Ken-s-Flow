@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, Suspense, lazy } from 'react';
 import { Student, ClassSession, Transaction, Goal, FinanceHistoryRecord } from './types';
 import { Users, BookOpen, LayoutDashboard, LogOut, Wallet, History } from 'lucide-react';
 import { auth, db } from './firebase';
@@ -7,18 +7,20 @@ import { collection, getDocs, doc, setDoc, deleteDoc, writeBatch, deleteField, g
 import { Toaster, toast } from 'sonner';
 import { motion, AnimatePresence } from 'motion/react';
 
-// Components
-import Dashboard from './components/Dashboard';
-import StudentManagement from './components/StudentManagement';
-import ClassTracker from './components/ClassTracker';
-import FinancialTracking from './components/FinancialTracking';
-import PersonalFinance from './components/PersonalFinance';
+// Lazy loaded components
+const Dashboard = lazy(() => import('./components/Dashboard'));
+const StudentManagement = lazy(() => import('./components/StudentManagement'));
+const ClassTracker = lazy(() => import('./components/ClassTracker'));
+const FinancialTracking = lazy(() => import('./components/FinancialTracking'));
+const PersonalFinance = lazy(() => import('./components/PersonalFinance'));
+
 import Login from './components/Login';
 import FloatingActionButton from './components/FloatingActionButton';
 import { Button } from './components/ui/Button';
 import { Input } from './components/ui/Input';
 import { Modal } from './components/ui/Modal';
 import FinanceHistory from './components/FinanceHistory';
+
 
 const DongSign = ({ className }: { className?: string }) => (
   <svg
@@ -179,7 +181,7 @@ export default function App() {
   };
 
   // CRUD for Students
-  const addStudent = async (student: Student) => {
+  const addStudent = useCallback(async (student: Student) => {
     if (!user) return;
     try {
       await setDoc(doc(db, `users/${user.uid}/students`, student.id), student);
@@ -189,9 +191,9 @@ export default function App() {
       console.error("Error adding student:", error);
       toast.error('Có lỗi xảy ra khi thêm học viên');
     }
-  };
+  }, [user]);
 
-  const updateStudent = async (student: Student) => {
+  const updateStudent = useCallback(async (student: Student) => {
     if (!user) return;
     try {
       await setDoc(doc(db, `users/${user.uid}/students`, student.id), student);
@@ -201,9 +203,9 @@ export default function App() {
       console.error("Error updating student:", error);
       toast.error('Có lỗi xảy ra khi cập nhật học viên');
     }
-  };
+  }, [user]);
 
-  const deleteStudent = async (id: string) => {
+  const deleteStudent = useCallback(async (id: string) => {
     if (!user) return;
     try {
       await deleteDoc(doc(db, `users/${user.uid}/students`, id));
@@ -213,10 +215,10 @@ export default function App() {
       console.error("Error deleting student:", error);
       toast.error('Có lỗi xảy ra khi xóa học viên');
     }
-  };
+  }, [user]);
 
   // CRUD for Classes
-  const addClass = async (cls: ClassSession) => {
+  const addClass = useCallback(async (cls: ClassSession) => {
     if (!user) return;
     try {
       await setDoc(doc(db, `users/${user.uid}/classes`, cls.id), cls);
@@ -227,9 +229,9 @@ export default function App() {
       toast.error('Có lỗi xảy ra khi thêm lớp học');
       throw error;
     }
-  };
+  }, [user]);
 
-  const updateClass = async (cls: ClassSession) => {
+  const updateClass = useCallback(async (cls: ClassSession) => {
     if (!user) return;
     try {
       await setDoc(doc(db, `users/${user.uid}/classes`, cls.id), cls);
@@ -240,9 +242,9 @@ export default function App() {
       toast.error('Có lỗi xảy ra khi cập nhật lớp học');
       throw error;
     }
-  };
+  }, [user]);
 
-  const deleteClass = async (id: string) => {
+  const deleteClass = useCallback(async (id: string) => {
     if (!user) return;
     try {
       await deleteDoc(doc(db, `users/${user.uid}/classes`, id));
@@ -252,7 +254,7 @@ export default function App() {
       console.error("Error deleting class:", error);
       toast.error('Có lỗi xảy ra khi xóa lớp học');
     }
-  };
+  }, [user]);
 
   // Financial
   const markClassesAsPaid = async (studentId: string, classIds: string[], studentName: string, amount: number, unpaidSessions: number) => {
@@ -622,7 +624,18 @@ export default function App() {
             </div>
           </div>
         ) : (
-          <>
+          <Suspense fallback={
+            <div className="py-20 animate-pulse">
+              <div className="max-w-4xl mx-auto space-y-6">
+                <div className="h-10 bg-sky-100 rounded-xl w-1/3"></div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                  <div className="h-32 bg-sky-50 rounded-2xl border border-sky-100"></div>
+                  <div className="h-32 bg-sky-50 rounded-2xl border border-sky-100"></div>
+                  <div className="h-32 bg-sky-50 rounded-2xl border border-sky-100"></div>
+                </div>
+              </div>
+            </div>
+          }>
             {activeTab === 'dashboard' && <Dashboard students={students} classes={classes} setActiveTab={setActiveTab} displayName={displayName} />}
             {activeTab === 'students' && <StudentManagement students={students} addStudent={addStudent} updateStudent={updateStudent} deleteStudent={deleteStudent} classes={classes} markClassesAsPaid={markClassesAsPaid} />}
             {activeTab === 'classes' && <ClassTracker students={students} classes={classes} addClass={addClass} updateClass={updateClass} deleteClass={deleteClass} />}
@@ -643,7 +656,7 @@ export default function App() {
                 deleteFinanceHistory={deleteFinanceHistory}
               />
             )}
-          </>
+          </Suspense>
         )}
       </main>
 
@@ -681,7 +694,7 @@ export default function App() {
   );
 }
 
-function TabButton({ active, onClick, icon, label, colorClass, hoverClass }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string, colorClass: string, hoverClass: string }) {
+const TabButton = React.memo(function TabButton({ active, onClick, icon, label, colorClass, hoverClass }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string, colorClass: string, hoverClass: string }) {
   return (
     <Button
       variant="ghost"
@@ -696,9 +709,9 @@ function TabButton({ active, onClick, icon, label, colorClass, hoverClass }: { a
       {label}
     </Button>
   );
-}
+});
 
-function MobileTabButton({ active, onClick, label, colorClass }: { active: boolean, onClick: () => void, label: string, colorClass: string }) {
+const MobileTabButton = React.memo(function MobileTabButton({ active, onClick, label, colorClass }: { active: boolean, onClick: () => void, label: string, colorClass: string }) {
   return (
     <Button
       variant="ghost"
@@ -712,7 +725,7 @@ function MobileTabButton({ active, onClick, label, colorClass }: { active: boole
       {label}
     </Button>
   );
-}
+});
 
 function Onboarding({ onSave }: { onSave: (name: string) => void }) {
   const [name, setName] = useState('');

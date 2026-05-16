@@ -10,7 +10,7 @@ const COLORS = ['#38bdf8', '#34d399', '#fbbf24', '#f472b6', '#a78bfa', '#60a5fa'
 
 export function DashboardCard({ title, amount, mainColor, accentColor, icon: Icon, glowColor, trend, trendValue }: { title: string, amount: number, mainColor: string, accentColor: string, icon: any, glowColor: string, trend?: 'up'|'down', trendValue?: string }) {
   return (
-    <div className="bg-white/60 backdrop-blur-2xl border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] p-8 rounded-[32px] flex flex-col justify-center items-start group hover:-translate-y-1.5 hover:shadow-[0_16px_48px_rgba(0,0,0,0.08)] transition-all duration-500 relative overflow-hidden">
+    <div className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] p-8 rounded-[32px] flex flex-col justify-center items-start group hover:-translate-y-1.5 hover:shadow-[0_16px_48px_rgba(0,0,0,0.08)] transition-all duration-500 relative overflow-hidden">
       {/* Subtle glow effect */}
       <div className={`absolute -right-12 -top-12 w-40 h-40 rounded-full blur-[50px] opacity-20 bg-current ${glowColor} transition-opacity duration-500 group-hover:opacity-30`} />
       
@@ -193,7 +193,7 @@ export default function FinanceOverview({
         initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.5 }}
         className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8"
       >
-        <div className="bg-white/60 backdrop-blur-2xl border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] p-8 rounded-[32px] h-[400px] flex flex-col group hover:shadow-[0_16px_48px_rgba(0,0,0,0.08)] transition-all duration-500">
+        <div className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] p-8 rounded-[32px] h-[400px] flex flex-col group hover:shadow-[0_16px_48px_rgba(0,0,0,0.08)] transition-all duration-500">
           <div className="flex items-center gap-3 mb-8">
             <div className="p-2 rounded-xl bg-sky-50 text-sky-600 border border-sky-100 shadow-sm">
               <LayoutList className="w-5 h-5" />
@@ -204,7 +204,7 @@ export default function FinanceOverview({
             {pieData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <RePieChart>
-                  <Pie data={pieData} cx="50%" cy="50%" innerRadius={70} outerRadius={100} paddingAngle={5} dataKey="value" stroke="none">
+                  <Pie data={pieData} cx="50%" cy="50%" innerRadius={70} outerRadius={100} paddingAngle={5} dataKey="value" stroke="none" isAnimationActive={false}>
                     {pieData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
@@ -229,7 +229,7 @@ export default function FinanceOverview({
           </div>
         </div>
 
-        <div className="bg-white/60 backdrop-blur-2xl border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] p-8 rounded-[32px] h-[400px] flex flex-col group hover:shadow-[0_16px_48px_rgba(0,0,0,0.08)] transition-all duration-500">
+        <div className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] p-8 rounded-[32px] h-[400px] flex flex-col group hover:shadow-[0_16px_48px_rgba(0,0,0,0.08)] transition-all duration-500">
           <div className="flex items-center gap-3 mb-8">
             <div className="p-2 rounded-xl bg-purple-50 text-purple-600 border border-purple-100 shadow-sm">
               <Activity className="w-5 h-5" />
@@ -256,8 +256,8 @@ export default function FinanceOverview({
                     contentStyle={{ borderRadius: '16px', border: '1px solid rgba(255,255,255,0.8)', boxShadow: '0 10px 25px -5px rgb(0 0 0 / 0.1)', backgroundColor: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(8px)', fontWeight: 600, color: '#0c4a6e' }}
                   />
                   <Legend iconType="circle" wrapperStyle={{ fontSize: '13px', paddingTop: '10px', fontWeight: 600, color: '#0c4a6e' }} />
-                  <Bar dataKey="income" name="Thu nhập" fill="#34d399" radius={[8, 8, 8, 8]} />
-                  <Bar dataKey="expense" name="Chi tiêu" fill="#fb7185" radius={[8, 8, 8, 8]} />
+                  <Bar dataKey="income" name="Thu nhập" fill="#34d399" radius={[8, 8, 8, 8]} isAnimationActive={false} />
+                  <Bar dataKey="expense" name="Chi tiêu" fill="#fb7185" radius={[8, 8, 8, 8]} isAnimationActive={false} />
                 </ReBarChart>
               </ResponsiveContainer>
             ) : (

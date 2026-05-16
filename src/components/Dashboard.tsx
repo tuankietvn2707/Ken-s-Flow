@@ -237,7 +237,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
       >
         <div 
           onClick={() => setActiveTab && setActiveTab('students')}
-          className="bg-white/60 backdrop-blur-2xl border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] overflow-hidden rounded-[32px] cursor-pointer transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(14,165,233,0.12)] group relative"
+          className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] overflow-hidden rounded-[32px] cursor-pointer transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(14,165,233,0.12)] group relative"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           <div className="p-8 relative z-10">
@@ -257,7 +257,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
 
         <div 
           onClick={() => setActiveTab && setActiveTab('classes')}
-          className="bg-white/60 backdrop-blur-2xl border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] overflow-hidden rounded-[32px] cursor-pointer transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(16,185,129,0.12)] group relative"
+          className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] overflow-hidden rounded-[32px] cursor-pointer transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(16,185,129,0.12)] group relative"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           <div className="p-8 relative z-10">
@@ -277,7 +277,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
 
         <div 
           onClick={() => setActiveTab && setActiveTab('finances')}
-          className="bg-white/60 backdrop-blur-2xl border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] overflow-hidden rounded-[32px] cursor-pointer transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(245,158,11,0.12)] group relative"
+          className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] overflow-hidden rounded-[32px] cursor-pointer transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(245,158,11,0.12)] group relative"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           <div className="p-8 relative z-10">
@@ -301,7 +301,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
         className="grid grid-cols-1 lg:grid-cols-2 gap-8"
       >
         {/* Revenue Trend Chart (50%) */}
-        <div className="bg-white/60 backdrop-blur-2xl border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] lg:col-span-1 flex flex-col hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(14,165,233,0.1)] transition-all duration-300">
+        <div className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] lg:col-span-1 flex flex-col hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(14,165,233,0.1)] transition-all duration-300">
           <div className="p-8 flex flex-col h-full min-h-[500px]">
             <h3 className="text-xl font-extrabold text-sky-950 tracking-tight mb-8">Xu hướng doanh thu</h3>
             <div className="flex-1 w-full min-h-0">
@@ -312,9 +312,9 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 13, fontWeight: 500 }} tickFormatter={formatYAxisCurrency} dx={-10} />
                   <RechartsTooltip content={<CustomAreaTooltip />} cursor={{ fill: '#f8fafc', opacity: 0.6 }} />
                   <Legend verticalAlign="top" height={40} iconType="circle" wrapperStyle={{ paddingBottom: '24px', fontSize: '13px', fontWeight: 600, color: '#475569' }} />
-                  <Bar dataKey="potential" name="Tổng thu kỳ vọng" fill="#bae6fd" radius={[6, 6, 0, 0]} maxBarSize={45} />
-                  <Bar dataKey="actual" name="Đã thanh toán" fill="#10b981" radius={[6, 6, 0, 0]} maxBarSize={45} />
-                  <Bar dataKey="remaining" name="Chờ thanh toán" fill="#f59e0b" radius={[6, 6, 0, 0]} maxBarSize={45} />
+                  <Bar dataKey="potential" name="Tổng thu kỳ vọng" fill="#bae6fd" radius={[6, 6, 0, 0]} maxBarSize={45} isAnimationActive={false} />
+                  <Bar dataKey="actual" name="Đã thanh toán" fill="#10b981" radius={[6, 6, 0, 0]} maxBarSize={45} isAnimationActive={false} />
+                  <Bar dataKey="remaining" name="Chờ thanh toán" fill="#f59e0b" radius={[6, 6, 0, 0]} maxBarSize={45} isAnimationActive={false} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -322,7 +322,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
         </div>
 
         {/* Tỷ lệ thu hồi học phí (Donut Chart) (50%) */}
-        <div className="bg-white/60 backdrop-blur-2xl border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] lg:col-span-1 flex flex-col hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(14,165,233,0.1)] transition-all duration-300">
+        <div className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] lg:col-span-1 flex flex-col hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(14,165,233,0.1)] transition-all duration-300">
           <div className="p-8 flex-1 min-h-[500px] flex flex-col">
             <div className="flex justify-between items-center mb-8 gap-4">
               <h3 className="text-xl font-extrabold text-sky-950 tracking-tight">Thu hồi học phí</h3>
@@ -366,6 +366,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
                       stroke="none"
                       cornerRadius={6}
                       className="drop-shadow-sm"
+                      isAnimationActive={false}
                     >
                       {donutData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.fill} />

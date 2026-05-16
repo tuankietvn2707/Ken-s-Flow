@@ -54,7 +54,7 @@ export function Modal({
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className={cn(
-              "bg-white/80 backdrop-blur-2xl rounded-[32px] w-full flex flex-col border border-white/60 relative max-h-[90vh] shadow-[0_24px_64px_rgba(14,165,233,0.12)] ring-1 ring-sky-100/50 object-contain z-10",
+              "bg-white/80 backdrop-blur-md rounded-[32px] w-full flex flex-col border border-white/60 relative max-h-[90vh] shadow-[0_24px_64px_rgba(14,165,233,0.12)] ring-1 ring-sky-100/50 object-contain z-10",
               maxWidthClasses[maxWidth],
               className
             )}

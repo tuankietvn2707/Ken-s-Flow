@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useDeferredValue } from 'react';
 import { Student, ClassSession, formatVND } from '../types';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { GripVertical, Edit2, Trash2, Search, Filter, LayoutGrid, List, AlertTriangle, MoreVertical, Calendar, DollarSign, BookOpen, Wallet } from 'lucide-react';
@@ -21,7 +21,8 @@ interface Props {
 }
 
 export default function StudentList({ students, classes = [], onUpdate, onDelete, onSelect, onEdit }: Props) {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQueryRaw, setSearchQueryRaw] = useState('');
+  const searchQuery = useDeferredValue(searchQueryRaw);
   const [filter, setFilter] = useState<'all' | 'active' | 'unpaid' | 'upcoming' | 'inactive'>('all');
   
   const [sortBy, setSortBy] = useState<'order' | 'nameAsc' | 'nameDesc' | 'feeDesc'>(() => {
@@ -294,8 +295,8 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
           <Input 
             type="text" 
             placeholder="Tìm kiếm học viên..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={searchQueryRaw}
+            onChange={(e) => setSearchQueryRaw(e.target.value)}
             className="w-full pl-10 pr-4 bg-sky-50/50"
           />
         </div>
@@ -393,7 +394,7 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
             <motion.div 
               key="list"
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="bg-white/40 backdrop-blur-2xl rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white/60 overflow-hidden"
+              className="bg-white/40 backdrop-blur-md rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white/60 overflow-hidden"
             >
               <div className="overflow-x-auto">
                 <table className="min-w-full border-collapse">

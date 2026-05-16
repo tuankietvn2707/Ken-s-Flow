@@ -70,24 +70,42 @@ export default function FinanceChatbot({ transactions, goals, addTransaction }: 
   useEffect(() => {
     const checkTime = () => {
       const now = new Date();
-      if (now.getHours() === 20 && now.getMinutes() === 0 && now.getSeconds() === 0) {
+      if (now.getHours() === 20 && now.getMinutes() === 0) {
         const today = now.toISOString().split('T')[0];
         const todayTxs = transactions.filter(t => (t.date || '') === today);
         const todayIncome = todayTxs.filter(t => t.type === 'income').reduce((sum, t) => sum + (t.amount || 0), 0);
         const todayExpense = todayTxs.filter(t => t.type === 'expense').reduce((sum, t) => sum + (t.amount || 0), 0);
         
-        setMessages(prev => [...prev, {
-          id: Date.now().toString(),
-          sender: 'ai',
-          text: `🔔 Tổng kết ngày: Hôm nay bạn đã chi ${formatNumber(todayExpense)}đ, và có khoản thu ${formatNumber(todayIncome)}đ. Bạn có muốn cập nhật thêm gì không?`,
-          isTyping: true
-        }]);
-        setIsOpen(true);
+        setMessages(prev => {
+          // Prevent duplicate messages if it runs multiple times in the same minute
+          const hasNotified = prev.some(m => m.text.includes('Tổng kết ngày') && new Date(parseInt(m.id)).getDate() === now.getDate());
+          if (hasNotified) return prev;
+          
+          setIsOpen(true);
+          return [...prev, {
+            id: Date.now().toString(),
+            sender: 'ai',
+            text: `🔔 Tổng kết ngày: Hôm nay bạn đã chi ${formatNumber(todayExpense)}đ, và có khoản thu ${formatNumber(todayIncome)}đ. Bạn có muốn cập nhật thêm gì không?`,
+            isTyping: true
+          }];
+        });
       }
     };
 
-    const interval = setInterval(checkTime, 1000);
-    return () => clearInterval(interval);
+    // Calculate time until next minute to align checks
+    const now = new Date();
+    const msUntilNextMinute = (60 - now.getSeconds()) * 1000;
+    
+    let interval: NodeJS.Timeout;
+    const timeout = setTimeout(() => {
+      checkTime(); // check at the start of the minute
+      interval = setInterval(checkTime, 60000); // then every minute
+    }, msUntilNextMinute);
+
+    return () => {
+      clearTimeout(timeout);
+      if (interval) clearInterval(interval);
+    };
   }, [transactions]);
 
   const handleSend = async (text: string = input) => {

@@ -85,7 +85,7 @@ export default function FinanceGoals({ goals, addGoal, updateGoal, deleteGoal, a
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-      className="bg-white/60 backdrop-blur-2xl border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] overflow-hidden"
+      className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] overflow-hidden"
     >
       <div className="flex flex-col">
         <div className="px-8 py-6 border-b border-white/40 flex justify-between items-center bg-white/40">

@@ -238,7 +238,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
   }, [classes, filterMonth, filterYear]);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 20;
+  const itemsPerPage = 10;
 
   useEffect(() => {
     setCurrentPage(1);
@@ -283,7 +283,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
           className="mb-8 relative"
         >
-          <div className="bg-white/60 backdrop-blur-2xl border border-white shadow-[0_8px_32px_rgba(0,0,0,0.06)] rounded-[32px] overflow-hidden p-8 relative">
+          <div className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.06)] rounded-[32px] overflow-hidden p-8 relative">
             <Button 
               variant="ghost"
               size="icon"
@@ -452,7 +452,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-        className="bg-white/60 backdrop-blur-2xl border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] overflow-hidden"
+        className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] overflow-hidden"
       >
         <div className="flex flex-col">
           <div className="px-8 py-6 border-b border-sky-100/60 bg-gradient-to-b from-white/40 to-transparent flex flex-col sm:flex-row sm:items-center justify-between gap-4">
