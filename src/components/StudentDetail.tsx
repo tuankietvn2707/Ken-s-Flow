@@ -246,7 +246,10 @@ export default function StudentDetail({ student, classes, onClose, onEdit, markC
           </div>
           {markClassesAsPaid && getUnpaidAmount() > 0 && (
             <Button 
-              onClick={() => {
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 const unpaid = classes.filter(c => c.studentId === student.id && !c.isPaid);
                 const unpaidIds = unpaid.map(c => c.id);
                 if (unpaidIds.length > 0) {

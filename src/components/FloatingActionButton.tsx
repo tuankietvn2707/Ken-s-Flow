@@ -38,7 +38,7 @@ export default function FloatingActionButton({ setActiveTab }: Props) {
       <div className={`flex flex-col items-end gap-3 transition-all duration-500 transform-gpu origin-bottom ${isFabOpen ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' : 'opacity-0 translate-y-8 scale-95 pointer-events-none'}`}>
         <button 
           onClick={() => { setIsFabOpen(false); setActiveTab('finances'); }}
-          className="pointer-events-auto flex items-center gap-3 bg-white/70 backdrop-blur-xl border border-white/60 px-5 py-3.5 text-sky-950 rounded-[18px] shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:bg-white hover:-translate-x-1 hover:shadow-[0_8px_24px_rgba(14,165,233,0.12)] transition-all duration-300 outline-none"
+          className="flex items-center gap-3 bg-white/70 backdrop-blur-xl border border-white/60 px-5 py-3.5 text-sky-950 rounded-[18px] shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:bg-white hover:-translate-x-1 hover:shadow-[0_8px_24px_rgba(14,165,233,0.12)] transition-all duration-300 outline-none"
         >
           <span className="font-bold text-[13px] tracking-wide text-sky-900">Thu học phí</span>
           <div className="bg-gradient-to-br from-orange-50 to-amber-50 text-amber-500 p-2 rounded-xl ring-1 ring-white shadow-sm">
@@ -48,7 +48,7 @@ export default function FloatingActionButton({ setActiveTab }: Props) {
         
         <button 
           onClick={() => { setIsFabOpen(false); setActiveTab('classes'); }}
-          className="pointer-events-auto flex items-center gap-3 bg-white/70 backdrop-blur-xl border border-white/60 px-5 py-3.5 text-sky-950 rounded-[18px] shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:bg-white hover:-translate-x-1 hover:shadow-[0_8px_24px_rgba(14,165,233,0.12)] transition-all duration-300 outline-none"
+          className="flex items-center gap-3 bg-white/70 backdrop-blur-xl border border-white/60 px-5 py-3.5 text-sky-950 rounded-[18px] shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:bg-white hover:-translate-x-1 hover:shadow-[0_8px_24px_rgba(14,165,233,0.12)] transition-all duration-300 outline-none"
         >
           <span className="font-bold text-[13px] tracking-wide text-sky-900">Lên lịch học</span>
           <div className="bg-gradient-to-br from-emerald-50 to-green-50 text-emerald-500 p-2 rounded-xl ring-1 ring-white shadow-sm">
@@ -58,7 +58,7 @@ export default function FloatingActionButton({ setActiveTab }: Props) {
 
         <button 
           onClick={() => { setIsFabOpen(false); setActiveTab('students'); }}
-          className="pointer-events-auto flex items-center gap-3 bg-white/70 backdrop-blur-xl border border-white/60 px-5 py-3.5 text-sky-950 rounded-[18px] shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:bg-white hover:-translate-x-1 hover:shadow-[0_8px_24px_rgba(14,165,233,0.12)] transition-all duration-300 outline-none"
+          className="flex items-center gap-3 bg-white/70 backdrop-blur-xl border border-white/60 px-5 py-3.5 text-sky-950 rounded-[18px] shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:bg-white hover:-translate-x-1 hover:shadow-[0_8px_24px_rgba(14,165,233,0.12)] transition-all duration-300 outline-none"
         >
           <span className="font-bold text-[13px] tracking-wide text-sky-900">Thêm học viên mới</span>
           <div className="bg-gradient-to-br from-blue-50 to-sky-50 text-blue-500 p-2 rounded-xl ring-1 ring-white shadow-sm">

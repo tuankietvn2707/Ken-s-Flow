@@ -164,9 +164,14 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
                     <td className="px-6 py-5 whitespace-nowrap text-right text-sm font-medium border-b border-sky-50/50">
                       <div className="flex items-center justify-end gap-2 opacity-100 transition-opacity duration-300">
                         <Button
+                          type="button"
                           variant="ghost"
                           size="icon"
-                          onClick={() => undoLastPayment(student.id)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            undoLastPayment(student.id);
+                          }}
                           disabled={!hasPaidClasses}
                           title="Hoàn tác lần thanh toán gần nhất"
                           className="h-9 w-9 text-sky-500 hover:text-sky-600 hover:bg-sky-50 bg-white/50 backdrop-blur-sm border border-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-all duration-300 rounded-[14px]"
@@ -174,8 +179,11 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
                           <RotateCcw className="w-4 h-4" />
                         </Button>
                         <Button
+                          type="button"
                           variant={unpaidClasses.length > 0 ? 'default' : 'secondary'}
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
                             if (unpaidClasses.length === 0) {
                               return;
                             }

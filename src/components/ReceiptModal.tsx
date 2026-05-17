@@ -39,11 +39,20 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, getPronoun 
     }
   };
 
-  const handlePrint = () => {
-    // Before printing, add a class to body to hide everything else
-    document.body.classList.add('printing-modal');
-    window.print();
-    document.body.classList.remove('printing-modal');
+  const handlePrint = async () => {
+    if (receiptRef.current === null) return;
+    try {
+      const dataUrl = await toPng(receiptRef.current, { cacheBust: true, pixelRatio: 2, backgroundColor: '#ffffff' });
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'px',
+        format: [receiptRef.current.offsetWidth, receiptRef.current.offsetHeight]
+      });
+      pdf.addImage(dataUrl, 'PNG', 0, 0, receiptRef.current.offsetWidth, receiptRef.current.offsetHeight);
+      pdf.save(`BienLai_${receiptData.student.name.replace(/\s+/g, '_')}_${new Date().getTime()}.pdf`);
+    } catch (err) {
+      console.error('Lỗi khi in PDF:', err);
+    }
   };
 
   const handleShare = async () => {
@@ -228,9 +237,9 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, getPronoun 
 
                   {/* Footer */}
                   <div className="pt-8 border-t-2 border-dashed border-sky-100 pb-2">
-                    <div className="flex flex-col items-center justify-center text-center">
-                      <p className="text-[13px] font-bold text-sky-900 italic mb-1">"Keep learning, keep growing."</p>
-                      <p className="text-[12px] font-medium text-sky-900/60 leading-relaxed max-w-[80%] mx-auto mb-6">
+                    <div className="flex flex-col items-center justify-center text-center space-y-3">
+                      <p className="text-[13px] font-bold text-sky-900 italic block whitespace-nowrap">"Keep learning, keep growing."</p>
+                      <p className="text-[12px] font-medium text-sky-900/60 leading-relaxed max-w-[80%] mx-auto mb-6 block">
                         Chúc {getPronoun(receiptData.student.birthYear, receiptData.student.gender)} luôn giữ vững tinh thần học tập thật tốt. Cảm ơn đã đồng hành cùng TutorFlow.
                       </p>
                       
