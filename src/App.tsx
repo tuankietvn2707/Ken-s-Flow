@@ -811,10 +811,14 @@ function UserMenu({ user, handleLogout, onViewHistory }: { user: User, handleLog
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-10 h-10 rounded-full bg-sky-100 text-sky-700 font-bold flex items-center justify-center hover:bg-sky-200 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+        className="w-10 h-10 rounded-full bg-sky-100 text-sky-700 font-bold flex items-center justify-center hover:bg-sky-200 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 overflow-hidden"
         title={user.email || ''}
       >
-        {firstLetter}
+        {user.photoURL ? (
+          <img src={user.photoURL} alt="Avatar" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+        ) : (
+          firstLetter
+        )}
       </button>
 
       <AnimatePresence>
@@ -827,8 +831,12 @@ function UserMenu({ user, handleLogout, onViewHistory }: { user: User, handleLog
             className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-sky-100 overflow-hidden z-50 flex flex-col origin-top-right transform"
           >
             <div className="px-4 py-4 border-b border-sky-100 bg-sky-50/50 text-center">
-              <div className="w-14 h-14 rounded-full bg-sky-100 text-sky-700 font-bold flex items-center justify-center text-2xl mx-auto mb-3 shadow-inner">
-                {firstLetter}
+              <div className="w-14 h-14 rounded-full bg-sky-100 text-sky-700 font-bold flex items-center justify-center text-2xl mx-auto mb-3 shadow-inner overflow-hidden">
+                {user.photoURL ? (
+                  <img src={user.photoURL} alt="Avatar" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                ) : (
+                  firstLetter
+                )}
               </div>
               <p className="text-sm font-semibold text-sky-900 truncate px-2" title={user.email || ''}>
                 {user.email}
