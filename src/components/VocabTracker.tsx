@@ -5,6 +5,7 @@ import { getGenerativeModel } from 'firebase/ai';
 import { ai, vocabDb } from '../firebase';
 import { collection, query, where, getDocs, doc, setDoc } from 'firebase/firestore';
 import { Student, VocabWord } from '../types';
+import { toast } from 'sonner';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 import { Modal } from './ui/Modal';
@@ -165,13 +166,18 @@ function VocabFormModal({
   const [isAutoFilling, setIsAutoFilling] = useState(false);
 
   const handleAutoFill = async () => {
-    if (!form.word?.trim()) return;
+    if (!form.word?.trim()) {
+      toast.warning("Vui lòng nhập từ vựng trước khi tự động điền");
+      return;
+    }
     const word = form.word.trim().toLowerCase();
     setIsAutoFilling(true);
+    toast.loading("Đang tra cứu và dịch nghĩa...", { id: "autofill" });
     
     try {
       let foundInGlobal = false;
       try {
+        console.log("Checking global dictionary for:", word);
         const globalRef = collection(vocabDb, 'global_dictionary');
         const q = query(globalRef, where('word', '==', word));
         const snapshot = await getDocs(q);
@@ -186,12 +192,15 @@ function VocabFormModal({
             notes: data.notes || prev.notes,
           }));
           foundInGlobal = true;
+          toast.success("Tìm thấy từ vựng trong kho Global!", { id: "autofill" });
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("Error reading global dictionary:", err);
+        // Do not crash the process, we will try to use AI next
       }
 
       if (!foundInGlobal) {
+        console.log("Not found in global dictionary, generating with AI...");
         const model = getGenerativeModel(ai, {
           model: 'gemini-1.5-flash',
           systemInstruction: `Bạn là một chuyên gia ngôn ngữ tiếng Anh. Trả về ĐÚNG MỘT chuỗi JSON hợp lệ, không giải thích gì thêm. Format:
@@ -200,9 +209,14 @@ function VocabFormModal({
         
         const result = await model.generateContent(`Từ vựng cần phân tích: "${word}"`);
         let reply = result.response.text() || '';
+        console.log("AI reply:", reply);
         
-        if (reply.startsWith('```json')) reply = reply.replace(/^```json\n/, '').replace(/\n```$/, '');
-        else if (reply.startsWith('```')) reply = reply.replace(/^```\n/, '').replace(/\n```$/, '');
+        // Clean JSON formatting
+        if (reply.includes('{')) {
+          const startIdx = reply.indexOf('{');
+          const endIdx = reply.lastIndexOf('}') + 1;
+          reply = reply.substring(startIdx, endIdx);
+        }
         
         const parsed = JSON.parse(reply.trim());
         setForm(prev => ({
@@ -212,7 +226,10 @@ function VocabFormModal({
           category: parsed.category || prev.category,
           notes: parsed.notes || prev.notes,
         }));
+        
+        toast.success("Dịch nghĩa từ vựng thành công!", { id: "autofill" });
 
+        // Save back to global dictionary
         try {
           const newDocRef = doc(collection(vocabDb, 'global_dictionary'));
           await setDoc(newDocRef, {
@@ -223,12 +240,14 @@ function VocabFormModal({
             notes: parsed.notes || '',
             createdAt: new Date().toISOString()
           });
-        } catch (err) {
+          console.log("Saved to global dictionary");
+        } catch (err: any) {
           console.error("Error saving to global dictionary:", err);
         }
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Auto fill error:", err);
+      toast.error(`Lỗi tự động điền: ${err?.message || err}`, { id: "autofill" });
     } finally {
       setIsAutoFilling(false);
     }
