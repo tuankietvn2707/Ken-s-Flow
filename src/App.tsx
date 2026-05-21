@@ -13,9 +13,10 @@ const StudentManagement = lazy(() => import('./components/StudentManagement'));
 const ClassTracker = lazy(() => import('./components/ClassTracker'));
 const FinancialTracking = lazy(() => import('./components/FinancialTracking'));
 const PersonalFinance = lazy(() => import('./components/PersonalFinance'));
+const GlobalChatbot = lazy(() => import('./components/GlobalChatbot'));
 
 import Login from './components/Login';
-import FloatingActionButton from './components/FloatingActionButton';
+
 import { Button } from './components/ui/Button';
 import { Input } from './components/ui/Input';
 import { Modal } from './components/ui/Modal';
@@ -679,7 +680,25 @@ export default function App() {
         </div>
       </Modal>
 
-      {activeTab !== 'personal_finance' && <FloatingActionButton setActiveTab={setActiveTab} />}
+
+      
+      <GlobalChatbot 
+        transactions={transactions} 
+        goals={goals} 
+        students={students}
+        classes={classes}
+        addTransaction={addTransaction}
+        addStudent={addStudent}
+        updateStudent={updateStudent}
+        deleteStudent={deleteStudent}
+        addClass={addClass}
+        updateClass={updateClass}
+        deleteClass={deleteClass}
+        deleteTransaction={deleteTransaction}
+        addGoal={addGoal}
+        updateGoal={updateGoal}
+        deleteGoal={deleteGoal}
+      />
 
       {/* Global Loading Overlay */}
       {isProcessing && (

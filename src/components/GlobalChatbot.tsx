@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { MessageCircle, X, Send, Bot, User, FileText, Download } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import OpenAI from 'openai';
-import { Transaction, Goal, TransactionType } from '../types';
+import { Transaction, Goal, TransactionType, Student, ClassSession } from '../types';
 import { formatNumber } from './PersonalFinance';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
@@ -11,7 +11,19 @@ import { Input } from './ui/Input';
 interface Props {
   transactions: Transaction[];
   goals: Goal[];
+  students: Student[];
+  classes: ClassSession[];
   addTransaction: (t: Transaction) => Promise<void>;
+  addStudent: (s: Student) => void;
+  updateStudent: (s: Student) => void;
+  deleteStudent: (id: string) => void;
+  addClass: (c: ClassSession) => Promise<void> | void;
+  updateClass: (c: ClassSession) => Promise<void> | void;
+  deleteClass: (id: string) => Promise<void> | void;
+  deleteTransaction: (id: string) => Promise<void> | void;
+  addGoal: (g: Goal) => Promise<void>;
+  updateGoal: (g: Goal) => Promise<void>;
+  deleteGoal: (id: string) => Promise<void>;
 }
 
 interface Message {
@@ -48,10 +60,15 @@ const TypingMessage = ({ text, onComplete, onUpdate }: { text: string, onComplet
   return <span dangerouslySetInnerHTML={{ __html: formatText(displayedText) }} />;
 };
 
-export default function FinanceChatbot({ transactions, goals, addTransaction }: Props) {
+export default function GlobalChatbot({ 
+  transactions, goals, students, classes, 
+  addTransaction, addStudent, updateStudent, deleteStudent,
+  addClass, updateClass, deleteClass, deleteTransaction,
+  addGoal, updateGoal, deleteGoal
+}: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { id: '1', sender: 'ai', text: 'Chào bạn! Mình là trợ lý tài chính AI. Mình có thể giúp gì cho bạn hôm nay?' }
+    { id: '1', sender: 'ai', text: 'Chào bạn! Mình là trợ lý AI. Mình có thể giúp gì cho bạn hôm nay (về học viên, lịch học hay tài chính)?' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -119,20 +136,27 @@ export default function FinanceChatbot({ transactions, goals, addTransaction }: 
     try {
       // Context for AI
       const systemInstruction = `
-Bạn là trợ lý quản lý tài chính cá nhân thông minh, thân thiện và chuyên nghiệp.
+Bạn là trợ lý AI thông minh, quản lý cả học viên, lịch dạy học và tài chính cá nhân.
 Dữ liệu hiện tại của người dùng:
 - Giao dịch gần đây: ${JSON.stringify(transactions.slice(0, 50))}
 - Mục tiêu tiết kiệm: ${JSON.stringify(goals)}
+- Học viên hiện tại: ${JSON.stringify(students.map(s => ({id: s.id, name: s.name, phone: s.phone, currentSubject: s.currentSubject})))}
+- Lịch học: ${JSON.stringify(classes.slice(0, 20).map(c => ({id: c.id, studentId: c.studentId, date: c.date, time: c.time, status: c.status})))}
 
 QUY TẮC QUAN TRỌNG:
-1. NẾU người dùng muốn THÊM GIAO DỊCH (ví dụ: "Nay tốn 15k tiền ăn sáng"):
-   - Bạn PHẢI xác định được: Loại (thu/chi), Số tiền, Mô tả, và NGUỒN TIỀN (Tiền mặt hay Chuyển khoản/Ngân hàng).
-   - NẾU người dùng CHƯA nói rõ nguồn tiền là tiền mặt hay chuyển khoản, bạn KHÔNG được trả về JSON. Thay vào đó, hãy hỏi lại: "Bạn sử dụng tiền mặt hay chuyển khoản ngân hàng cho giao dịch này?"
-   - NẾU đã có đủ thông tin, chỉ trả về MỘT chuỗi JSON duy nhất, tuyệt đối không có markdown (\`\`\`json), không có text nào khác.
-   - Định dạng JSON: {"action": "add_transaction", "data": {"type": "expense" | "income", "source": "cash" | "banking", "amount": number, "description": "string", "category": "string"}}
+1. NẾU người dùng yêu cầu thực hiện thao tác Thêm/Sửa/Xóa (Học viên, Lịch học, Giao dịch, Mục tiêu), bạn PHẢI phân tích và trả về DUY NHẤT một chuỗi JSON hợp lệ, KHÔNG có markdown hay văn bản nào khác.
+Cấu trúc JSON: {"action": "<tên_hành_động>", "data": { <dữ liệu tương ứng> }}
 
-2. NẾU người dùng hỏi thông tin, tóm tắt, phân tích, hoặc trò chuyện bình thường:
-   Hãy trả lời như một chuyên gia tài chính, phân tích số liệu từ dữ liệu JSON được cung cấp. Trả lời ngắn gọn, súc tích, dễ hiểu, có thể dùng emoji. KHÔNG trả về JSON trong trường hợp này.
+Các action hỗ trợ:
+- "add_transaction": {"type": "expense" | "income", "source": "cash" | "banking", "amount": number, "description": "string", "category": "string"}
+- "add_student": {"name": "string", "phone": "string", "email": "string", "fee": number, "currentSubject": "string", "parentDetails": "string"}
+- "add_class": {"studentId": "string", "date": "YYYY-MM-DD", "time": "HH:MM", "duration": number, "status": "scheduled" | "completed" | "cancelled", "notes": "string"}
+- "update_class": {"id": "string", "status": "scheduled" | "completed" | "cancelled"}
+
+* Chú ý: NẾU thông tin chưa đủ (ví dụ thiếu mã học viên, số tiền), KHÔNG trả về JSON. Thay vào đó hãy đặt câu hỏi văn bản để hỏi người dùng lấy thêm chi tiết. Để tìm studentId, hãy dựa vào tên trong danh sách.
+
+2. NẾU người dùng hỏi thông tin (VD: học viên, lịch học, báo cáo tài chính, tổng thu chi):
+Hãy trả lời như một người trợ lý đắc lực, dựa vào phân tích từ dữ liệu JSON được cung cấp. Trả lời chi tiết nhưng súc tích, dễ hiểu, dùng emoji để sinh động. KHÔNG trả về JSON.
       `;
 
       const callGemini = async () => {
@@ -140,7 +164,7 @@ QUY TẮC QUAN TRỌNG:
         if (!apiKey) throw new Error("Missing_GEMINI_API_KEY");
         const ai = new GoogleGenAI({ apiKey });
         const response = await ai.models.generateContent({
-          model: 'gemini-flash-latest',
+          model: 'gemini-2.5-flash',
           contents: text,
           config: {
             systemInstruction: systemInstruction,
@@ -206,26 +230,67 @@ QUY TẮC QUAN TRỌNG:
         const trimmedReply = reply.trim();
         if (trimmedReply.startsWith('{') && trimmedReply.endsWith('}')) {
           const parsed = JSON.parse(trimmedReply);
-          if (parsed.action === 'add_transaction') {
+          const action = parsed.action;
+          const data = parsed.data;
+          
+          let aiResponseText = `Đã thực hiện xong thao tác.`;
+
+          if (action === 'add_transaction') {
             const newTx: Transaction = {
               id: Date.now().toString(),
-              type: parsed.data.type,
-              source: parsed.data.source || 'cash',
-              amount: parsed.data.amount,
-              description: parsed.data.description,
-              category: parsed.data.category,
+              type: data.type,
+              source: data.source || 'cash',
+              amount: data.amount,
+              description: data.description,
+              category: data.category,
               date: new Date().toISOString().split('T')[0],
             };
-            addTransaction(newTx);
-            
-            setMessages(prev => [...prev, {
-              id: Date.now().toString(),
-              sender: 'ai',
-              text: `Đã tự động thêm giao dịch: ${parsed.data.type === 'income' ? 'Thu' : 'Chi'} ${formatNumber(parsed.data.amount)}đ từ ${parsed.data.source === 'cash' ? 'Tiền mặt' : 'Ngân hàng'} cho "${parsed.data.description}" (${parsed.data.category}). (Đã dùng ${usedModel})`,
-              isTyping: true
-            }]);
-            return;
+            await addTransaction(newTx);
+            aiResponseText = `Đã tự động thêm giao dịch: ${data.type === 'income' ? 'Thu' : 'Chi'} ${formatNumber(data.amount)}đ từ ${data.source === 'cash' ? 'Tiền mặt' : 'Ngân hàng'} cho "${data.description}". (${usedModel})`;
+          } else if (action === 'add_student') {
+             const newStudent: Student = {
+                id: Date.now().toString(),
+                name: data.name,
+                phone: data.phone || '',
+                email: data.email || '',
+                fee: data.fee,
+                currentSubject: data.currentSubject || '',
+                parentDetails: data.parentDetails || '',
+                joinDate: new Date().toISOString().split('T')[0]
+             };
+             addStudent(newStudent);
+             aiResponseText = `Đã thêm học viên mới: ${data.name} (Học phí: ${formatNumber(data.fee)}đ). (${usedModel})`;
+          } else if (action === 'add_class') {
+             const newClass: ClassSession = {
+                id: Date.now().toString(),
+                studentId: data.studentId,
+                date: data.date,
+                time: data.time || '18:00',
+                duration: data.duration || 60,
+                status: data.status || 'scheduled',
+                notes: data.notes || '',
+                isPaid: false
+             };
+             await addClass(newClass);
+             const sName = students.find((s: Student) => s.id === data.studentId)?.name || 'Học viên';
+             aiResponseText = `Đã lên lịch học cho ${sName} vào ${data.date} ${data.time}. (${usedModel})`;
+          } else if (action === 'update_class') {
+             const cls = classes.find((c: ClassSession) => c.id === data.id);
+             if (cls) {
+                await updateClass({...cls, status: data.status || 'completed'});
+                aiResponseText = `Đã cập nhật trạng thái lớp học thành ${data.status}. (${usedModel})`;
+             } else {
+                aiResponseText = `Không tìm thấy lớp học yêu cầu cập nhật. (${usedModel})`;
+             }
           }
+          
+          setMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            sender: 'ai',
+            text: aiResponseText,
+            isTyping: true
+          }]);
+          return;
         }
       } catch (e) {
         // Not JSON or invalid JSON, just normal text.
@@ -283,7 +348,7 @@ QUY TẮC QUAN TRỌNG:
             <div className="bg-gradient-to-r from-cyan-500 to-blue-500 p-4 flex justify-between items-center text-white">
               <div className="flex items-center gap-2">
                 <Bot className="w-6 h-6" />
-                <span className="font-semibold">Trợ lý Tài chính AI</span>
+                <span className="font-semibold">Trợ lý Trí tuệ nhân tạo (AI)</span>
               </div>
               <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="hover:bg-white/20 h-8 w-8 text-white rounded-full transition-colors">
                 <X className="w-5 h-5" />
@@ -332,10 +397,10 @@ QUY TẮC QUAN TRỌNG:
             {/* Quick Actions */}
             <div className="px-4 py-2 bg-white/50 border-t border-sky-100 flex gap-2 overflow-x-auto custom-scrollbar">
               <Button variant="secondary" size="sm" onClick={() => handleQuickAction('Báo cáo tuần')} className="whitespace-nowrap rounded-full text-xs h-8">
-                <FileText className="w-3 h-3 mr-1" /> Báo cáo tuần
+                <FileText className="w-3 h-3 mr-1" /> TT Tài chính
               </Button>
-              <Button variant="secondary" size="sm" onClick={() => handleQuickAction('Xuất CSV')} className="whitespace-nowrap rounded-full text-xs h-8">
-                <Download className="w-3 h-3 mr-1" /> Xuất CSV
+              <Button variant="secondary" size="sm" onClick={() => handleSend('Hôm nay tôi có lịch dạy học viên nào không?')} className="whitespace-nowrap rounded-full text-xs h-8">
+                <FileText className="w-3 h-3 mr-1" /> Lịch dạy hôm nay
               </Button>
             </div>
 
