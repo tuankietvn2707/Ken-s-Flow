@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, Suspense, lazy } from 'react';
 import { Student, ClassSession, Transaction, Goal, FinanceHistoryRecord } from './types';
-import { Users, BookOpen, LayoutDashboard, LogOut, Wallet, History, Moon, Sun } from 'lucide-react';
+import { Users, BookOpen, LayoutDashboard, LogOut, Wallet, History } from 'lucide-react';
 import { auth, db } from './firebase';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { collection, getDocs, doc, setDoc, deleteDoc, writeBatch, deleteField, getDoc, onSnapshot } from 'firebase/firestore';
@@ -59,19 +59,10 @@ export default function App() {
   const [isGlobalHistoryOpen, setIsGlobalHistoryOpen] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    return localStorage.getItem('theme') === 'dark';
-  });
-
   useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  }, [isDarkMode]);
+    document.documentElement.classList.remove('dark');
+    localStorage.removeItem('theme');
+  }, []);
 
   const showLoading = () => setIsProcessing(true);
   const hideLoading = () => setIsProcessing(false);
@@ -589,13 +580,6 @@ export default function App() {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <button
-                onClick={() => setIsDarkMode(!isDarkMode)}
-                className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-                aria-label="Toggle Dark Mode"
-              >
-                {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-              </button>
               <UserMenu user={user} handleLogout={handleLogout} onViewHistory={() => setIsGlobalHistoryOpen(true)} />
             </div>
           </div>

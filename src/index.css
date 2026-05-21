@@ -13,10 +13,6 @@ body {
   transition: background 0.3s ease, color 0.3s ease;
 }
 
-.dark body {
-  background: linear-gradient(135deg, #020617 0%, #0f172a 40%, #1e293b 100%);
-  color: #f8fafc;
-}
 
 /* Glass Panel — dùng cho cards, form, modal */
 .glass-panel {
