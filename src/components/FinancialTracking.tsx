@@ -100,11 +100,11 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
           <p className="text-sky-700/80 font-medium text-lg">Theo dõi công nợ và thu học phí</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-2 sm:mt-0">
-          <div className="px-5 py-3 bg-white/60 backdrop-blur-md rounded-[20px] shadow-[0_4px_16px_rgba(14,165,233,0.04)] border border-white flex flex-col items-start min-w-[200px]">
+          <div className="px-6 py-4 bg-white/90 rounded-[24px] shadow-sm border border-sky-100 flex flex-col items-start min-w-[200px]">
             <span className="text-[11px] font-bold text-emerald-600/80 uppercase tracking-widest mb-1">Số tiền có thể thu</span>
             <span className="text-2xl font-extrabold text-emerald-600 tracking-tight">{formatVND(totalPotentialRevenue)}</span>
           </div>
-          <div className="px-5 py-3 bg-white/60 backdrop-blur-md rounded-[20px] shadow-[0_4px_16px_rgba(244,63,94,0.04)] border border-white flex flex-col items-start min-w-[200px]">
+          <div className="px-6 py-4 bg-white/90 rounded-[24px] shadow-sm border border-rose-100 flex flex-col items-start min-w-[200px]">
             <span className="text-[11px] font-bold text-rose-600/80 uppercase tracking-widest mb-1">Chờ Thanh Toán</span>
             <span className="text-2xl font-extrabold text-rose-600 tracking-tight">{formatVND(totalOutstanding)}</span>
           </div>

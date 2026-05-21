@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Target, MessageCircle, X } from 'lucide-react';
 import { Button } from './ui/Button';
-import FinanceChatbot from './FinanceChatbot';
 import { Transaction, Goal, FinanceHistoryRecord } from '../types';
 
 import FinanceOverview from './FinanceOverview';
@@ -115,12 +114,6 @@ export default function PersonalFinance({
         <FinanceHistory financeHistory={financeHistory} deleteFinanceHistory={deleteFinanceHistory} />
       )}
 
-      {/* Chatbot Module (it manages its own FAB and Modal) */}
-      <FinanceChatbot 
-        transactions={transactions} 
-        goals={goals} 
-        addTransaction={addTransaction}
-      />
     </div>
   );
 }
