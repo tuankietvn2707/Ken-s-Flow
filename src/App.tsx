@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback, Suspense, lazy } from 'react';
 import { Student, ClassSession, Transaction, Goal, FinanceHistoryRecord } from './types';
-import { Users, BookOpen, LayoutDashboard, LogOut, Wallet, History } from 'lucide-react';
+import { Users, BookOpen, LayoutDashboard, LogOut, Wallet, History, Moon, Sun } from 'lucide-react';
 import { auth, db } from './firebase';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
-import { collection, getDocs, doc, setDoc, deleteDoc, writeBatch, deleteField, getDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, setDoc, deleteDoc, writeBatch, deleteField, getDoc, onSnapshot } from 'firebase/firestore';
 import { Toaster, toast } from 'sonner';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -59,6 +59,19 @@ export default function App() {
   const [isGlobalHistoryOpen, setIsGlobalHistoryOpen] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return localStorage.getItem('theme') === 'dark';
+  });
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDarkMode]);
 
   const showLoading = () => setIsProcessing(true);
   const hideLoading = () => setIsProcessing(false);
@@ -71,105 +84,113 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    if (user) {
-      fetchData(user.uid);
-    } else {
-      setStudents([]);
-      setClasses([]);
-    }
-  }, [user]);
-
-  const fetchData = async (uid: string) => {
+  const setupListeners = (uid: string) => {
     setLoadingData(true);
-    try {
-      const [studentsSnap, classesSnap, transactionsSnap, historySnap, goalsSnap, settingsSnap, profileSnap] = await Promise.all([
-        getDocs(collection(db, `users/${uid}/students`)),
-        getDocs(collection(db, `users/${uid}/classes`)),
-        getDocs(collection(db, `users/${uid}/transactions`)),
-        getDocs(collection(db, `users/${uid}/financeHistory`)),
-        getDocs(collection(db, `users/${uid}/goals`)),
-        getDoc(doc(db, `users/${uid}/settings/finance`)),
-        getDoc(doc(db, `users/${uid}/profile/info`))
-      ]);
-      
-      if (profileSnap.exists()) {
-        setDisplayName(profileSnap.data().displayName || '');
+    let loadedCount = 0;
+    const totalCollections = 5;
+
+    const checkLoadingComplete = () => {
+      loadedCount++;
+      if (loadedCount >= totalCollections) {
+        setLoadingData(false);
+      }
+    };
+
+    // Profile listener
+    const unsubProfile = onSnapshot(doc(db, `users/${uid}/profile/info`), (snap) => {
+      if (snap.exists()) {
+        setDisplayName(snap.data().displayName || '');
         setShowOnboarding(false);
       } else {
         setShowOnboarding(true);
       }
-      const studentsData = studentsSnap.docs.map(doc => doc.data() as Student);
-      const classesData = classesSnap.docs.map(doc => doc.data() as ClassSession);
-      const transactionsData = transactionsSnap.docs.map(doc => doc.data() as Transaction);
-      const historyData = historySnap.docs.map(doc => doc.data() as FinanceHistoryRecord);
-      const goalsData = goalsSnap.docs.map(doc => doc.data() as Goal);
-      const settingsData = settingsSnap.exists() ? settingsSnap.data() : { initialBalance: { cash: 0, banking: 0 } };
-      
-      setStudents(studentsData);
-      setClasses(classesData);
-      setTransactions(transactionsData);
-      setFinanceHistory(historyData);
-      setGoals(goalsData);
-      setInitialBalance(settingsData.initialBalance || { cash: 0, banking: 0 });
+    });
 
-      // Migration logic from localStorage to Firestore
-      if (transactionsData.length === 0 && goalsData.length === 0 && !settingsSnap.exists()) {
+    // Settings listener
+    const unsubSettings = onSnapshot(doc(db, `users/${uid}/settings/finance`), (snap) => {
+      if (snap.exists()) {
+        setInitialBalance(snap.data().initialBalance || { cash: 0, banking: 0 });
+      } else {
+        setInitialBalance({ cash: 0, banking: 0 });
+      }
+    });
+
+    // Students listener
+    const unsubStudents = onSnapshot(collection(db, `users/${uid}/students`), (snap) => {
+      setStudents(snap.docs.map(doc => doc.data() as Student));
+      checkLoadingComplete();
+    });
+
+    // Classes listener
+    const unsubClasses = onSnapshot(collection(db, `users/${uid}/classes`), (snap) => {
+      setClasses(snap.docs.map(doc => doc.data() as ClassSession));
+      checkLoadingComplete();
+    });
+
+    // Transactions listener
+    const unsubTransactions = onSnapshot(collection(db, `users/${uid}/transactions`), (snap) => {
+      const txs = snap.docs.map(doc => doc.data() as Transaction);
+      setTransactions(txs);
+      
+      // Migration logic from localStorage to Firestore (only runs if Firestore is empty)
+      if (txs.length === 0) {
         try {
           const localTxs = localStorage.getItem('pf_transactions');
-          const localGoals = localStorage.getItem('pf_goals');
-          const localBalance = localStorage.getItem('pf_initial_balance');
-
-          if (localTxs || localGoals || localBalance) {
-            const batch = writeBatch(db);
-            let hasData = false;
-
-            if (localTxs) {
-              const txs = JSON.parse(localTxs) as Transaction[];
-              if (Array.isArray(txs)) {
-                txs.forEach(tx => {
-                  batch.set(doc(db, `users/${uid}/transactions`, tx.id), tx);
-                });
-                setTransactions(txs);
-                hasData = true;
-              }
-            }
-
-            if (localGoals) {
-              const gs = JSON.parse(localGoals) as Goal[];
-              if (Array.isArray(gs)) {
-                gs.forEach(g => {
-                  batch.set(doc(db, `users/${uid}/goals`, g.id), g);
-                });
-                setGoals(gs);
-                hasData = true;
-              }
-            }
-
-            if (localBalance) {
-              const balance = Number(localBalance);
-              if (!isNaN(balance)) {
-                batch.set(doc(db, `users/${uid}/settings/finance`), { initialBalance: balance });
-                setInitialBalance(balance);
-                hasData = true;
-              }
-            }
-
-            if (hasData) {
-              await batch.commit();
-              console.log("Successfully migrated local data to Firestore.");
+          if (localTxs) {
+            const parsedTxs = JSON.parse(localTxs) as Transaction[];
+            if (Array.isArray(parsedTxs) && parsedTxs.length > 0) {
+              const batch = writeBatch(db);
+              parsedTxs.forEach(tx => {
+                batch.set(doc(db, `users/${uid}/transactions`, tx.id), tx);
+              });
+              batch.commit().then(() => console.log("Migrated local transactions to Firestore."));
             }
           }
-        } catch (migrateError) {
-          console.error("Error during migration:", migrateError);
+        } catch (e) {
+          console.error("Migration error:", e);
         }
       }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setLoadingData(false);
-    }
+      checkLoadingComplete();
+    });
+
+    // History listener
+    const unsubHistory = onSnapshot(collection(db, `users/${uid}/financeHistory`), (snap) => {
+      setFinanceHistory(snap.docs.map(doc => doc.data() as FinanceHistoryRecord));
+      checkLoadingComplete();
+    });
+
+    // Goals listener
+    const unsubGoals = onSnapshot(collection(db, `users/${uid}/goals`), (snap) => {
+      setGoals(snap.docs.map(doc => doc.data() as Goal));
+      checkLoadingComplete();
+    });
+
+    return () => {
+      unsubProfile();
+      unsubSettings();
+      unsubStudents();
+      unsubClasses();
+      unsubTransactions();
+      unsubHistory();
+      unsubGoals();
+    };
   };
+
+  useEffect(() => {
+    let unsubscribe: (() => void) | undefined;
+    if (user) {
+      unsubscribe = setupListeners(user.uid);
+    } else {
+      setStudents([]);
+      setClasses([]);
+      setTransactions([]);
+      setFinanceHistory([]);
+      setGoals([]);
+    }
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [user]);
 
   const handleLogout = async () => {
     try {
@@ -498,7 +519,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen text-sky-950 font-sans relative overflow-x-hidden">
+    <div className="min-h-screen text-sky-950 dark:text-sky-50 font-sans relative overflow-x-hidden">
       {/* Premium Glassmorphism Background */}
       <div className="fixed inset-0 z-[-1] bg-gradient-to-br from-[#f8fafc] via-[#e8f4fd] to-[#f0f9ff]">
         <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-sky-200/40 blur-[120px]" />
@@ -507,7 +528,7 @@ export default function App() {
       </div>
 
       <Toaster position="top-center" richColors theme="light" />
-      <nav className="bg-white/80 backdrop-blur-3xl border-b border-white fixed w-full top-0 z-50 shadow-[0_12px_40px_rgba(14,165,233,0.12)] transition-all">
+      <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl border-b border-white dark:border-slate-700 fixed w-full top-0 z-50 shadow-[0_12px_40px_rgba(14,165,233,0.12)] transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex">
@@ -516,7 +537,7 @@ export default function App() {
                   onClick={() => window.location.reload()}
                   className="animated-border-box cursor-pointer hover:opacity-80 transition-opacity flex bg-transparent outline-none border-none p-0"
                 >
-                  <div className="animated-border-inner flex items-center gap-2 m-0 p-2 px-3 bg-white/80 rounded-[10px]">
+                  <div className="animated-border-inner flex items-center gap-2 m-0 p-2 px-3 bg-white/80 dark:bg-slate-900/80 rounded-[10px]">
                     <Wallet className="w-6 h-6 text-sky-600" />
                     <span className="text-xl font-bold text-sky-600">
                       TutorFlow
@@ -530,44 +551,51 @@ export default function App() {
                   onClick={() => setActiveTab('dashboard')}
                   icon={<LayoutDashboard className="w-4 h-4 mr-2" />}
                   label="Tổng quan"
-                  colorClass="glass-active text-sky-900 border-sky-300/30"
-                  hoverClass="hover:bg-sky-50 hover:text-sky-800"
+                  colorClass="glass-active text-sky-900 dark:text-sky-100 border-sky-300/30"
+                  hoverClass="hover:bg-sky-50 hover:text-sky-800 dark:text-sky-200"
                 />
                 <TabButton 
                   active={activeTab === 'students'} 
                   onClick={() => setActiveTab('students')}
                   icon={<Users className="w-4 h-4 mr-2" />}
                   label="Học viên"
-                  colorClass="glass-active text-sky-900 border-sky-300/30"
-                  hoverClass="hover:bg-sky-50 hover:text-sky-800"
+                  colorClass="glass-active text-sky-900 dark:text-sky-100 border-sky-300/30"
+                  hoverClass="hover:bg-sky-50 hover:text-sky-800 dark:text-sky-200"
                 />
                 <TabButton 
                   active={activeTab === 'classes'} 
                   onClick={() => setActiveTab('classes')}
                   icon={<BookOpen className="w-4 h-4 mr-2" />}
                   label="Lớp học"
-                  colorClass="glass-active text-sky-900 border-sky-300/30"
-                  hoverClass="hover:bg-sky-50 hover:text-sky-800"
+                  colorClass="glass-active text-sky-900 dark:text-sky-100 border-sky-300/30"
+                  hoverClass="hover:bg-sky-50 hover:text-sky-800 dark:text-sky-200"
                 />
                 <TabButton 
                   active={activeTab === 'finances'} 
                   onClick={() => setActiveTab('finances')}
                   icon={<DongSign className="w-4 h-4 mr-2" />}
                   label="Tài chính"
-                  colorClass="glass-active text-sky-900 border-sky-300/30"
-                  hoverClass="hover:bg-sky-50 hover:text-sky-800"
+                  colorClass="glass-active text-sky-900 dark:text-sky-100 border-sky-300/30"
+                  hoverClass="hover:bg-sky-50 hover:text-sky-800 dark:text-sky-200"
                 />
                 <TabButton 
                   active={activeTab === 'personal_finance'} 
                   onClick={() => setActiveTab('personal_finance')}
                   icon={<Wallet className="w-4 h-4 mr-2" />}
                   label="Thu - Chi"
-                  colorClass="glass-active text-sky-900 border-sky-300/30"
-                  hoverClass="hover:bg-sky-50 hover:text-sky-800"
+                  colorClass="glass-active text-sky-900 dark:text-sky-100 border-sky-300/30"
+                  hoverClass="hover:bg-sky-50 hover:text-sky-800 dark:text-sky-200"
                 />
               </div>
             </div>
-            <div className="flex items-center">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setIsDarkMode(!isDarkMode)}
+                className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                aria-label="Toggle Dark Mode"
+              >
+                {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </button>
               <UserMenu user={user} handleLogout={handleLogout} onViewHistory={() => setIsGlobalHistoryOpen(true)} />
             </div>
           </div>
@@ -579,31 +607,31 @@ export default function App() {
               active={activeTab === 'dashboard'} 
               onClick={() => setActiveTab('dashboard')}
               label="Tổng quan"
-              colorClass="glass-active text-sky-900 border-sky-300/30"
+              colorClass="glass-active text-sky-900 dark:text-sky-100 border-sky-300/30"
             />
             <MobileTabButton 
               active={activeTab === 'students'} 
               onClick={() => setActiveTab('students')}
               label="Học viên"
-              colorClass="glass-active text-sky-900 border-sky-300/30"
+              colorClass="glass-active text-sky-900 dark:text-sky-100 border-sky-300/30"
             />
             <MobileTabButton 
               active={activeTab === 'classes'} 
               onClick={() => setActiveTab('classes')}
               label="Lớp học"
-              colorClass="glass-active text-sky-900 border-sky-300/30"
+              colorClass="glass-active text-sky-900 dark:text-sky-100 border-sky-300/30"
             />
             <MobileTabButton 
               active={activeTab === 'finances'} 
               onClick={() => setActiveTab('finances')}
               label="Tài chính"
-              colorClass="glass-active text-sky-900 border-sky-300/30"
+              colorClass="glass-active text-sky-900 dark:text-sky-100 border-sky-300/30"
             />
             <MobileTabButton 
               active={activeTab === 'personal_finance'} 
               onClick={() => setActiveTab('personal_finance')}
               label="Thu - Chi"
-              colorClass="glass-active text-sky-900 border-sky-300/30"
+              colorClass="glass-active text-sky-900 dark:text-sky-100 border-sky-300/30"
             />
         </div>
       </nav>
@@ -673,7 +701,7 @@ export default function App() {
           ) : (
             <div className="text-center py-20 bg-sky-50/50 rounded-[32px] border border-sky-100/50 shadow-inner">
               <History className="w-16 h-16 text-sky-200 mx-auto mb-4" />
-              <p className="text-sky-800 font-medium text-lg">Chưa có lịch sử giao dịch nào.</p>
+              <p className="text-sky-800 dark:text-sky-200 font-medium text-lg">Chưa có lịch sử giao dịch nào.</p>
               <p className="text-sky-600/70 mt-1">Lịch sử sẽ xuất hiện khi bạn xác nhận thu học phí của học viên.</p>
             </div>
           )}
@@ -703,9 +731,9 @@ export default function App() {
       {/* Global Loading Overlay */}
       {isProcessing && (
         <div id="loading-overlay" className="fixed inset-0 z-[120] flex items-center justify-center bg-sky-900/20 backdrop-blur-md">
-          <div className="flex flex-col items-center bg-white/80 p-8 rounded-3xl shadow-2xl border border-white/60 backdrop-blur-xl">
+          <div className="flex flex-col items-center bg-white/80 dark:bg-slate-900/80 p-8 rounded-3xl shadow-2xl border border-white dark:border-slate-700/60 backdrop-blur-xl">
             <div className="animate-spin rounded-full h-12 w-12 border-4 border-sky-200 border-b-sky-600 mb-4"></div>
-            <span className="text-sky-950 font-bold tracking-tight">Đang xử lý...</span>
+            <span className="text-sky-950 dark:text-sky-50 font-bold tracking-tight">Đang xử lý...</span>
           </div>
         </div>
       )}
@@ -738,7 +766,7 @@ const MobileTabButton = React.memo(function MobileTabButton({ active, onClick, l
       className={`whitespace-nowrap py-2 px-4 rounded-xl text-sm font-medium flex-1 text-center transition-all duration-300 border ${
         active 
           ? `${colorClass} shadow-sm` 
-          : `border-transparent text-sky-700/80 hover:bg-white/10 hover:text-sky-900 hover:shadow-sm`
+          : `border-transparent text-sky-700/80 hover:bg-white/10 hover:text-sky-900 dark:text-sky-100 hover:shadow-sm`
       }`}
     >
       {label}
@@ -765,7 +793,7 @@ function Onboarding({ onSave }: { onSave: (name: string) => void }) {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center space-y-4">
           <div className="text-4xl animate-bounce">👋</div>
-          <h1 className="text-2xl font-bold text-sky-950">
+          <h1 className="text-2xl font-bold text-sky-950 dark:text-sky-50">
             Chào mừng <span className="text-sky-600">{name}</span> đến với WebApp!
           </h1>
           <p className="text-sky-700/80 animate-pulse">Đang chuẩn bị không gian làm việc cho bạn...</p>
@@ -781,13 +809,13 @@ function Onboarding({ onSave }: { onSave: (name: string) => void }) {
           <div className="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <BookOpen className="w-8 h-8 text-sky-600" />
           </div>
-          <h1 className="text-2xl font-bold text-sky-950">Chào mừng bạn!</h1>
+          <h1 className="text-2xl font-bold text-sky-950 dark:text-sky-50">Chào mừng bạn!</h1>
           <p className="text-sky-700/80">Chúng tôi rất vui khi có bạn đồng hành.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-sky-900 mb-2">Bạn là_______?</label>
+            <label className="block text-sm font-medium text-sky-900 dark:text-sky-100 mb-2">Bạn là_______?</label>
             <Input
               type="text"
               required
@@ -857,7 +885,7 @@ function UserMenu({ user, handleLogout, onViewHistory }: { user: User, handleLog
                   firstLetter
                 )}
               </div>
-              <p className="text-sm font-semibold text-sky-900 truncate px-2" title={user.email || ''}>
+              <p className="text-sm font-semibold text-sky-900 dark:text-sky-100 truncate px-2" title={user.email || ''}>
                 {user.email}
               </p>
             </div>

@@ -52,7 +52,7 @@ export default function Login() {
             <BookOpen className="w-8 h-8 text-white" />
           </div>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-sky-950">
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-sky-950 dark:text-sky-50">
           TutorFlow
         </h2>
         <p className="mt-2 text-center text-sm text-sky-700/80">
@@ -70,7 +70,7 @@ export default function Login() {
                 </div>
               )}
               <div className="space-y-1.5">
-                <label className="block text-sm font-medium text-sky-900">Email</label>
+                <label className="block text-sm font-medium text-sky-900 dark:text-sky-100">Email</label>
                 <Input
                   type="email"
                   required
@@ -80,7 +80,7 @@ export default function Login() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-sm font-medium text-sky-900">Mật khẩu</label>
+                <label className="block text-sm font-medium text-sky-900 dark:text-sky-100">Mật khẩu</label>
                 <Input
                   type="password"
                   required
@@ -104,7 +104,7 @@ export default function Login() {
                   <div className="w-full border-t border-sky-100" />
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-sky-700/80">Hoặc tiếp tục với</span>
+                  <span className="px-2 bg-white dark:bg-slate-900 text-sky-700/80">Hoặc tiếp tục với</span>
                 </div>
               </div>
 

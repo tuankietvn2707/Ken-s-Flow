@@ -96,15 +96,15 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
         className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
       >
         <div className="flex flex-col gap-1 items-start">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-sky-950 tracking-tight">Quản lý Tài chính</h1>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-sky-950 dark:text-sky-50 tracking-tight">Quản lý Tài chính</h1>
           <p className="text-sky-700/80 font-medium text-lg">Theo dõi công nợ và thu học phí</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-2 sm:mt-0">
-          <div className="px-6 py-4 bg-white/90 rounded-[24px] shadow-sm border border-sky-100 flex flex-col items-start min-w-[200px]">
+          <div className="px-6 py-4 bg-white/90 dark:bg-slate-900/90 rounded-[24px] shadow-sm border border-sky-100 flex flex-col items-start min-w-[200px]">
             <span className="text-[11px] font-bold text-emerald-600/80 uppercase tracking-widest mb-1">Số tiền có thể thu</span>
             <span className="text-2xl font-extrabold text-emerald-600 tracking-tight">{formatVND(totalPotentialRevenue)}</span>
           </div>
-          <div className="px-6 py-4 bg-white/90 rounded-[24px] shadow-sm border border-rose-100 flex flex-col items-start min-w-[200px]">
+          <div className="px-6 py-4 bg-white/90 dark:bg-slate-900/90 rounded-[24px] shadow-sm border border-rose-100 flex flex-col items-start min-w-[200px]">
             <span className="text-[11px] font-bold text-rose-600/80 uppercase tracking-widest mb-1">Chờ Thanh Toán</span>
             <span className="text-2xl font-extrabold text-rose-600 tracking-tight">{formatVND(totalOutstanding)}</span>
           </div>
@@ -113,7 +113,7 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-        className="bg-white/40 backdrop-blur-md rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white/60 overflow-hidden"
+        className="bg-white/40 backdrop-blur-md rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white dark:border-slate-700/60 overflow-hidden"
         
       >
         <div className="overflow-x-auto">
@@ -137,9 +137,9 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
                 </tr>
               ) : (
                 allFinancials.map(({ student, totalUnpaidSessions, totalOwed, potentialRevenue, unpaidClassIds, unpaidClasses, hasPaidClasses }) => (
-                  <tr key={student.id} className="group hover:bg-white/80 hover:shadow-[0_4px_24px_rgba(14,165,233,0.06)] transition-all duration-300 relative z-0 hover:z-10 bg-transparent">
+                  <tr key={student.id} className="group hover:bg-white/80 dark:bg-slate-900/80 hover:shadow-[0_4px_24px_rgba(14,165,233,0.06)] transition-all duration-300 relative z-0 hover:z-10 bg-transparent">
                     <td className="px-6 py-5 whitespace-nowrap border-b border-sky-50/50">
-                      <div className="text-[15px] font-extrabold text-sky-950 tracking-tight">{student.name}</div>
+                      <div className="text-[15px] font-extrabold text-sky-950 dark:text-sky-50 tracking-tight">{student.name}</div>
                     </td>
                     <td className="px-6 py-5 whitespace-nowrap text-[14px] font-semibold text-sky-700/80 border-b border-sky-50/50">
                       {formatVND(student.fee)}
@@ -174,7 +174,7 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
                           }}
                           disabled={!hasPaidClasses}
                           title="Hoàn tác lần thanh toán gần nhất"
-                          className="h-9 w-9 text-sky-500 hover:text-sky-600 hover:bg-sky-50 bg-white/50 backdrop-blur-sm border border-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-all duration-300 rounded-[14px]"
+                          className="h-9 w-9 text-sky-500 hover:text-sky-600 hover:bg-sky-50 bg-white/50 backdrop-blur-sm border border-white dark:border-slate-700 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-all duration-300 rounded-[14px]"
                         >
                           <RotateCcw className="w-4 h-4" />
                         </Button>
@@ -190,7 +190,7 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
                             handleMarkAsPaid(student, unpaidClassIds, totalUnpaidSessions, potentialRevenue, totalOwed, unpaidClasses);
                           }}
                           disabled={unpaidClasses.length === 0}
-                          className={`rounded-[14px] shadow-[0_4px_16px_rgba(14,165,233,0.3)] hover:shadow-[0_8px_24px_rgba(14,165,233,0.4)] ${unpaidClasses.length > 0 ? 'bg-sky-500 hover:bg-sky-600 text-white' : 'bg-white/50 text-sky-800'}`}
+                          className={`rounded-[14px] shadow-[0_4px_16px_rgba(14,165,233,0.3)] hover:shadow-[0_8px_24px_rgba(14,165,233,0.4)] ${unpaidClasses.length > 0 ? 'bg-sky-500 hover:bg-sky-600 text-white' : 'bg-white/50 text-sky-800 dark:text-sky-200'}`}
                         >
                           <CheckCircle className="w-4 h-4 mr-1.5" />
                           Đã thanh toán

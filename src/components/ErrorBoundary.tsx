@@ -37,12 +37,12 @@ export default class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-sky-50/40 p-4">
-          <div className="glass-panel text-sky-950 p-6 rounded-2xl shadow-xl max-w-lg w-full border border-sky-300/30">
+          <div className="glass-panel text-sky-950 dark:text-sky-50 p-6 rounded-2xl shadow-xl max-w-lg w-full border border-sky-300/30">
             <h2 className="text-xl font-bold text-rose-600 mb-4">Đã xảy ra lỗi không mong muốn</h2>
             <p className="text-sky-700/80 mb-4">
               Ứng dụng gặp sự cố khi hiển thị dữ liệu. Điều này thường xảy ra do dữ liệu cũ không tương thích.
             </p>
-            <div className="bg-sky-50/40 p-4 rounded-xl overflow-auto text-xs text-sky-900 font-mono max-h-48 mb-6">
+            <div className="bg-sky-50/40 p-4 rounded-xl overflow-auto text-xs text-sky-900 dark:text-sky-100 font-mono max-h-48 mb-6">
               {this.state.error?.toString()}
             </div>
             <div className="flex flex-col gap-3">

@@ -3,6 +3,7 @@ import { Student, ClassSession, formatVND, parseDateSafe } from '../types';
 import { Users, Calendar, Plus, UserPlus, CalendarPlus, CreditCard } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Input } from './ui/Input';
+import { Select } from './ui/Select';
 import {
   BarChart,
   Bar,
@@ -63,8 +64,8 @@ const CustomBarTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     const dayName = label === 'CN' ? 'Chủ Nhật' : `Thứ ${label.replace('T', '')}`;
     return (
-      <div className="glass-panel p-3 border border-sky-300/30 text-sky-950 rounded-xl">
-        <p className="font-semibold text-sky-950 mb-1">{dayName}</p>
+      <div className="glass-panel p-3 border border-sky-300/30 text-sky-950 dark:text-sky-50 rounded-xl">
+        <p className="font-semibold text-sky-950 dark:text-sky-50 mb-1">{dayName}</p>
         <p className="text-sm text-sky-700/80">
           <span className="font-medium text-sky-600">{payload[0].value} buổi học</span>
           {' '}
@@ -84,11 +85,11 @@ const CustomAreaTooltip = ({ active, payload, label }: any) => {
 
     return (
       <div className="bg-white/95 backdrop-blur-md p-4 border border-sky-100 shadow-xl rounded-2xl">
-        <p className="font-bold text-sky-950 mb-4">{`Tháng ${label.replace('T', '')}`}</p>
+        <p className="font-bold text-sky-950 dark:text-sky-50 mb-4">{`Tháng ${label.replace('T', '')}`}</p>
         <div className="space-y-3">
           <p className="text-sm flex justify-between items-center gap-6">
             <span className="text-sky-700 font-medium">Tổng thu kỳ vọng:</span>
-            <span className="font-bold text-sky-950">{formatVND(potential)}</span>
+            <span className="font-bold text-sky-950 dark:text-sky-50">{formatVND(potential)}</span>
           </p>
           <p className="text-sm flex justify-between items-center gap-6">
             <span className="text-emerald-600 font-medium tracking-wide">Đã thanh toán:</span>
@@ -104,6 +105,18 @@ const CustomAreaTooltip = ({ active, payload, label }: any) => {
   }
   return null;
 };
+
+const COLORS = ['#38bdf8', '#fb923c', '#818cf8', '#34d399', '#f472b6', '#facc15', '#a78bfa', '#fb7185', '#2dd4bf'];
+const PIE_COLORS = ['#10b981', '#f59e0b', '#ef4444']; // Paid, Pending, Overdue
+
+// Generate last 12 months for select dropdown
+const monthOptions = Array.from({ length: 12 }).map((_, i) => {
+  const d = new Date();
+  d.setMonth(d.getMonth() - i);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  return { value: `${year}-${month}`, label: `Tháng ${month}/${year}` };
+});
 
 interface DashboardProps {
   students: Student[];
@@ -219,7 +232,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
       <div className="flex flex-col gap-1 items-start">
         <motion.h1 
           initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, ease: 'easeOut' }}
-          className="text-3xl sm:text-4xl font-extrabold text-sky-950 tracking-tight"
+          className="text-3xl sm:text-4xl font-extrabold text-sky-950 dark:text-sky-50 tracking-tight"
         >
           {getGreeting()}
         </motion.h1>
@@ -237,7 +250,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
       >
         <div 
           onClick={() => setActiveTab && setActiveTab('students')}
-          className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] overflow-hidden rounded-[32px] cursor-pointer transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(14,165,233,0.12)] group relative"
+          className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white dark:border-slate-700 shadow-[0_8px_32px_rgba(0,0,0,0.04)] overflow-hidden rounded-[32px] cursor-pointer transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(14,165,233,0.12)] group relative"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           <div className="p-8 relative z-10">
@@ -249,7 +262,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
               </div>
               <div>
                 <dt className="text-xs font-bold text-sky-600/80 uppercase tracking-[0.15em] mb-2">Học viên hoạt động</dt>
-                <dd className="text-5xl font-black text-sky-950 tracking-tighter drop-shadow-sm">{students.filter(s => s.status !== 'inactive').length}</dd>
+                <dd className="text-5xl font-black text-sky-950 dark:text-sky-50 tracking-tighter drop-shadow-sm">{students.filter(s => s.status !== 'inactive').length}</dd>
               </div>
             </div>
           </div>
@@ -257,7 +270,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
 
         <div 
           onClick={() => setActiveTab && setActiveTab('classes')}
-          className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] overflow-hidden rounded-[32px] cursor-pointer transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(16,185,129,0.12)] group relative"
+          className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white dark:border-slate-700 shadow-[0_8px_32px_rgba(0,0,0,0.04)] overflow-hidden rounded-[32px] cursor-pointer transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(16,185,129,0.12)] group relative"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           <div className="p-8 relative z-10">
@@ -269,7 +282,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
               </div>
               <div>
                 <dt className="text-xs font-bold text-emerald-600/80 uppercase tracking-[0.15em] mb-2">Lớp học tuần này</dt>
-                <dd className="text-5xl font-black text-sky-950 tracking-tighter drop-shadow-sm">{classesThisWeek}</dd>
+                <dd className="text-5xl font-black text-sky-950 dark:text-sky-50 tracking-tighter drop-shadow-sm">{classesThisWeek}</dd>
               </div>
             </div>
           </div>
@@ -277,7 +290,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
 
         <div 
           onClick={() => setActiveTab && setActiveTab('finances')}
-          className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] overflow-hidden rounded-[32px] cursor-pointer transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(245,158,11,0.12)] group relative"
+          className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white dark:border-slate-700 shadow-[0_8px_32px_rgba(0,0,0,0.04)] overflow-hidden rounded-[32px] cursor-pointer transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(245,158,11,0.12)] group relative"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           <div className="p-8 relative z-10">
@@ -289,7 +302,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
               </div>
               <div>
                 <dt className="text-xs font-bold text-amber-600/80 uppercase tracking-[0.15em] mb-2">Chờ thanh toán</dt>
-                <dd className="text-4xl font-black text-sky-950 tracking-tight leading-tight mt-1 truncate drop-shadow-sm">{formatVND(choThanhToan)}</dd>
+                <dd className="text-4xl font-black text-sky-950 dark:text-sky-50 tracking-tight leading-tight mt-1 truncate drop-shadow-sm">{formatVND(choThanhToan)}</dd>
               </div>
             </div>
           </div>
@@ -301,9 +314,9 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
         className="grid grid-cols-1 lg:grid-cols-2 gap-8"
       >
         {/* Revenue Trend Chart (50%) */}
-        <div className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] lg:col-span-1 flex flex-col hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(14,165,233,0.1)] transition-all duration-300">
+        <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white dark:border-slate-700 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] lg:col-span-1 flex flex-col hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(14,165,233,0.1)] transition-all duration-300">
           <div className="p-8 flex flex-col h-full min-h-[500px]">
-            <h3 className="text-xl font-extrabold text-sky-950 tracking-tight mb-8">Xu hướng doanh thu</h3>
+            <h3 className="text-xl font-extrabold text-sky-950 dark:text-sky-50 tracking-tight mb-8">Xu hướng doanh thu</h3>
             <div className="flex-1 w-full min-h-0">
               <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                 <BarChart data={dynamicRevenueTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -322,15 +335,14 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
         </div>
 
         {/* Tỷ lệ thu hồi học phí (Donut Chart) (50%) */}
-        <div className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] lg:col-span-1 flex flex-col hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(14,165,233,0.1)] transition-all duration-300">
+        <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white dark:border-slate-700 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] lg:col-span-1 flex flex-col hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(14,165,233,0.1)] transition-all duration-300">
           <div className="p-8 flex-1 min-h-[500px] flex flex-col">
             <div className="flex justify-between items-center mb-8 gap-4">
-              <h3 className="text-xl font-extrabold text-sky-950 tracking-tight">Thu hồi học phí</h3>
+              <h3 className="text-xl font-extrabold text-sky-950 dark:text-sky-50 tracking-tight">Thu hồi học phí</h3>
               <div className="relative shrink-0 group">
-                <div className="flex items-center gap-2 bg-white/60 backdrop-blur-md border border-white shadow-[0_4px_16px_rgba(14,165,233,0.05)] hover:shadow-[0_8px_24px_rgba(14,165,233,0.1)] hover:bg-white/90 transition-all duration-300 rounded-[20px] px-4 py-2 ring-1 ring-sky-100/50 group-hover:ring-sky-200">
+                <div className="flex items-center gap-2 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white dark:border-slate-700 shadow-[0_4px_16px_rgba(14,165,233,0.05)] hover:shadow-[0_8px_24px_rgba(14,165,233,0.1)] hover:bg-white/90 dark:bg-slate-900/90 transition-all duration-300 rounded-[20px] px-3 py-1.5 ring-1 ring-sky-100 dark:ring-slate-700/50 group-hover:ring-sky-200">
                   <Calendar className="w-5 h-5 text-sky-500 group-hover:text-sky-600 transition-colors" />
-                  <input
-                    type="month"
+                  <Select
                     id="financialMonthFilter"
                     value={selectedMonth}
                     onChange={(e) => {
@@ -338,9 +350,14 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
                         setSelectedMonth(e.target.value);
                       }
                     }}
-                    className="bg-transparent border-none p-0 text-sky-950 font-semibold focus:ring-0 cursor-pointer outline-none w-[110px] text-sm"
-                    style={{ WebkitAppearance: 'none' }}
-                  />
+                    className="border-none bg-transparent shadow-none focus:ring-0 text-sky-950 dark:text-sky-50 font-semibold p-0 cursor-pointer h-auto py-1 pl-1 pr-6"
+                  >
+                    {monthOptions.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </Select>
                 </div>
               </div>
             </div>
@@ -380,7 +397,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                  <span className="text-5xl leading-none font-extrabold text-sky-950 tracking-tighter drop-shadow-sm">{(tongTienCoTheThu > 0 ? (soTienThanhToan / tongTienCoTheThu) * 100 : 0).toFixed(0)}%</span>
+                  <span className="text-5xl leading-none font-extrabold text-sky-950 dark:text-sky-50 tracking-tighter drop-shadow-sm">{(tongTienCoTheThu > 0 ? (soTienThanhToan / tongTienCoTheThu) * 100 : 0).toFixed(0)}%</span>
                   <span className="text-[0.65rem] font-bold text-sky-500 uppercase tracking-[0.25em] mt-3 opacity-60">Hoàn thành</span>
                 </div>
               </motion.div>
@@ -388,30 +405,30 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
             
             <div className="mt-8 bg-white/40 backdrop-blur-md rounded-[24px] p-6 ring-1 ring-white/60 shadow-[0_4px_24px_rgba(14,165,233,0.03)] border border-sky-100/50">
               <div className="flex justify-between items-center pb-5 border-b border-sky-100/60 mb-5">
-                <span className="text-[0.8rem] font-bold text-sky-900/80 uppercase tracking-widest">Tổng thu kỳ vọng</span>
-                <span className="font-extrabold text-xl text-sky-950 tracking-tight">{formatVND(tongTienCoTheThu)}</span>
+                <span className="text-[0.8rem] font-bold text-sky-900 dark:text-sky-100/80 uppercase tracking-widest">Tổng thu kỳ vọng</span>
+                <span className="font-extrabold text-xl text-sky-950 dark:text-sky-50 tracking-tight">{formatVND(tongTienCoTheThu)}</span>
               </div>
               <div className="space-y-4">
                 <div className="flex items-center justify-between group/item">
                   <div className="flex items-center gap-3 w-1/2">
                     <div className="w-3 h-3 rounded-full bg-[#10b981] shadow-[0_0_8px_rgba(16,185,129,0.4)]"></div>
-                    <span className="text-sm font-semibold text-sky-800/90 truncate">Đã thanh toán</span>
+                    <span className="text-sm font-semibold text-sky-800 dark:text-sky-200/90 truncate">Đã thanh toán</span>
                   </div>
-                  <span className="font-bold text-sky-950 text-right w-1/2">{formatVND(soTienThanhToan)}</span>
+                  <span className="font-bold text-sky-950 dark:text-sky-50 text-right w-1/2">{formatVND(soTienThanhToan)}</span>
                 </div>
                 <div className="flex items-center justify-between group/item">
                   <div className="flex items-center gap-3 w-1/2">
                     <div className="w-3 h-3 rounded-full bg-[#f59e0b] shadow-[0_0_8px_rgba(245,158,11,0.4)]"></div>
-                    <span className="text-sm font-semibold text-sky-800/90 truncate">Chờ thanh toán</span>
+                    <span className="text-sm font-semibold text-sky-800 dark:text-sky-200/90 truncate">Chờ thanh toán</span>
                   </div>
-                  <span className="font-bold text-sky-950 text-right w-1/2">{formatVND(choThanhToan)}</span>
+                  <span className="font-bold text-sky-950 dark:text-sky-50 text-right w-1/2">{formatVND(choThanhToan)}</span>
                 </div>
                 <div className="flex items-center justify-between group/item">
                   <div className="flex items-center gap-3 w-1/2">
                     <div className="w-3 h-3 rounded-full bg-[#38bdf8] shadow-[0_0_8px_rgba(56,189,248,0.4)]"></div>
-                    <span className="text-sm font-semibold text-sky-800/90 truncate">Có thể thu thêm</span>
+                    <span className="text-sm font-semibold text-sky-800 dark:text-sky-200/90 truncate">Có thể thu thêm</span>
                   </div>
-                  <span className="font-bold text-sky-950 text-right w-1/2">{formatVND(soTienCoTheThuConLai)}</span>
+                  <span className="font-bold text-sky-950 dark:text-sky-50 text-right w-1/2">{formatVND(soTienCoTheThuConLai)}</span>
                 </div>
               </div>
             </div>
