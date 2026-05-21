@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useDeferredValue } from 'react';
 import { Student, ClassSession, formatVND } from '../types';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
-import { GripVertical, Edit2, Trash2, Search, Filter, LayoutGrid, List, AlertTriangle, MoreVertical, Calendar, DollarSign, BookOpen, Wallet } from 'lucide-react';
+import { GripVertical, Edit2, Trash2, Search, Filter, LayoutGrid, List, AlertTriangle, MoreVertical, Calendar, DollarSign, BookOpen, Wallet, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { getAvatarColor } from './StudentManagementUtils';
 import { Select } from './ui/Select';
@@ -35,6 +35,10 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
     return (saved as any) || 'list';
   });
 
+  // Pagination states for high performance UI
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
   useEffect(() => {
     localStorage.setItem('tutorflow_sortBy', sortBy);
   }, [sortBy]);
@@ -42,6 +46,11 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
   useEffect(() => {
     localStorage.setItem('tutorflow_viewMode', viewMode);
   }, [viewMode]);
+
+  // Reset to first page when search filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filter, sortBy]);
 
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
@@ -107,6 +116,13 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
     return result;
   }, [students, studentStats, searchQuery, filter, sortBy]);
 
+  const paginatedStudents = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredAndSortedStudents.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredAndSortedStudents, currentPage, itemsPerPage]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredAndSortedStudents.length / itemsPerPage));
+
   const toggleStudentStatus = (student: Student) => {
     const newStatus = student.status === 'inactive' ? 'active' : 'inactive';
     onUpdate({ ...student, status: newStatus });
@@ -119,9 +135,13 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
     const destinationIndex = result.destination.index;
     if (sourceIndex === destinationIndex) return;
 
+    const offset = (currentPage - 1) * itemsPerPage;
+    const globalSourceIndex = sourceIndex + offset;
+    const globalDestinationIndex = destinationIndex + offset;
+
     const newStudents = [...filteredAndSortedStudents];
-    const [reorderedItem] = newStudents.splice(sourceIndex, 1);
-    newStudents.splice(destinationIndex, 0, reorderedItem);
+    const [reorderedItem] = newStudents.splice(globalSourceIndex, 1);
+    newStudents.splice(globalDestinationIndex, 0, reorderedItem);
 
     newStudents.forEach((student, index) => {
       if (student.order !== index) {
@@ -388,7 +408,7 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
             >
-              {filteredAndSortedStudents.map(student => renderGridItem(student))}
+              {paginatedStudents.map(student => renderGridItem(student))}
             </motion.div>
           ) : (
             <motion.div 
@@ -413,7 +433,7 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
                       <Droppable droppableId="student-list">
                         {(provided) => (
                           <tbody {...provided.droppableProps} ref={provided.innerRef}>
-                            {filteredAndSortedStudents.map((student, index) => {
+                            {paginatedStudents.map((student, index) => {
                               const DraggableComponent = Draggable as any;
                               return (
                                 <DraggableComponent key={student.id} draggableId={student.id} index={index}>
@@ -428,7 +448,7 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
                     </DragDropContext>
                   ) : (
                     <tbody>
-                      {filteredAndSortedStudents.map((student, index) => (
+                      {paginatedStudents.map((student, index) => (
                         <React.Fragment key={student.id}>
                           {renderListItem(student, index)}
                         </React.Fragment>
@@ -441,6 +461,51 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
           )
         )}
       </AnimatePresence>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/60 backdrop-blur-md border border-white p-4 rounded-2xl shadow-sm mt-4">
+          <p className="text-sm font-medium text-sky-900/60">
+            Hiển thị <span className="font-semibold text-sky-900">{paginatedStudents.length}</span> / <span className="font-semibold text-sky-900">{filteredAndSortedStudents.length}</span> học viên
+          </p>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="h-9 w-9 p-0 rounded-xl"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </Button>
+            
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <Button
+                key={page}
+                variant={currentPage === page ? 'default' : 'ghost'}
+                onClick={() => setCurrentPage(page)}
+                className={`h-9 w-9 p-0 rounded-xl text-sm font-bold transition-all ${
+                  currentPage === page 
+                    ? 'bg-sky-500 text-white shadow-sm'
+                    : 'text-sky-700 hover:bg-sky-50'
+                }`}
+              >
+                {page}
+              </Button>
+            ))}
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className="h-9 w-9 p-0 rounded-xl"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </Button>
+          </div>
+        </div>
+      )}
 
       <Modal
         isOpen={!!confirmDeleteId}

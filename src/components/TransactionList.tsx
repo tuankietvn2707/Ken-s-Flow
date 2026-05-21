@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Minus, Trash2, Download, Archive, Check, X, AlertTriangle, FileText, ArrowRight } from 'lucide-react';
+import { Plus, Minus, Trash2, Download, Archive, Check, X, AlertTriangle, FileText, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 import { Modal } from './ui/Modal';
@@ -45,13 +45,30 @@ export default function TransactionList({
     document.body.removeChild(link);
   };
 
-  const groupedTransactions = transactions.reduce((acc, t) => {
-    const dateStr = t.date || new Date().toISOString().split('T')[0];
-    const month = dateStr.substring(0, 7); // YYYY-MM
-    if (!acc[month]) acc[month] = [];
-    acc[month].push(t);
-    return acc;
-  }, {} as Record<string, Transaction[]>);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+  const totalPages = Math.max(1, Math.ceil(transactions.length / itemsPerPage));
+
+  // Auto fallback if items deleted
+  React.useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [transactions.length, totalPages, currentPage]);
+
+  const paginatedTxs = React.useMemo(() => {
+    return transactions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  }, [transactions, currentPage, itemsPerPage]);
+
+  const groupedTransactions = React.useMemo(() => {
+    return paginatedTxs.reduce((acc, t) => {
+      const dateStr = t.date || new Date().toISOString().split('T')[0];
+      const month = dateStr.substring(0, 7); // YYYY-MM
+      if (!acc[month]) acc[month] = [];
+      acc[month].push(t);
+      return acc;
+    }, {} as Record<string, Transaction[]>);
+  }, [paginatedTxs]);
 
   return (
     <>
@@ -145,6 +162,51 @@ export default function TransactionList({
                   </div>
                 </motion.div>
               ))}
+            </div>
+          )}
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-sky-100/30">
+              <p className="text-xs font-semibold text-sky-900/60">
+                Hiển thị <span className="font-extrabold text-sky-900">{paginatedTxs.length}</span> / <span className="font-extrabold text-sky-900">{transactions.length}</span> giao dịch
+              </p>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                  className="h-8 w-8 p-0 rounded-lg hover:bg-sky-50 text-sky-700"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <Button
+                    key={page}
+                    variant={currentPage === page ? 'default' : 'ghost'}
+                    onClick={() => setCurrentPage(page)}
+                    className={`h-8 w-8 p-0 rounded-lg text-xs font-bold transition-all ${
+                      currentPage === page 
+                        ? 'bg-sky-500 text-white shadow-sm'
+                        : 'text-sky-700 hover:bg-sky-50'
+                    }`}
+                  >
+                    {page}
+                  </Button>
+                ))}
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                  className="h-8 w-8 p-0 rounded-lg hover:bg-sky-50 text-sky-700"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
           )}
         </div>
