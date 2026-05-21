@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, Suspense, lazy } from 'react';
-import { Student, ClassSession, Transaction, Goal, FinanceHistoryRecord } from './types';
-import { Users, BookOpen, LayoutDashboard, LogOut, Wallet, History } from 'lucide-react';
+import { Student, ClassSession, Transaction, Goal, FinanceHistoryRecord, VocabWord } from './types';
+import { Users, BookOpen, LayoutDashboard, LogOut, Wallet, History, BookMarked } from 'lucide-react';
 import { auth, db } from './firebase';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { collection, getDocs, doc, setDoc, deleteDoc, writeBatch, deleteField, getDoc, onSnapshot } from 'firebase/firestore';
@@ -14,6 +14,7 @@ const ClassTracker = lazy(() => import('./components/ClassTracker'));
 const FinancialTracking = lazy(() => import('./components/FinancialTracking'));
 const PersonalFinance = lazy(() => import('./components/PersonalFinance'));
 const GlobalChatbot = lazy(() => import('./components/GlobalChatbot'));
+const VocabTracker = lazy(() => import('./components/VocabTracker'));
 
 import Login from './components/Login';
 
@@ -54,6 +55,7 @@ export default function App() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [financeHistory, setFinanceHistory] = useState<FinanceHistoryRecord[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
+  const [vocab, setVocab] = useState<VocabWord[]>([]);
   const [initialBalance, setInitialBalance] = useState<{ cash: number; banking: number }>({ cash: 0, banking: 0 });
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isGlobalHistoryOpen, setIsGlobalHistoryOpen] = useState(false);
@@ -78,7 +80,7 @@ export default function App() {
   const setupListeners = (uid: string) => {
     setLoadingData(true);
     let loadedCount = 0;
-    const totalCollections = 5;
+    const totalCollections = 6;
 
     const checkLoadingComplete = () => {
       loadedCount++;
@@ -156,6 +158,12 @@ export default function App() {
       checkLoadingComplete();
     });
 
+    // Vocab listener
+    const unsubVocab = onSnapshot(collection(db, `users/${uid}/vocab`), (snap) => {
+      setVocab(snap.docs.map(doc => doc.data() as VocabWord));
+      checkLoadingComplete();
+    });
+
     return () => {
       unsubProfile();
       unsubSettings();
@@ -164,6 +172,7 @@ export default function App() {
       unsubTransactions();
       unsubHistory();
       unsubGoals();
+      unsubVocab();
     };
   };
 
@@ -177,6 +186,7 @@ export default function App() {
       setTransactions([]);
       setFinanceHistory([]);
       setGoals([]);
+      setVocab([]);
     }
     return () => {
       if (unsubscribe) unsubscribe();
@@ -366,6 +376,43 @@ export default function App() {
       toast.error('Có lỗi xảy ra khi hoàn tác');
     } finally {
       hideLoading();
+    }
+  };
+
+  // CRUD for Vocab
+  const addVocab = async (word: VocabWord) => {
+    if (!user) return;
+    try {
+      await setDoc(doc(db, `users/${user.uid}/vocab`, word.id), word);
+      setVocab(prev => [word, ...prev]);
+      toast.success('Thêm từ vựng thành công');
+    } catch (error) {
+      console.error("Error adding vocab:", error);
+      toast.error('Có lỗi xảy ra khi thêm từ vựng');
+    }
+  };
+
+  const updateVocab = async (word: VocabWord) => {
+    if (!user) return;
+    try {
+      await setDoc(doc(db, `users/${user.uid}/vocab`, word.id), word);
+      setVocab(prev => prev.map(v => v.id === word.id ? word : v));
+      toast.success('Cập nhật từ vựng thành công');
+    } catch (error) {
+      console.error("Error updating vocab:", error);
+      toast.error('Có lỗi xảy ra khi cập nhật từ vựng');
+    }
+  };
+
+  const deleteVocab = async (id: string) => {
+    if (!user) return;
+    try {
+      await deleteDoc(doc(db, `users/${user.uid}/vocab`, id));
+      setVocab(prev => prev.filter(v => v.id !== id));
+      toast.success('Đã xóa từ vựng');
+    } catch (error) {
+      console.error("Error deleting vocab:", error);
+      toast.error('Có lỗi xảy ra khi xóa từ vựng');
     }
   };
 
@@ -570,6 +617,14 @@ export default function App() {
                   hoverClass="hover:bg-sky-50 hover:text-sky-800 dark:text-sky-200"
                 />
                 <TabButton 
+                  active={activeTab === 'vocab'} 
+                  onClick={() => setActiveTab('vocab')}
+                  icon={<BookMarked className="w-4 h-4 mr-2" />}
+                  label="Từ vựng"
+                  colorClass="glass-active text-sky-900 dark:text-sky-100 border-sky-300/30"
+                  hoverClass="hover:bg-sky-50 hover:text-sky-800 dark:text-sky-200"
+                />
+                <TabButton 
                   active={activeTab === 'personal_finance'} 
                   onClick={() => setActiveTab('personal_finance')}
                   icon={<Wallet className="w-4 h-4 mr-2" />}
@@ -609,6 +664,12 @@ export default function App() {
               active={activeTab === 'finances'} 
               onClick={() => setActiveTab('finances')}
               label="Tài chính"
+              colorClass="glass-active text-sky-900 dark:text-sky-100 border-sky-300/30"
+            />
+            <MobileTabButton 
+              active={activeTab === 'vocab'} 
+              onClick={() => setActiveTab('vocab')}
+              label="Từ vựng"
               colorClass="glass-active text-sky-900 dark:text-sky-100 border-sky-300/30"
             />
             <MobileTabButton 
@@ -652,6 +713,7 @@ export default function App() {
             {activeTab === 'dashboard' && <Dashboard students={students} classes={classes} setActiveTab={setActiveTab} displayName={displayName} />}
             {activeTab === 'students' && <StudentManagement students={students} addStudent={addStudent} updateStudent={updateStudent} deleteStudent={deleteStudent} classes={classes} markClassesAsPaid={markClassesAsPaid} />}
             {activeTab === 'classes' && <ClassTracker students={students} classes={classes} addClass={addClass} updateClass={updateClass} deleteClass={deleteClass} />}
+            {activeTab === 'vocab' && <VocabTracker students={students} vocab={vocab} addVocab={addVocab} updateVocab={updateVocab} deleteVocab={deleteVocab} />}
             {activeTab === 'finances' && <FinancialTracking students={students} classes={classes} markClassesAsPaid={markClassesAsPaid} undoLastPayment={undoLastPayment} />}
             {activeTab === 'personal_finance' && (
               <PersonalFinance 
