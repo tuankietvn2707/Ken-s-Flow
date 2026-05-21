@@ -74,14 +74,14 @@ export default function TransactionList({
     <>
       <motion.div 
         initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
-        className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white dark:border-slate-700 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] lg:col-span-2 overflow-hidden flex flex-col"
+        className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] lg:col-span-2 overflow-hidden flex flex-col"
       >
-        <div className="px-8 py-6 border-b border-white dark:border-slate-700/40 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/40">
+        <div className="px-8 py-6 border-b border-white/40 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/40">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-orange-50 text-orange-600 border border-orange-100 shadow-sm">
               <FileText className="w-5 h-5" />
             </div>
-            <h2 className="text-xl font-extrabold text-sky-950 dark:text-sky-50 tracking-tight">Giao Dịch Gần Đây</h2>
+            <h2 className="text-xl font-extrabold text-sky-950 tracking-tight">Giao Dịch Gần Đây</h2>
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <Button
@@ -109,10 +109,10 @@ export default function TransactionList({
         <div className="p-8 flex-1 min-h-0 bg-white/20">
           {Object.keys(groupedTransactions).length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 opacity-60">
-              <div className="w-20 h-20 bg-gradient-to-tr from-sky-100 to-sky-50 -rotate-6 rounded-[24px] flex items-center justify-center mb-6 border border-white dark:border-slate-700 shadow-sm">
+              <div className="w-20 h-20 bg-gradient-to-tr from-sky-100 to-sky-50 -rotate-6 rounded-[24px] flex items-center justify-center mb-6 border border-white shadow-sm">
                 <FileText className="w-10 h-10 text-sky-300" />
               </div>
-              <p className="text-lg font-bold text-sky-900 dark:text-sky-100 mb-2">Chưa có giao dịch nào</p>
+              <p className="text-lg font-bold text-sky-900 mb-2">Chưa có giao dịch nào</p>
               <p className="text-sm font-medium text-sky-600 mt-1 max-w-xs text-center leading-relaxed">Hãy thêm giao dịch mới để bắt đầu theo dõi dòng tiền của bạn</p>
             </div>
           ) : (
@@ -123,22 +123,22 @@ export default function TransactionList({
                   key={month}
                 >
                   <div className="flex items-center gap-4 mb-4">
-                    <h3 className="text-sm font-extrabold uppercase tracking-widest text-sky-900 dark:text-sky-100/60">{month.replace('-', '/')}</h3>
+                    <h3 className="text-sm font-extrabold uppercase tracking-widest text-sky-900/60">{month.replace('-', '/')}</h3>
                     <div className="h-px bg-sky-200/50 flex-1 rounded-full"></div>
                   </div>
                   
                   <div className="space-y-3">
                     {groupedTransactions[month].map(t => (
-                      <div key={t.id} className="flex items-center justify-between p-4 bg-white/70 backdrop-blur-sm rounded-[20px] border border-white dark:border-slate-700 shadow-[0_4px_16px_rgba(0,0,0,0.02)] group hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden">
+                      <div key={t.id} className="flex items-center justify-between p-4 bg-white/70 backdrop-blur-sm rounded-[20px] border border-white shadow-[0_4px_16px_rgba(0,0,0,0.02)] group hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden">
                         
                         <div className="flex items-center gap-4">
                           <div className={`w-12 h-12 rounded-[16px] flex items-center justify-center shadow-sm border ${t.type === 'income' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'}`}>
                             {t.type === 'income' ? <Plus className="w-5 h-5" /> : <Minus className="w-5 h-5" />}
                           </div>
                           <div>
-                            <p className="font-extrabold text-[15px] text-sky-950 dark:text-sky-50 tracking-tight leading-tight mb-1">{t.description}</p>
-                            <p className="text-[13px] font-medium text-sky-900 dark:text-sky-100/50 flex items-center gap-2">
-                              <span className="bg-sky-100/50 px-2 py-0.5 rounded-full text-sky-800 dark:text-sky-200">{t.category || 'Khác'}</span>
+                            <p className="font-extrabold text-[15px] text-sky-950 tracking-tight leading-tight mb-1">{t.description}</p>
+                            <p className="text-[13px] font-medium text-sky-900/50 flex items-center gap-2">
+                              <span className="bg-sky-100/50 px-2 py-0.5 rounded-full text-sky-800">{t.category || 'Khác'}</span>
                               <span className="opacity-70">{t.date}</span>
                             </p>
                           </div>
@@ -168,8 +168,8 @@ export default function TransactionList({
           {/* Pagination Controls */}
           {totalPages > 1 && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-sky-100/30">
-              <p className="text-xs font-semibold text-sky-900 dark:text-sky-100/60">
-                Hiển thị <span className="font-extrabold text-sky-900 dark:text-sky-100">{paginatedTxs.length}</span> / <span className="font-extrabold text-sky-900 dark:text-sky-100">{transactions.length}</span> giao dịch
+              <p className="text-xs font-semibold text-sky-900/60">
+                Hiển thị <span className="font-extrabold text-sky-900">{paginatedTxs.length}</span> / <span className="font-extrabold text-sky-900">{transactions.length}</span> giao dịch
               </p>
               <div className="flex items-center gap-1">
                 <Button
@@ -243,7 +243,7 @@ export default function TransactionList({
       >
         <div className="pt-2">
           <div className="p-4 bg-sky-50 rounded-[16px] border border-sky-100 mb-6">
-            <p className="text-[14px] leading-relaxed text-sky-800 dark:text-sky-200 font-medium">Thao tác này sẽ lưu toàn bộ giao dịch hiện tại vào Lịch sử và reset danh sách để bắt đầu kỳ mới. Vui lòng nhập số dư THỰC TẾ hiện tại của bạn.</p>
+            <p className="text-[14px] leading-relaxed text-sky-800 font-medium">Thao tác này sẽ lưu toàn bộ giao dịch hiện tại vào Lịch sử và reset danh sách để bắt đầu kỳ mới. Vui lòng nhập số dư THỰC TẾ hiện tại của bạn.</p>
           </div>
           
           <form id="consolidate-form" onSubmit={async (e) => {
@@ -262,7 +262,7 @@ export default function TransactionList({
             }
           }} className="space-y-5">
             <div className="space-y-2">
-              <label className="block text-xs font-bold text-sky-950 dark:text-sky-50/60 uppercase tracking-widest pl-1">Tiền mặt thực tế (VNĐ)</label>
+              <label className="block text-xs font-bold text-sky-950/60 uppercase tracking-widest pl-1">Tiền mặt thực tế (VNĐ)</label>
               <Input
                 type="text"
                 value={consolidateCashStr}
@@ -273,14 +273,14 @@ export default function TransactionList({
                 className="font-bold text-lg border-sky-200 focus:border-sky-400 py-3 rounded-[14px]"
                 required
               />
-              <div className="flex justify-between items-center text-[13px] mt-1.5 px-2 text-sky-900 dark:text-sky-100 border-t border-sky-100 pt-2">
+              <div className="flex justify-between items-center text-[13px] mt-1.5 px-2 text-sky-900 border-t border-sky-100 pt-2">
                 <span className="opacity-60 font-medium">Ước tính theo sổ sách:</span>
                 <span className="font-extrabold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-lg border border-sky-100">{formatNumber(currentCashBalance)} đ</span>
               </div>
             </div>
             
             <div className="space-y-2">
-              <label className="block text-xs font-bold text-sky-950 dark:text-sky-50/60 uppercase tracking-widest pl-1">Ngân hàng thực tế (VNĐ)</label>
+              <label className="block text-xs font-bold text-sky-950/60 uppercase tracking-widest pl-1">Ngân hàng thực tế (VNĐ)</label>
               <Input
                 type="text"
                 value={consolidateBankingStr}
@@ -291,7 +291,7 @@ export default function TransactionList({
                 className="font-bold text-lg border-sky-200 focus:border-sky-400 py-3 rounded-[14px]"
                 required
               />
-              <div className="flex justify-between items-center text-[13px] mt-1.5 px-2 text-sky-900 dark:text-sky-100 border-t border-sky-100 pt-2">
+              <div className="flex justify-between items-center text-[13px] mt-1.5 px-2 text-sky-900 border-t border-sky-100 pt-2">
                 <span className="opacity-60 font-medium">Ước tính theo sổ sách:</span>
                 <span className="font-extrabold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-lg border border-sky-100">{formatNumber(currentBankingBalance)} đ</span>
               </div>
@@ -326,7 +326,7 @@ export default function TransactionList({
           <div className="flex items-center justify-center w-14 h-14 rounded-[20px] bg-rose-50 border border-rose-100 mb-5 shadow-sm">
             <AlertTriangle className="w-7 h-7 text-rose-500" />
           </div>
-          <h3 className="text-xl font-extrabold text-sky-950 dark:text-sky-50 text-center mb-2 tracking-tight">Xóa giao dịch</h3>
+          <h3 className="text-xl font-extrabold text-sky-950 text-center mb-2 tracking-tight">Xóa giao dịch</h3>
           <p className="text-sky-700/80 text-center text-[15px] leading-relaxed">
             Bạn có muốn xóa giao dịch này? Hành động này sẽ thay đổi số dư và không thể hoàn tác.
           </p>

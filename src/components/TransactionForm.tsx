@@ -78,14 +78,14 @@ export default function TransactionForm({ addTransaction }: Props) {
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
-      className="lg:col-span-1 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white dark:border-slate-700 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] overflow-hidden"
+      className="lg:col-span-1 bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] overflow-hidden"
     >
-      <div className="px-8 py-6 border-b border-white dark:border-slate-700/40 bg-white/40">
+      <div className="px-8 py-6 border-b border-white/40 bg-white/40">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100 shadow-sm">
             <ReceiptText className="w-5 h-5" />
           </div>
-          <h2 className="text-xl font-extrabold text-sky-950 dark:text-sky-50 tracking-tight">Thêm Giao Dịch</h2>
+          <h2 className="text-xl font-extrabold text-sky-950 tracking-tight">Thêm Giao Dịch</h2>
         </div>
       </div>
       
@@ -95,7 +95,7 @@ export default function TransactionForm({ addTransaction }: Props) {
             <button
               type="button"
               onClick={() => setType('expense')}
-              className={`py-2 px-3 rounded-xl text-[13px] font-bold transition-all flex items-center justify-center gap-2 relative ${type === 'expense' ? 'text-rose-700 shadow-sm bg-white' : 'text-sky-900 dark:text-sky-100/50 hover:text-sky-900 dark:text-sky-100'}`}
+              className={`py-2 px-3 rounded-xl text-[13px] font-bold transition-all flex items-center justify-center gap-2 relative ${type === 'expense' ? 'text-rose-700 shadow-sm bg-white' : 'text-sky-900/50 hover:text-sky-900'}`}
             >
               <div className={`p-1 rounded-full ${type === 'expense' ? 'bg-rose-100 text-rose-600' : 'bg-transparent'}`}>
                 <Minus className="w-3.5 h-3.5" />
@@ -105,7 +105,7 @@ export default function TransactionForm({ addTransaction }: Props) {
             <button
               type="button"
               onClick={() => setType('income')}
-              className={`py-2 px-3 rounded-xl text-[13px] font-bold transition-all flex items-center justify-center gap-2 relative ${type === 'income' ? 'text-emerald-700 shadow-sm bg-white' : 'text-sky-900 dark:text-sky-100/50 hover:text-sky-900 dark:text-sky-100'}`}
+              className={`py-2 px-3 rounded-xl text-[13px] font-bold transition-all flex items-center justify-center gap-2 relative ${type === 'income' ? 'text-emerald-700 shadow-sm bg-white' : 'text-sky-900/50 hover:text-sky-900'}`}
             >
               <div className={`p-1 rounded-full ${type === 'income' ? 'bg-emerald-100 text-emerald-600' : 'bg-transparent'}`}>
                 <Plus className="w-3.5 h-3.5" />
@@ -115,18 +115,18 @@ export default function TransactionForm({ addTransaction }: Props) {
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <label className={`cursor-pointer py-3 px-4 rounded-[16px] border flex flex-col items-center justify-center gap-1.5 transition-all text-center ${source === 'cash' ? 'bg-sky-50 border-sky-200 text-sky-800 dark:text-sky-200 shadow-[0_2px_10px_rgba(14,165,233,0.06)]' : 'border-sky-100 bg-white/50 text-sky-900 dark:text-sky-100/50 hover:border-sky-300/50 hover:bg-white'} group`}>
+            <label className={`cursor-pointer py-3 px-4 rounded-[16px] border flex flex-col items-center justify-center gap-1.5 transition-all text-center ${source === 'cash' ? 'bg-sky-50 border-sky-200 text-sky-800 shadow-[0_2px_10px_rgba(14,165,233,0.06)]' : 'border-sky-100 bg-white/50 text-sky-900/50 hover:border-sky-300/50 hover:bg-white'} group`}>
               <input type="radio" value="cash" checked={source === 'cash'} onChange={() => setSource('cash')} className="sr-only" />
-              <span className={`text-[13px] font-extrabold tracking-wide uppercase transition-colors ${source === 'cash' ? 'text-sky-700' : 'group-hover:text-sky-900 dark:text-sky-100/70'}`}>Tiền mặt</span>
+              <span className={`text-[13px] font-extrabold tracking-wide uppercase transition-colors ${source === 'cash' ? 'text-sky-700' : 'group-hover:text-sky-900/70'}`}>Tiền mặt</span>
             </label>
-            <label className={`cursor-pointer py-3 px-4 rounded-[16px] border flex flex-col items-center justify-center gap-1.5 transition-all text-center ${source === 'banking' ? 'bg-blue-50 border-blue-200 text-blue-800 shadow-[0_2px_10px_rgba(59,130,246,0.06)]' : 'border-sky-100 bg-white/50 text-sky-900 dark:text-sky-100/50 hover:border-sky-300/50 hover:bg-white'} group`}>
+            <label className={`cursor-pointer py-3 px-4 rounded-[16px] border flex flex-col items-center justify-center gap-1.5 transition-all text-center ${source === 'banking' ? 'bg-blue-50 border-blue-200 text-blue-800 shadow-[0_2px_10px_rgba(59,130,246,0.06)]' : 'border-sky-100 bg-white/50 text-sky-900/50 hover:border-sky-300/50 hover:bg-white'} group`}>
               <input type="radio" value="banking" checked={source === 'banking'} onChange={() => setSource('banking')} className="sr-only" />
               <span className={`text-[13px] font-extrabold tracking-wide uppercase transition-colors ${source === 'banking' ? 'text-blue-700' : 'group-hover:text-blue-900/70'}`}>Ngân hàng</span>
             </label>
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-sky-950 dark:text-sky-50/60 uppercase tracking-widest pl-1">Số tiền (VNĐ)</label>
+            <label className="block text-xs font-bold text-sky-950/60 uppercase tracking-widest pl-1">Số tiền (VNĐ)</label>
             <div className={`relative flex items-center transition-all duration-300 rounded-[16px] border ${type === 'expense' ? 'focus-within:ring-2 focus-within:ring-rose-200 focus-within:border-rose-300 bg-rose-50/30' : 'focus-within:ring-2 focus-within:ring-emerald-200 focus-within:border-emerald-300 bg-emerald-50/30'}`}>
               <span className={`absolute left-4 font-bold text-lg ${type === 'expense' ? 'text-rose-500' : 'text-emerald-500'}`}>đ</span>
               <Input
@@ -144,20 +144,20 @@ export default function TransactionForm({ addTransaction }: Props) {
           </div>
           
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-sky-950 dark:text-sky-50/60 uppercase tracking-widest pl-1">Mô tả</label>
+            <label className="block text-xs font-bold text-sky-950/60 uppercase tracking-widest pl-1">Mô tả</label>
             <Input
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               onBlur={handleDescriptionBlur}
               placeholder="VD: Mua cà phê sáng"
-              className="bg-white/80 dark:bg-slate-900/80 border-sky-200/60 focus:border-sky-400 focus:ring-sky-400/20 py-2.5 rounded-[12px]"
+              className="bg-white/80 border-sky-200/60 focus:border-sky-400 focus:ring-sky-400/20 py-2.5 rounded-[12px]"
               required
             />
           </div>
           
           <div className="space-y-1.5">
-            <label className="flex items-center justify-between text-xs font-bold text-sky-950 dark:text-sky-50/60 uppercase tracking-widest pl-1 pr-1">
+            <label className="flex items-center justify-between text-xs font-bold text-sky-950/60 uppercase tracking-widest pl-1 pr-1">
               <span>Danh mục</span>
               {isCategorizing && (
                 <span className="flex items-center gap-1 text-[10px] text-sky-500 bg-sky-50 px-2 py-0.5 rounded-full normal-case tracking-normal">
@@ -170,18 +170,18 @@ export default function TransactionForm({ addTransaction }: Props) {
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               placeholder="VD: Ăn uống"
-              className={`bg-white/80 dark:bg-slate-900/80 border-sky-200/60 focus:border-sky-400 focus:ring-sky-400/20 py-2.5 rounded-[12px] transition-all ${isCategorizing ? 'opacity-50' : 'opacity-100'}`}
+              className={`bg-white/80 border-sky-200/60 focus:border-sky-400 focus:ring-sky-400/20 py-2.5 rounded-[12px] transition-all ${isCategorizing ? 'opacity-50' : 'opacity-100'}`}
               required
             />
           </div>
           
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-sky-950 dark:text-sky-50/60 uppercase tracking-widest pl-1">Ngày</label>
+            <label className="block text-xs font-bold text-sky-950/60 uppercase tracking-widest pl-1">Ngày</label>
             <Input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="bg-white/80 dark:bg-slate-900/80 border-sky-200/60 focus:border-sky-400 focus:ring-sky-400/20 py-2.5 rounded-[12px] text-sky-900 dark:text-sky-100 font-medium"
+              className="bg-white/80 border-sky-200/60 focus:border-sky-400 focus:ring-sky-400/20 py-2.5 rounded-[12px] text-sky-900 font-medium"
               required
             />
           </div>

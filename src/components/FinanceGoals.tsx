@@ -85,15 +85,15 @@ export default function FinanceGoals({ goals, addGoal, updateGoal, deleteGoal, a
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-      className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white dark:border-slate-700 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] overflow-hidden"
+      className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] overflow-hidden"
     >
       <div className="flex flex-col">
-        <div className="px-8 py-6 border-b border-white dark:border-slate-700/40 flex justify-between items-center bg-white/40">
+        <div className="px-8 py-6 border-b border-white/40 flex justify-between items-center bg-white/40">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-sky-50 text-sky-600 border border-sky-100 shadow-sm">
               <Target className="w-5 h-5" />
             </div>
-            <h2 className="text-xl font-extrabold text-sky-950 dark:text-sky-50 tracking-tight">Mục Tiêu Tiết Kiệm</h2>
+            <h2 className="text-xl font-extrabold text-sky-950 tracking-tight">Mục Tiêu Tiết Kiệm</h2>
           </div>
           <Button 
             variant="ghost" 
@@ -116,18 +116,18 @@ export default function FinanceGoals({ goals, addGoal, updateGoal, deleteGoal, a
                 className="mb-6 space-y-4 overflow-hidden border-b border-sky-100 pb-6"
               >
                 <div>
-                  <label className="block text-xs font-bold text-sky-950 dark:text-sky-50/60 uppercase tracking-widest mb-1.5 pl-1">Tên mục tiêu</label>
+                  <label className="block text-xs font-bold text-sky-950/60 uppercase tracking-widest mb-1.5 pl-1">Tên mục tiêu</label>
                   <Input
                     type="text" 
                     placeholder="VD: Mua Macbook mới..." 
                     value={goalName} 
                     onChange={e => setGoalName(e.target.value)}
-                    className="bg-white/80 dark:bg-slate-900/80 border-sky-200/60 focus:border-sky-400 focus:ring-sky-400/20"
+                    className="bg-white/80 border-sky-200/60 focus:border-sky-400 focus:ring-sky-400/20"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-sky-950 dark:text-sky-50/60 uppercase tracking-widest mb-1.5 pl-1">Số tiền mục tiêu (VNĐ)</label>
+                  <label className="block text-xs font-bold text-sky-950/60 uppercase tracking-widest mb-1.5 pl-1">Số tiền mục tiêu (VNĐ)</label>
                   <Input
                     type="text" 
                     placeholder="0 đ" 
@@ -136,7 +136,7 @@ export default function FinanceGoals({ goals, addGoal, updateGoal, deleteGoal, a
                       const val = e.target.value.replace(/[^0-9]/g, '');
                       setGoalTargetStr(val ? formatNumber(parseInt(val, 10)) : '');
                     }}
-                    className="bg-white/80 dark:bg-slate-900/80 border-sky-200/60 focus:border-sky-400 focus:ring-sky-400/20 font-semibold"
+                    className="bg-white/80 border-sky-200/60 focus:border-sky-400 focus:ring-sky-400/20 font-semibold"
                     required
                   />
                 </div>
@@ -165,14 +165,14 @@ export default function FinanceGoals({ goals, addGoal, updateGoal, deleteGoal, a
                 <motion.div 
                   initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.1, duration: 0.3 }}
                   key={goal.id} 
-                  className="p-5 bg-white/70 backdrop-blur-md rounded-[20px] border border-white dark:border-slate-700 shadow-[0_4px_16px_rgba(0,0,0,0.03)] group relative overflow-hidden transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:-translate-y-0.5"
+                  className="p-5 bg-white/70 backdrop-blur-md rounded-[20px] border border-white shadow-[0_4px_16px_rgba(0,0,0,0.03)] group relative overflow-hidden transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:-translate-y-0.5"
                 >
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex items-center gap-2">
                        <div className={`w-8 h-8 flex items-center justify-center rounded-xl bg-gradient-to-br border shadow-sm ${isCompleted ? 'from-emerald-100 to-emerald-50 border-emerald-200 text-emerald-600' : 'from-sky-100 to-sky-50 border-sky-200 text-sky-600'}`}>
                           {isCompleted ? <Check className="w-4 h-4" /> : <Target className="w-4 h-4" />}
                        </div>
-                      <h3 className="font-extrabold text-[15px] text-sky-950 dark:text-sky-50 tracking-tight">{goal.name}</h3>
+                      <h3 className="font-extrabold text-[15px] text-sky-950 tracking-tight">{goal.name}</h3>
                     </div>
                     <Button
                       variant="ghost"
@@ -185,8 +185,8 @@ export default function FinanceGoals({ goals, addGoal, updateGoal, deleteGoal, a
                   </div>
                   
                   <div className="flex justify-between text-[13px] mb-2 font-bold whitespace-nowrap">
-                    <span className="text-sky-950 dark:text-sky-50">{formatNumber(goal.currentAmount)} đ</span>
-                    <span className="text-sky-900 dark:text-sky-100/50">{formatNumber(goal.targetAmount)} đ</span>
+                    <span className="text-sky-950">{formatNumber(goal.currentAmount)} đ</span>
+                    <span className="text-sky-900/50">{formatNumber(goal.targetAmount)} đ</span>
                   </div>
                   
                   <div className="w-full bg-sky-100/50 rounded-full h-2.5 mb-4 inset-shadow-sm overflow-hidden border border-sky-200/30">
@@ -208,7 +208,7 @@ export default function FinanceGoals({ goals, addGoal, updateGoal, deleteGoal, a
                             const val = e.target.value.replace(/[^0-9]/g, '');
                             setDepositAmountStr(val ? formatNumber(parseInt(val, 10)) : '');
                           }}
-                          className="h-9 text-sm bg-white/80 dark:bg-slate-900/80 border-transparent focus:border-sky-300 font-semibold"
+                          className="h-9 text-sm bg-white/80 border-transparent focus:border-sky-300 font-semibold"
                         />
                       </div>
                       <Button 
@@ -241,7 +241,7 @@ export default function FinanceGoals({ goals, addGoal, updateGoal, deleteGoal, a
                       <Button 
                         onClick={() => setDepositGoalId(goal.id)}
                         variant="ghost"
-                        className="w-full text-sm font-bold text-sky-700 bg-sky-50/50 hover:bg-sky-100 hover:text-sky-800 dark:text-sky-200 border border-sky-100 shadow-sm rounded-xl py-2 h-auto hover:shadow-md transition-all group/btn flex items-center justify-center gap-1.5"
+                        className="w-full text-sm font-bold text-sky-700 bg-sky-50/50 hover:bg-sky-100 hover:text-sky-800 border border-sky-100 shadow-sm rounded-xl py-2 h-auto hover:shadow-md transition-all group/btn flex items-center justify-center gap-1.5"
                       >
                         Nạp Tiết Kiệm
                         <ArrowRight className="w-3.5 h-3.5 opacity-50 group-hover/btn:opacity-100 transition-opacity" />
@@ -256,7 +256,7 @@ export default function FinanceGoals({ goals, addGoal, updateGoal, deleteGoal, a
                   <div className="w-16 h-16 bg-sky-50 rounded-full flex items-center justify-center mb-3">
                      <Target className="w-7 h-7 text-sky-300" />
                   </div>
-                  <p className="text-[15px] font-semibold text-sky-900 dark:text-sky-100 mb-1">Chưa có mục tiêu nào</p>
+                  <p className="text-[15px] font-semibold text-sky-900 mb-1">Chưa có mục tiêu nào</p>
                   <p className="text-[13px] text-sky-600/70 max-w-[250px]">Hãy thêm mục tiêu để bắt đầu hành trình tiết kiệm của bạn nhé.</p>
                </div>
             )}
@@ -290,7 +290,7 @@ export default function FinanceGoals({ goals, addGoal, updateGoal, deleteGoal, a
           <div className="flex items-center justify-center w-14 h-14 rounded-[20px] bg-rose-50 border border-rose-100 mb-5 shadow-sm">
             <AlertTriangle className="w-7 h-7 text-rose-500" />
           </div>
-          <h3 className="text-xl font-extrabold text-sky-950 dark:text-sky-50 text-center mb-2 tracking-tight">Xóa mục tiêu</h3>
+          <h3 className="text-xl font-extrabold text-sky-950 text-center mb-2 tracking-tight">Xóa mục tiêu</h3>
           <p className="text-sky-700/80 text-center text-[15px] leading-relaxed">
             Bạn có muốn xóa mục tiêu này? Các giao dịch đã nạp trước đó sẽ được giữ lại.
           </p>

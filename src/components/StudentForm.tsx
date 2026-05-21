@@ -195,7 +195,7 @@ export default function StudentForm({ editingId, initialData, students, onClose,
           </legend>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-3">
             <div>
-              <label className="block text-sm font-medium text-sky-900 dark:text-sky-100 mb-1">Họ và Tên đệm <span className="text-rose-500">*</span></label>
+              <label className="block text-sm font-medium text-sky-900 mb-1">Họ và Tên đệm <span className="text-rose-500">*</span></label>
               <Input
                 type="text"
                 placeholder="VD: Nguyễn Văn"
@@ -209,7 +209,7 @@ export default function StudentForm({ editingId, initialData, students, onClose,
               {fieldErrors.lastName && <p className="mt-1 text-xs text-rose-500">{fieldErrors.lastName}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-sky-900 dark:text-sky-100 mb-1">Tên <span className="text-rose-500">*</span></label>
+              <label className="block text-sm font-medium text-sky-900 mb-1">Tên <span className="text-rose-500">*</span></label>
               <Input
                 type="text"
                 placeholder="VD: A"
@@ -223,7 +223,7 @@ export default function StudentForm({ editingId, initialData, students, onClose,
               {fieldErrors.firstName && <p className="mt-1 text-xs text-rose-500">{fieldErrors.firstName}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-sky-900 dark:text-sky-100 mb-1">Năm sinh</label>
+              <label className="block text-sm font-medium text-sky-900 mb-1">Năm sinh</label>
               <Input
                 type="number"
                 placeholder="VD: 2009"
@@ -237,7 +237,7 @@ export default function StudentForm({ editingId, initialData, students, onClose,
               {fieldErrors.birthYear && <p className="mt-1 text-xs text-rose-500">{fieldErrors.birthYear}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-sky-900 dark:text-sky-100 mb-1">Giới tính</label>
+              <label className="block text-sm font-medium text-sky-900 mb-1">Giới tính</label>
               <Select
                 value={formData.gender}
                 onChange={e => setFormData({...formData, gender: e.target.value})}
@@ -247,7 +247,7 @@ export default function StudentForm({ editingId, initialData, students, onClose,
               </Select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-sky-900 dark:text-sky-100 mb-1">Nghề nghiệp / Bối cảnh</label>
+              <label className="block text-sm font-medium text-sky-900 mb-1">Nghề nghiệp / Bối cảnh</label>
               <Input
                 type="text"
                 placeholder="VD: Học sinh, Nhân viên..."
@@ -266,7 +266,7 @@ export default function StudentForm({ editingId, initialData, students, onClose,
           </legend>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-3">
             <div>
-              <label className="block text-sm font-medium text-sky-900 dark:text-sky-100 mb-1">Trình độ hiện tại</label>
+              <label className="block text-sm font-medium text-sky-900 mb-1">Trình độ hiện tại</label>
               <Select
                 value={formData.currentLevel}
                 onChange={e => setFormData({...formData, currentLevel: e.target.value})}
@@ -282,7 +282,7 @@ export default function StudentForm({ editingId, initialData, students, onClose,
               </Select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-sky-900 dark:text-sky-100 mb-1">Mục tiêu học tập</label>
+              <label className="block text-sm font-medium text-sky-900 mb-1">Mục tiêu học tập</label>
               <Input
                 type="text"
                 placeholder="VD: VSTEP, IELTS, Giao tiếp..."
@@ -316,7 +316,7 @@ export default function StudentForm({ editingId, initialData, students, onClose,
           </legend>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-3">
             <div>
-              <label className="block text-sm font-medium text-sky-900 dark:text-sky-100 mb-1">Học phí mỗi buổi (VNĐ) <span className="text-rose-500">*</span></label>
+              <label className="block text-sm font-medium text-sky-900 mb-1">Học phí mỗi buổi (VNĐ) <span className="text-rose-500">*</span></label>
               <div className="relative">
                 <Input
                   type="text"
@@ -335,7 +335,7 @@ export default function StudentForm({ editingId, initialData, students, onClose,
               {fieldErrors.fee && <p className="mt-1 text-xs text-rose-500">{fieldErrors.fee}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-sky-900 dark:text-sky-100 mb-1">Chu kỳ thu học phí</label>
+              <label className="block text-sm font-medium text-sky-900 mb-1">Chu kỳ thu học phí</label>
               <Select
                 value={formData.feeCycle}
                 onChange={e => setFormData({...formData, feeCycle: e.target.value})}
@@ -345,7 +345,7 @@ export default function StudentForm({ editingId, initialData, students, onClose,
               </Select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-sky-900 dark:text-sky-100 mb-1">Lịch học ưu tiên</label>
+              <label className="block text-sm font-medium text-sky-900 mb-1">Lịch học ưu tiên</label>
               <Input
                 type="text"
                 placeholder="VD: Tối Thứ 3/Thứ 5"
@@ -354,7 +354,7 @@ export default function StudentForm({ editingId, initialData, students, onClose,
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-sky-900 dark:text-sky-100 mb-1">Trạng thái hoạt động</label>
+              <label className="block text-sm font-medium text-sky-900 mb-1">Trạng thái hoạt động</label>
               <Select
                 value={formData.status}
                 onChange={e => setFormData({...formData, status: e.target.value as 'active' | 'inactive'})}
@@ -364,7 +364,7 @@ export default function StudentForm({ editingId, initialData, students, onClose,
               </Select>
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-sky-900 dark:text-sky-100 mb-1">Ghi chú riêng</label>
+              <label className="block text-sm font-medium text-sky-900 mb-1">Ghi chú riêng</label>
               <Textarea
                 rows={3}
                 placeholder="Ghi chú về điểm mạnh, điểm yếu, lộ trình học..."

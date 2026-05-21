@@ -187,7 +187,7 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
         </div>
       </div>
       <div>
-        <h3 className="font-bold text-sky-950 dark:text-sky-50 text-lg line-clamp-1 group-hover:text-sky-700 transition-colors">
+        <h3 className="font-bold text-sky-950 text-lg line-clamp-1 group-hover:text-sky-700 transition-colors">
           {student.lastName} {student.firstName}
         </h3>
         <p className="text-sm text-sky-700/70 mb-3">{student.occupation || 'Chưa cập nhật nghề nghiệp'}</p>
@@ -195,13 +195,13 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
         <div className="space-y-2 mt-4">
           <div className="flex justify-between items-center text-sm">
             <span className="text-sky-700/60 flex items-center gap-1.5"><BookOpen className="w-4 h-4"/> Mục tiêu</span>
-            <span className="font-semibold text-sky-900 dark:text-sky-100 px-2 py-0.5 rounded-md" style={{ backgroundColor: student.targetColor || '#f1f5f9' }}>
+            <span className="font-semibold text-sky-900 px-2 py-0.5 rounded-md" style={{ backgroundColor: student.targetColor || '#f1f5f9' }}>
               {student.goal || 'N/A'}
             </span>
           </div>
           <div className="flex justify-between items-center text-sm">
             <span className="text-sky-700/60 flex items-center gap-1.5"><Wallet className="w-4 h-4"/> Học phí</span>
-            <span className="font-semibold text-sky-900 dark:text-sky-100">{formatVND(student.fee)}</span>
+            <span className="font-semibold text-sky-900">{formatVND(student.fee)}</span>
           </div>
         </div>
         
@@ -228,8 +228,8 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
 
   const renderListItem = (student: Student, index: number, provided?: any, snapshot?: any) => {
     const isInactive = student.status === 'inactive';
-    const rowClass = `group hover:bg-white/80 dark:bg-slate-900/80 hover:shadow-[0_4px_24px_rgba(14,165,233,0.06)] transition-all duration-300 relative z-0 hover:z-10 bg-transparent
-      ${snapshot && snapshot.isDragging ? 'shadow-lg ring-1 ring-sky-300 bg-white/90 dark:bg-slate-900/90' : ''}
+    const rowClass = `group hover:bg-white/80 hover:shadow-[0_4px_24px_rgba(14,165,233,0.06)] transition-all duration-300 relative z-0 hover:z-10 bg-transparent
+      ${snapshot && snapshot.isDragging ? 'shadow-lg ring-1 ring-sky-300 bg-white/90' : ''}
       ${isInactive ? 'opacity-70 bg-gray-50/30' : ''}
     `;
 
@@ -251,11 +251,11 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
         </td>
         <td className="px-6 py-5 whitespace-nowrap border-b border-sky-50/50">
           <div className="flex items-center gap-4">
-            <div className={`w-11 h-11 rounded-[16px] flex items-center justify-center font-bold text-sm shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-white dark:border-slate-700/60 backdrop-blur-sm transition-transform group-hover:scale-105 duration-300 ${getAvatarColor(student.id)}`}>
+            <div className={`w-11 h-11 rounded-[16px] flex items-center justify-center font-bold text-sm shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-white/60 backdrop-blur-sm transition-transform group-hover:scale-105 duration-300 ${getAvatarColor(student.id)}`}>
               {student.firstName ? student.firstName.charAt(0).toUpperCase() : student.name.charAt(0).toUpperCase()}
             </div>
             <div>
-              <div className="font-extrabold text-sky-950 dark:text-sky-50 group-hover:text-sky-700 transition-colors tracking-tight text-[15px]">
+              <div className="font-extrabold text-sky-950 group-hover:text-sky-700 transition-colors tracking-tight text-[15px]">
                 {student.lastName} {student.firstName}
               </div>
               <div className="text-[13px] font-medium text-sky-600/70 mt-0.5">
@@ -271,13 +271,13 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
         </td>
         <td className="px-6 py-5 whitespace-nowrap border-b border-sky-50/50">
           <span 
-            className="px-3 py-1.5 inline-flex text-[11px] leading-5 font-bold rounded-full text-sky-900 dark:text-sky-100 border border-white dark:border-slate-700 shadow-sm backdrop-blur-sm"
+            className="px-3 py-1.5 inline-flex text-[11px] leading-5 font-bold rounded-full text-sky-900 border border-white shadow-sm backdrop-blur-sm"
             style={{ backgroundColor: student.targetColor || '#f1f5f9' }}
           >
             {student.goal || 'Chưa cập nhật'}
           </span>
         </td>
-        <td className="px-6 py-5 whitespace-nowrap text-sm text-sky-950 dark:text-sky-50 font-bold border-b border-sky-50/50">
+        <td className="px-6 py-5 whitespace-nowrap text-sm text-sky-950 font-bold border-b border-sky-50/50">
           {formatVND(student.fee)}
         </td>
         <td className="px-6 py-5 whitespace-nowrap text-right border-b border-sky-50/50">
@@ -286,7 +286,7 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
               variant="ghost"
               size="icon"
               onClick={(e) => { e.stopPropagation(); onEdit(student); }} 
-              className="h-9 w-9 text-sky-500 hover:text-sky-600 hover:bg-sky-50 bg-white/50 backdrop-blur-sm border border-white dark:border-slate-700 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-all duration-300 rounded-[14px]"
+              className="h-9 w-9 text-sky-500 hover:text-sky-600 hover:bg-sky-50 bg-white/50 backdrop-blur-sm border border-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-all duration-300 rounded-[14px]"
               title="Sửa"
             >
               <Edit2 className="w-4 h-4" />
@@ -295,7 +295,7 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
               variant="ghost"
               size="icon" 
               onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(student.id); }} 
-              className="h-9 w-9 text-rose-500 hover:text-rose-600 hover:bg-rose-50 bg-white/50 backdrop-blur-sm border border-white dark:border-slate-700 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-all duration-300 rounded-[14px]"
+              className="h-9 w-9 text-rose-500 hover:text-rose-600 hover:bg-rose-50 bg-white/50 backdrop-blur-sm border border-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-all duration-300 rounded-[14px]"
               title="Xóa"
             >
               <Trash2 className="w-4 h-4" />
@@ -327,7 +327,7 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
               variant="ghost"
               size="sm"
               onClick={() => setFilter('all')} 
-              className={`px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors h-auto ${filter === 'all' ? 'bg-white shadow-sm text-sky-900 dark:text-sky-100 border border-sky-200/50 hover:bg-white' : 'text-sky-600 hover:text-sky-900 dark:text-sky-100'}`}
+              className={`px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors h-auto ${filter === 'all' ? 'bg-white shadow-sm text-sky-900 border border-sky-200/50 hover:bg-white' : 'text-sky-600 hover:text-sky-900'}`}
             >
               Tất cả
             </Button>
@@ -335,7 +335,7 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
               variant="ghost"
               size="sm"
               onClick={() => setFilter('active')} 
-              className={`px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors h-auto ${filter === 'active' ? 'bg-white shadow-sm text-sky-900 dark:text-sky-100 border border-sky-200/50 hover:bg-white' : 'text-sky-600 hover:text-sky-900 dark:text-sky-100'}`}
+              className={`px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors h-auto ${filter === 'active' ? 'bg-white shadow-sm text-sky-900 border border-sky-200/50 hover:bg-white' : 'text-sky-600 hover:text-sky-900'}`}
             >
               Hoạt động
             </Button>
@@ -343,7 +343,7 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
               variant="ghost"
               size="sm"
               onClick={() => setFilter('unpaid')} 
-              className={`px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors h-auto ${filter === 'unpaid' ? 'bg-white shadow-sm text-sky-900 dark:text-sky-100 border border-sky-200/50 hover:bg-white' : 'text-sky-600 hover:text-sky-900 dark:text-sky-100'}`}
+              className={`px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors h-auto ${filter === 'unpaid' ? 'bg-white shadow-sm text-sky-900 border border-sky-200/50 hover:bg-white' : 'text-sky-600 hover:text-sky-900'}`}
             >
               Chưa đóng phí
             </Button>
@@ -396,7 +396,7 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
             <div className="w-24 h-24 bg-sky-50 rounded-full flex items-center justify-center mb-6">
               <Search className="w-10 h-10 text-sky-300" />
             </div>
-            <h3 className="text-xl font-bold text-sky-900 dark:text-sky-100 mb-2">Không tìm thấy học viên</h3>
+            <h3 className="text-xl font-bold text-sky-900 mb-2">Không tìm thấy học viên</h3>
             <p className="text-sky-600 max-w-md">
               Không có học viên nào khớp với điều kiện tìm kiếm/lọc hiện tại. Vui lòng thay đổi bộ lọc hoặc thêm học viên mới.
             </p>
@@ -414,7 +414,7 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
             <motion.div 
               key="list"
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="bg-white/40 backdrop-blur-md rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white dark:border-slate-700/60 overflow-hidden"
+              className="bg-white/40 backdrop-blur-md rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white/60 overflow-hidden"
             >
               <div className="overflow-x-auto">
                 <table className="min-w-full border-collapse">
@@ -464,9 +464,9 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
 
       {/* Pagination Controls */}
       {totalPages > 1 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white dark:border-slate-700 p-4 rounded-2xl shadow-sm mt-4">
-          <p className="text-sm font-medium text-sky-900 dark:text-sky-100/60">
-            Hiển thị <span className="font-semibold text-sky-900 dark:text-sky-100">{paginatedStudents.length}</span> / <span className="font-semibold text-sky-900 dark:text-sky-100">{filteredAndSortedStudents.length}</span> học viên
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/60 backdrop-blur-md border border-white p-4 rounded-2xl shadow-sm mt-4">
+          <p className="text-sm font-medium text-sky-900/60">
+            Hiển thị <span className="font-semibold text-sky-900">{paginatedStudents.length}</span> / <span className="font-semibold text-sky-900">{filteredAndSortedStudents.length}</span> học viên
           </p>
           <div className="flex items-center gap-1">
             <Button
@@ -533,7 +533,7 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
           <div className="flex items-center justify-center w-12 h-12 rounded-full bg-rose-100 mb-4">
             <AlertTriangle className="w-6 h-6 text-rose-600" />
           </div>
-          <h3 className="text-xl font-bold text-sky-950 dark:text-sky-50 text-center mb-2">Xác nhận xóa</h3>
+          <h3 className="text-xl font-bold text-sky-950 text-center mb-2">Xác nhận xóa</h3>
           <p className="text-sky-700/80 text-center text-sm">
             Bạn có chắc chắn muốn xóa học viên này? Hành động này không thể hoàn tác và sẽ xóa toàn bộ lịch sử học tập, thanh toán liên quan.
           </p>

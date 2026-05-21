@@ -50,28 +50,28 @@ export default function StudentDetail({ student, classes, onClose, onEdit, markC
               <BookOpen className="w-3.5 h-3.5" />
               Chủ đề / Nội dung
             </p>
-            <p className="text-sky-950 dark:text-sky-50 font-extrabold text-xl tracking-tight">{cls.topic || '—'}</p>
+            <p className="text-sky-950 font-extrabold text-xl tracking-tight">{cls.topic || '—'}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="bg-emerald-50/50 p-4 rounded-[20px] border border-emerald-100/50">
               <p className="text-[12px] font-bold text-emerald-700 mb-2 flex items-center gap-2 uppercase tracking-wide">👍 Điểm mạnh</p>
-              <p className="text-[15px] font-medium text-sky-900 dark:text-sky-100 whitespace-pre-wrap">{cls.strengths || '—'}</p>
+              <p className="text-[15px] font-medium text-sky-900 whitespace-pre-wrap">{cls.strengths || '—'}</p>
             </div>
             <div className="bg-rose-50/50 p-4 rounded-[20px] border border-rose-100/50">
               <p className="text-[12px] font-bold text-rose-700 mb-2 flex items-center gap-2 uppercase tracking-wide">👎 Điểm yếu</p>
-              <p className="text-[15px] font-medium text-sky-900 dark:text-sky-100 whitespace-pre-wrap">{cls.weaknesses || '—'}</p>
+              <p className="text-[15px] font-medium text-sky-900 whitespace-pre-wrap">{cls.weaknesses || '—'}</p>
             </div>
             <div className="bg-red-50/50 p-4 rounded-[20px] border border-red-100/50">
               <p className="text-[12px] font-bold text-red-700 mb-2 flex items-center gap-2 uppercase tracking-wide">❌ Các lỗi sai</p>
-              <p className="text-[15px] font-medium text-sky-900 dark:text-sky-100 whitespace-pre-wrap">{cls.mistakes || '—'}</p>
+              <p className="text-[15px] font-medium text-sky-900 whitespace-pre-wrap">{cls.mistakes || '—'}</p>
             </div>
             <div className="bg-amber-50/50 p-4 rounded-[20px] border border-amber-100/50">
               <p className="text-[12px] font-bold text-amber-700 mb-2 flex items-center gap-2 uppercase tracking-wide">🛠️ Cách khắc phục</p>
-              <p className="text-[15px] font-medium text-sky-900 dark:text-sky-100 whitespace-pre-wrap">{cls.remedies || '—'}</p>
+              <p className="text-[15px] font-medium text-sky-900 whitespace-pre-wrap">{cls.remedies || '—'}</p>
             </div>
             <div className="md:col-span-2 lg:col-span-2 bg-sky-50/50 p-4 rounded-[20px] border border-sky-100/50">
               <p className="text-[12px] font-bold text-sky-700 mb-2 flex items-center gap-2 uppercase tracking-wide">📝 Kế hoạch buổi tiếp theo</p>
-              <p className="text-[15px] font-medium text-sky-900 dark:text-sky-100 whitespace-pre-wrap">{cls.nextLessonPrep || '—'}</p>
+              <p className="text-[15px] font-medium text-sky-900 whitespace-pre-wrap">{cls.nextLessonPrep || '—'}</p>
             </div>
           </div>
         </CardContent>
@@ -87,10 +87,10 @@ export default function StudentDetail({ student, classes, onClose, onEdit, markC
       maxWidth="3xl"
     >
       <div className="space-y-8 flex-1">
-        <div className="flex justify-between items-center bg-white/60 dark:bg-slate-900/60 backdrop-blur-md px-6 py-4 rounded-3xl border border-white dark:border-slate-700 shadow-[0_4px_16px_rgba(14,165,233,0.04)] mb-8">
+        <div className="flex justify-between items-center bg-white/60 backdrop-blur-md px-6 py-4 rounded-3xl border border-white shadow-[0_4px_16px_rgba(14,165,233,0.04)] mb-8">
            <div className="flex items-center gap-3">
              <div className="flex flex-col">
-               <span className="text-sm font-semibold text-sky-800 dark:text-sky-200">Thao tác</span>
+               <span className="text-sm font-semibold text-sky-800">Thao tác</span>
              </div>
            </div>
            <Button
@@ -105,23 +105,23 @@ export default function StudentDetail({ student, classes, onClose, onEdit, markC
            </Button>
         </div>
 
-        <Card className="p-8 bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm border-white dark:border-slate-700 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px]">
+        <Card className="p-8 bg-white/60 backdrop-blur-sm border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px]">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
-            <div className={`h-24 w-24 rounded-[24px] flex items-center justify-center font-bold text-4xl shrink-0 shadow-[0_8px_24px_rgba(0,0,0,0.06)] border border-white dark:border-slate-700/60 backdrop-blur-md transition-transform hover:scale-105 duration-300 ${getAvatarColor(student.id)}`}>
+            <div className={`h-24 w-24 rounded-[24px] flex items-center justify-center font-bold text-4xl shrink-0 shadow-[0_8px_24px_rgba(0,0,0,0.06)] border border-white/60 backdrop-blur-md transition-transform hover:scale-105 duration-300 ${getAvatarColor(student.id)}`}>
               {student.firstName ? student.firstName.charAt(0).toUpperCase() : student.name.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-6 w-full">
               <div className="bg-sky-50/30 p-4 rounded-2xl border border-sky-100/50">
                 <p className="text-[11px] font-bold text-sky-600/80 uppercase tracking-widest mb-1.5">Họ và Tên</p>
-                <p className="font-extrabold text-sky-950 dark:text-sky-50 text-lg tracking-tight">{student.name}</p>
+                <p className="font-extrabold text-sky-950 text-lg tracking-tight">{student.name}</p>
               </div>
               <div className="bg-sky-50/30 p-4 rounded-2xl border border-sky-100/50">
                 <p className="text-[11px] font-bold text-sky-600/80 uppercase tracking-widest mb-1.5">Năm sinh</p>
-                <p className="font-extrabold text-sky-950 dark:text-sky-50 text-lg tracking-tight">{student.birthYear || '—'}</p>
+                <p className="font-extrabold text-sky-950 text-lg tracking-tight">{student.birthYear || '—'}</p>
               </div>
               <div className="bg-sky-50/30 p-4 rounded-2xl border border-sky-100/50">
                 <p className="text-[11px] font-bold text-sky-600/80 uppercase tracking-widest mb-1.5">Trình độ</p>
-                <p className="font-extrabold text-sky-950 dark:text-sky-50 text-lg tracking-tight">{student.currentLevel || '—'}</p>
+                <p className="font-extrabold text-sky-950 text-lg tracking-tight">{student.currentLevel || '—'}</p>
               </div>
               <div className="bg-sky-50/30 p-4 rounded-2xl border border-sky-100/50">
                 <p className="text-[11px] font-bold text-sky-600/80 uppercase tracking-widest mb-1.5">Mục tiêu</p>
@@ -131,26 +131,26 @@ export default function StudentDetail({ student, classes, onClose, onEdit, markC
                       onClose();
                       onEdit(student);
                     }}
-                    className="px-3.5 py-1.5 inline-flex text-[13px] font-bold rounded-full text-sky-900 dark:text-sky-100 shadow-sm border border-white dark:border-slate-700 hover:scale-105 transition-all duration-300"
+                    className="px-3.5 py-1.5 inline-flex text-[13px] font-bold rounded-full text-sky-900 shadow-sm border border-white hover:scale-105 transition-all duration-300"
                     style={{ backgroundColor: student.targetColor || '#D1F2EB' }}
                     title="Nhấn để sửa mục tiêu"
                   >
                     {student.goal}
                   </button>
                 ) : (
-                  <p className="font-bold text-sky-950 dark:text-sky-50">—</p>
+                  <p className="font-bold text-sky-950">—</p>
                 )}
               </div>
               <div className="md:col-span-4 bg-sky-50/30 p-4 rounded-2xl border border-sky-100/50">
                 <p className="text-[11px] font-bold text-sky-600/80 uppercase tracking-widest mb-1.5">Lịch học</p>
-                <p className="font-extrabold text-sky-950 dark:text-sky-50 text-lg tracking-tight">{student.schedule || '—'}</p>
+                <p className="font-extrabold text-sky-950 text-lg tracking-tight">{student.schedule || '—'}</p>
               </div>
             </div>
           </div>
         </Card>
 
         <div>
-          <h3 className="text-xl font-extrabold text-sky-950 dark:text-sky-50 mb-6 flex items-center tracking-tight">
+          <h3 className="text-xl font-extrabold text-sky-950 mb-6 flex items-center tracking-tight">
             <BookOpen className="w-6 h-6 mr-3 text-blue-600" />
             Theo dõi buổi học (Đợt hiện tại)
           </h3>
@@ -175,7 +175,7 @@ export default function StudentDetail({ student, classes, onClose, onEdit, markC
         </div>
 
         <div>
-          <h3 className="text-xl font-extrabold text-sky-950 dark:text-sky-50 mb-6 flex items-center tracking-tight">
+          <h3 className="text-xl font-extrabold text-sky-950 mb-6 flex items-center tracking-tight">
             <Calendar className="w-6 h-6 mr-3 text-emerald-600" />
             Lịch sử học tập (Đã thanh toán)
           </h3>
@@ -212,10 +212,10 @@ export default function StudentDetail({ student, classes, onClose, onEdit, markC
                     onClick={() => toggleMonth(monthYear)}
                     className="w-full px-8 py-5 flex justify-between items-center bg-transparent hover:bg-sky-50/50 transition-colors"
                   >
-                    <div className="font-extrabold text-sky-950 dark:text-sky-50 text-lg">
+                    <div className="font-extrabold text-sky-950 text-lg">
                       {monthYear} <span className="opacity-60 font-medium ml-2 text-[15px]">({monthClasses.length} buổi)</span>
                     </div>
-                    <div className="bg-white/80 dark:bg-slate-900/80 p-2 rounded-xl shadow-sm border border-sky-50">
+                    <div className="bg-white/80 p-2 rounded-xl shadow-sm border border-sky-50">
                       {expandedMonths[monthYear] ? (
                         <ChevronUp className="w-5 h-5 text-sky-600" />
                       ) : (
@@ -238,8 +238,8 @@ export default function StudentDetail({ student, classes, onClose, onEdit, markC
           <div>
             <p className="text-[11px] font-bold text-sky-600/80 uppercase tracking-widest mb-1.5">Tóm tắt tài chính</p>
             <div className="flex items-baseline gap-3">
-              <p className="text-3xl font-extrabold text-sky-950 dark:text-sky-50 tracking-tight">{formatVND(getUnpaidAmount())}</p>
-              <p className="text-[15px] font-medium text-sky-700/80 bg-white/60 dark:bg-slate-900/60 px-3 py-1 rounded-full border border-sky-100/50 backdrop-blur-sm">
+              <p className="text-3xl font-extrabold text-sky-950 tracking-tight">{formatVND(getUnpaidAmount())}</p>
+              <p className="text-[15px] font-medium text-sky-700/80 bg-white/60 px-3 py-1 rounded-full border border-sky-100/50 backdrop-blur-sm">
                 ({classes.filter(c => c.studentId === student.id && !c.isPaid).reduce((sum, c) => sum + c.duration, 0)} buổi chưa thanh toán)
               </p>
             </div>

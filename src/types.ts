@@ -94,15 +94,3 @@ export interface Goal {
   targetAmount: number;
   currentAmount: number;
 }
-
-export interface VocabWord {
-  id: string;
-  studentId: string;
-  word: string;
-  meaning: string;
-  level: string;
-  status: string;
-  notes?: string;
-  category?: string;
-  dateAdded: string;
-}

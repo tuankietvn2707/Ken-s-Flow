@@ -97,7 +97,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, getPronoun 
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="relative w-full max-w-[720px] bg-white/70 backdrop-blur-md rounded-[32px] shadow-[0_24px_80px_-12px_rgba(14,165,233,0.2)] border border-white dark:border-slate-700 max-h-[90vh] flex flex-col print:shadow-none print:max-h-none print:h-auto print:border-none print:bg-white"
+            className="relative w-full max-w-[720px] bg-white/70 backdrop-blur-md rounded-[32px] shadow-[0_24px_80px_-12px_rgba(14,165,233,0.2)] border border-white max-h-[90vh] flex flex-col print:shadow-none print:max-h-none print:h-auto print:border-none print:bg-white"
           >
             {/* Close Button */}
             <div className="absolute -top-4 -right-4 z-10 print:hidden">
@@ -123,7 +123,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, getPronoun 
                         T
                       </div>
                       <div>
-                        <h2 className="text-xl font-black text-sky-950 dark:text-sky-50">TutorFlow</h2>
+                        <h2 className="text-xl font-black text-sky-950">TutorFlow</h2>
                         <p className="text-sm font-medium text-sky-600/70">English Tutoring Services</p>
                       </div>
                     </div>
@@ -132,13 +132,13 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, getPronoun 
                         <CheckCircle2 className="w-4 h-4" />
                         ĐÃ THANH TOÁN
                       </div>
-                      <div className="text-sm font-medium text-sky-900 dark:text-sky-100/40">Mã GD: #{transactionId}</div>
+                      <div className="text-sm font-medium text-sky-900/40">Mã GD: #{transactionId}</div>
                     </div>
                   </div>
 
                   {/* Student Info */}
                   <div className="bg-gradient-to-br from-sky-50/50 to-white rounded-2xl p-5 border border-sky-100/50 flex items-center gap-4 mb-8">
-                    <div className="w-14 h-14 rounded-full bg-sky-100 flex items-center justify-center text-sky-600 border-2 border-white dark:border-slate-700 shadow-sm overflow-hidden flex-shrink-0">
+                    <div className="w-14 h-14 rounded-full bg-sky-100 flex items-center justify-center text-sky-600 border-2 border-white shadow-sm overflow-hidden flex-shrink-0">
                       {receiptData.student.gender === 'Nam' ? (
                         <img src={`https://api.dicebear.com/7.x/notionists/svg?seed=${receiptData.student.name}&backgroundColor=bae6fd`} alt="Avatar" className="w-full h-full object-cover" />
                       ) : (
@@ -146,7 +146,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, getPronoun 
                       )}
                     </div>
                     <div>
-                      <h3 className="text-xl font-extrabold text-sky-950 dark:text-sky-50">{receiptData.student.name}</h3>
+                      <h3 className="text-xl font-extrabold text-sky-950">{receiptData.student.name}</h3>
                       <div className="flex items-center gap-2 mt-1">
                         <BookOpen className="w-3.5 h-3.5 text-sky-600/60" />
                         <span className="text-sm font-medium text-sky-600/80">English Speaking Class</span>
@@ -169,14 +169,14 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, getPronoun 
                   </div>
 
                   {/* Payment Details Grid */}
-                  <h4 className="text-sm font-extrabold text-sky-900 dark:text-sky-100/50 uppercase mb-4">Chi tiết thanh toán</h4>
+                  <h4 className="text-sm font-extrabold text-sky-900/50 uppercase mb-4">Chi tiết thanh toán</h4>
                   <div className="grid grid-cols-2 gap-3 mb-8">
                     <div className="bg-sky-50/50 rounded-xl p-4 border border-sky-100/50 flex flex-col gap-1 hover:bg-sky-50 transition-colors">
                       <div className="flex items-center gap-1.5 text-sky-600/70 mb-1">
                         <CalendarDays className="w-3.5 h-3.5" />
                         <span className="text-xs font-medium uppercase">Số buổi</span>
                       </div>
-                      <div className="font-extrabold text-sky-950 dark:text-sky-50 text-lg">{receiptData.totalUnpaidSessions} <span className="text-sm font-bold text-sky-900 dark:text-sky-100/50">/ {receiptData.student.feeCycle}</span></div>
+                      <div className="font-extrabold text-sky-950 text-lg">{receiptData.totalUnpaidSessions} <span className="text-sm font-bold text-sky-900/50">/ {receiptData.student.feeCycle}</span></div>
                     </div>
                     
                     <div className="bg-sky-50/50 rounded-xl p-4 border border-sky-100/50 flex flex-col gap-1 hover:bg-sky-50 transition-colors">
@@ -184,7 +184,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, getPronoun 
                         <Receipt className="w-3.5 h-3.5" />
                         <span className="text-xs font-medium uppercase">Đơn giá</span>
                       </div>
-                      <div className="font-extrabold text-sky-950 dark:text-sky-50 text-lg">{formatVND(receiptData.student.fee)}</div>
+                      <div className="font-extrabold text-sky-950 text-lg">{formatVND(receiptData.student.fee)}</div>
                     </div>
 
                     <div className="bg-sky-50/50 rounded-xl p-4 border border-sky-100/50 flex flex-col gap-1 mt-1 hover:bg-sky-50 transition-colors">
@@ -192,7 +192,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, getPronoun 
                         <CreditCard className="w-3.5 h-3.5" />
                         <span className="text-xs font-medium uppercase">Phương thức</span>
                       </div>
-                      <div className="font-extrabold text-sky-950 dark:text-sky-50 text-md">Chuyển khoản / Tiền mặt</div>
+                      <div className="font-extrabold text-sky-950 text-md">Chuyển khoản / Tiền mặt</div>
                     </div>
 
                     <div className="bg-sky-50/50 rounded-xl p-4 border border-sky-100/50 flex flex-col gap-1 mt-1 hover:bg-sky-50 transition-colors">
@@ -200,23 +200,23 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, getPronoun 
                         <CalendarDays className="w-3.5 h-3.5" />
                         <span className="text-xs font-medium uppercase">Ngày thu</span>
                       </div>
-                      <div className="font-extrabold text-sky-950 dark:text-sky-50 text-md">
+                      <div className="font-extrabold text-sky-950 text-md">
                         {paymentDate.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                       </div>
                     </div>
                   </div>
 
                   {/* Sessions Timeline */}
-                  <h4 className="text-sm font-extrabold text-sky-900 dark:text-sky-100/50 uppercase mb-4">Các buổi học ({sortedClasses.length})</h4>
+                  <h4 className="text-sm font-extrabold text-sky-900/50 uppercase mb-4">Các buổi học ({sortedClasses.length})</h4>
                   <div className="space-y-3 mb-10">
                     {sortedClasses.map((c, index) => (
                       <div key={c.id} className="flex gap-4 p-3 rounded-xl hover:bg-sky-50/50 transition-colors">
-                        <div className="w-8 h-8 rounded-full bg-sky-100 flex items-center justify-center text-sky-600 font-bold text-sm flex-shrink-0 shadow-sm border border-white dark:border-slate-700">
+                        <div className="w-8 h-8 rounded-full bg-sky-100 flex items-center justify-center text-sky-600 font-bold text-sm flex-shrink-0 shadow-sm border border-white">
                           {index + 1}
                         </div>
                         <div className="flex-1">
                           <div className="flex justify-between items-start mb-0.5">
-                            <span className="font-bold text-sky-950 dark:text-sky-50 text-sm">
+                            <span className="font-bold text-sky-950 text-sm">
                               {!isNaN(parseDateSafe(c.date).getTime()) 
                                 ? parseDateSafe(c.date).toLocaleDateString('vi-VN', {
                                     day: '2-digit', month: 'long', year: 'numeric'
@@ -227,7 +227,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, getPronoun 
                               {c.duration} buổi
                             </span>
                           </div>
-                          <p className="text-xs font-medium text-sky-900 dark:text-sky-100/60">
+                          <p className="text-xs font-medium text-sky-900/60">
                             {c.topic || "Không có ghi chú chủ đề học"}
                           </p>
                         </div>
@@ -238,14 +238,14 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, getPronoun 
                   {/* Footer */}
                   <div className="pt-8 border-t-2 border-dashed border-sky-100 pb-2">
                     <div className="flex flex-col items-center justify-center text-center space-y-3">
-                      <p className="text-[13px] font-bold text-sky-900 dark:text-sky-100 italic block whitespace-nowrap">"Keep learning, keep growing."</p>
-                      <p className="text-[12px] font-medium text-sky-900 dark:text-sky-100/60 leading-relaxed max-w-[80%] mx-auto mb-6 block">
+                      <p className="text-[13px] font-bold text-sky-900 italic block whitespace-nowrap">"Keep learning, keep growing."</p>
+                      <p className="text-[12px] font-medium text-sky-900/60 leading-relaxed max-w-[80%] mx-auto mb-6 block">
                         Chúc {getPronoun(receiptData.student.birthYear, receiptData.student.gender)} luôn giữ vững tinh thần học tập thật tốt. Cảm ơn đã đồng hành cùng TutorFlow.
                       </p>
                       
                       <div className="mt-2 mb-2 w-32 h-12 bg-[url('https://api.dicebear.com/7.x/initials/svg?seed=Tuấn Kiệt&fontFamily=Brush%20Script%20MT,cursive')] bg-contain bg-center bg-no-repeat opacity-60 mix-blend-multiply"></div>
-                      <p className="text-sm font-extrabold text-sky-950 dark:text-sky-50 uppercase mt-1">Võ Nguyễn Tuấn Kiệt</p>
-                      <p className="text-[11px] font-medium text-sky-900 dark:text-sky-100/40 mt-1">Generated at {paymentDate.toLocaleTimeString('vi-VN')} - {paymentDate.toLocaleDateString('vi-VN')}</p>
+                      <p className="text-sm font-extrabold text-sky-950 uppercase mt-1">Võ Nguyễn Tuấn Kiệt</p>
+                      <p className="text-[11px] font-medium text-sky-900/40 mt-1">Generated at {paymentDate.toLocaleTimeString('vi-VN')} - {paymentDate.toLocaleDateString('vi-VN')}</p>
                     </div>
                   </div>
                 </div>
@@ -253,7 +253,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, getPronoun 
             </div>
 
             {/* Sticky Action Footer */}
-            <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-sky-100 p-4 sm:px-8 sm:py-5 flex flex-col sm:flex-row gap-3 justify-end rounded-b-[32px] print:hidden">
+            <div className="bg-white/80 backdrop-blur-xl border-t border-sky-100 p-4 sm:px-8 sm:py-5 flex flex-col sm:flex-row gap-3 justify-end rounded-b-[32px] print:hidden">
               <button
                 onClick={handlePrint}
                 className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-sky-200 text-sky-700 font-bold hover:bg-sky-50 transition-colors shadow-sm"

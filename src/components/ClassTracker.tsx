@@ -266,12 +266,12 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
         className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
       >
         <div className="flex flex-col gap-1 items-start">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-sky-950 dark:text-sky-50 tracking-tight">Theo dõi Lớp học</h1>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-sky-950 tracking-tight">Theo dõi Lớp học</h1>
           <p className="text-sky-700/80 font-medium text-lg">Quản lý lịch học và trạng thái thanh toán học viên</p>
         </div>
         <Button
           onClick={() => setIsFormOpen(true)}
-          className="bg-gradient-to-r from-sky-400 to-sky-500 hover:from-sky-500 hover:to-sky-600 text-white border border-white dark:border-slate-700/40 shadow-[0_4px_16px_rgba(56,189,248,0.3)] hover:shadow-[0_8px_24px_rgba(56,189,248,0.4)] hover:-translate-y-0.5 transition-all duration-300 rounded-[20px] h-12 px-6 backdrop-blur-md group"
+          className="bg-gradient-to-r from-sky-400 to-sky-500 hover:from-sky-500 hover:to-sky-600 text-white border border-white/40 shadow-[0_4px_16px_rgba(56,189,248,0.3)] hover:shadow-[0_8px_24px_rgba(56,189,248,0.4)] hover:-translate-y-0.5 transition-all duration-300 rounded-[20px] h-12 px-6 backdrop-blur-md group"
         >
           <Plus className="w-5 h-5 mr-2 group-hover:scale-110 group-hover:rotate-90 transition-all duration-300" />
           <span className="font-semibold text-[15px]">Ghi nhận Lớp học</span>
@@ -283,7 +283,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
           className="mb-8 relative"
         >
-          <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white dark:border-slate-700 shadow-[0_8px_32px_rgba(0,0,0,0.06)] rounded-[32px] overflow-hidden p-8 relative">
+          <div className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.06)] rounded-[32px] overflow-hidden p-8 relative">
             <Button 
               variant="ghost"
               size="icon"
@@ -294,7 +294,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
             </Button>
             
             <div className="mb-6">
-              <h2 className="text-xl font-extrabold text-sky-950 dark:text-sky-50 tracking-tight">
+              <h2 className="text-xl font-extrabold text-sky-950 tracking-tight">
                 {editingId ? 'Sửa thông tin Lớp học' : 'Ghi nhận Lớp học mới'}
               </h2>
             </div>
@@ -311,7 +311,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
               <form onSubmit={handleSubmit} className="space-y-5" noValidate>
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   <div className="space-y-1.5">
-                    <label className="block text-sm font-bold text-sky-900 dark:text-sky-100/90 tracking-wide">Học viên <span className="text-rose-500">*</span></label>
+                    <label className="block text-sm font-bold text-sky-900/90 tracking-wide">Học viên <span className="text-rose-500">*</span></label>
                     <Select
                       value={formData.studentId}
                       onChange={e => setFormData({...formData, studentId: e.target.value})}
@@ -324,7 +324,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                     </Select>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="block text-sm font-bold text-sky-900 dark:text-sky-100/90 tracking-wide">Ngày học <span className="text-rose-500">*</span></label>
+                    <label className="block text-sm font-bold text-sky-900/90 tracking-wide">Ngày học <span className="text-rose-500">*</span></label>
                     <Input
                       type="date"
                       value={formData.date}
@@ -333,7 +333,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="block text-sm font-bold text-sky-900 dark:text-sky-100/90 tracking-wide">Khung giờ (Tùy chọn)</label>
+                    <label className="block text-sm font-bold text-sky-900/90 tracking-wide">Khung giờ (Tùy chọn)</label>
                     <Input
                       type="text"
                       ref={timeInputRef}
@@ -344,7 +344,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                     />
                   </div>
                   <div className="sm:col-span-2 space-y-1.5">
-                    <label className="block text-sm font-bold text-sky-900 dark:text-sky-100/90 tracking-wide">Chủ đề bài học <span className="text-rose-500">*</span></label>
+                    <label className="block text-sm font-bold text-sky-900/90 tracking-wide">Chủ đề bài học <span className="text-rose-500">*</span></label>
                     <Input
                       type="text"
                       placeholder="VD: Thì hiện tại hoàn thành, Luyện nói..."
@@ -354,7 +354,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="block text-sm font-bold text-sky-900 dark:text-sky-100/90 tracking-wide">Thời lượng (1 buổi = 1h30 phút) <span className="text-rose-500">*</span></label>
+                    <label className="block text-sm font-bold text-sky-900/90 tracking-wide">Thời lượng (1 buổi = 1h30 phút) <span className="text-rose-500">*</span></label>
                     <Input
                       type="number"
                       min="0.5"
@@ -369,7 +369,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                     <h4 className="text-sm font-extrabold text-sky-600/90 uppercase tracking-widest mb-4">Đánh giá chi tiết buổi học</h4>
                     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                       <div className="space-y-1.5">
-                        <label className="block text-sm font-bold text-sky-900 dark:text-sky-100/90 tracking-wide">Điểm mạnh</label>
+                        <label className="block text-sm font-bold text-sky-900/90 tracking-wide">Điểm mạnh</label>
                         <Textarea
                           rows={2}
                           placeholder="Những điểm học viên làm tốt..."
@@ -379,7 +379,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="block text-sm font-bold text-sky-900 dark:text-sky-100/90 tracking-wide">Điểm yếu</label>
+                        <label className="block text-sm font-bold text-sky-900/90 tracking-wide">Điểm yếu</label>
                         <Textarea
                           rows={2}
                           placeholder="Những điểm học viên cần cải thiện..."
@@ -389,7 +389,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="block text-sm font-bold text-sky-900 dark:text-sky-100/90 tracking-wide">Các lỗi sai</label>
+                        <label className="block text-sm font-bold text-sky-900/90 tracking-wide">Các lỗi sai</label>
                         <Textarea
                           rows={2}
                           placeholder="Các lỗi sai thường gặp..."
@@ -399,7 +399,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="block text-sm font-bold text-sky-900 dark:text-sky-100/90 tracking-wide">Cách khắc phục</label>
+                        <label className="block text-sm font-bold text-sky-900/90 tracking-wide">Cách khắc phục</label>
                         <Textarea
                           rows={2}
                           placeholder="Giải pháp hoặc bài tập để khắc phục..."
@@ -409,7 +409,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                         />
                       </div>
                       <div className="sm:col-span-2 space-y-1.5">
-                        <label className="block text-sm font-bold text-sky-900 dark:text-sky-100/90 tracking-wide">Soạn bài cho buổi sau</label>
+                        <label className="block text-sm font-bold text-sky-900/90 tracking-wide">Soạn bài cho buổi sau</label>
                         <Textarea
                           rows={2}
                           placeholder="Nội dung cần chuẩn bị cho buổi học tiếp theo..."
@@ -452,19 +452,19 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-        className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white dark:border-slate-700 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] overflow-hidden"
+        className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] overflow-hidden"
       >
         <div className="flex flex-col">
           <div className="px-8 py-6 border-b border-sky-100/60 bg-gradient-to-b from-white/40 to-transparent flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <h3 className="text-xl font-extrabold text-sky-950 dark:text-sky-50 tracking-tight">Các buổi học gần đây</h3>
-            <div className="flex items-center gap-3 bg-white/50 backdrop-blur-md rounded-[20px] p-1.5 border border-white dark:border-slate-700 shadow-[0_4px_16px_rgba(14,165,233,0.03)] focus-within:ring-2 focus-within:ring-sky-200 focus-within:shadow-[0_8px_24px_rgba(14,165,233,0.08)] transition-all duration-300">
+            <h3 className="text-xl font-extrabold text-sky-950 tracking-tight">Các buổi học gần đây</h3>
+            <div className="flex items-center gap-3 bg-white/50 backdrop-blur-md rounded-[20px] p-1.5 border border-white shadow-[0_4px_16px_rgba(14,165,233,0.03)] focus-within:ring-2 focus-within:ring-sky-200 focus-within:shadow-[0_8px_24px_rgba(14,165,233,0.08)] transition-all duration-300">
               <div className="flex items-center pl-3">
                 <Calendar className="w-4 h-4 text-sky-500" />
               </div>
               <Select
                 value={filterMonth}
                 onChange={(e) => setFilterMonth(e.target.value)}
-                className="w-[130px] border-none bg-transparent hover:bg-sky-50/50 focus:ring-0 cursor-pointer !h-9 text-sm font-semibold text-sky-950 dark:text-sky-50 transition-colors"
+                className="w-[130px] border-none bg-transparent hover:bg-sky-50/50 focus:ring-0 cursor-pointer !h-9 text-sm font-semibold text-sky-950 transition-colors"
                 style={{ WebkitAppearance: 'none' }}
               >
                 <option value="all">Tất cả tháng</option>
@@ -476,7 +476,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
               <Select
                 value={filterYear}
                 onChange={(e) => setFilterYear(e.target.value)}
-                className="w-[110px] border-none bg-transparent hover:bg-sky-50/50 focus:ring-0 cursor-pointer !h-9 text-sm font-semibold text-sky-950 dark:text-sky-50 transition-colors"
+                className="w-[110px] border-none bg-transparent hover:bg-sky-50/50 focus:ring-0 cursor-pointer !h-9 text-sm font-semibold text-sky-950 transition-colors"
                 style={{ WebkitAppearance: 'none' }}
               >
                 <option value="all">Tất cả năm</option>
@@ -507,19 +507,19 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                   </tr>
                 ) : (
                   paginatedClasses.map((cls) => (
-                    <tr key={cls.id} className="group hover:bg-white/80 dark:bg-slate-900/80 hover:shadow-[0_4px_24px_rgba(14,165,233,0.06)] transition-all duration-300 relative z-0 hover:z-10 bg-transparent">
-                      <td className="px-8 py-5 whitespace-nowrap text-sm text-sky-950 dark:text-sky-50 font-bold tracking-tight">
+                    <tr key={cls.id} className="group hover:bg-white/80 hover:shadow-[0_4px_24px_rgba(14,165,233,0.06)] transition-all duration-300 relative z-0 hover:z-10 bg-transparent">
+                      <td className="px-8 py-5 whitespace-nowrap text-sm text-sky-950 font-bold tracking-tight">
                         {!isNaN(parseDateSafe(cls.date).getTime()) 
                           ? parseDateSafe(cls.date).toLocaleDateString('vi-VN') 
                           : 'Ngày không hợp lệ'}
                         {cls.time && <span className="text-sky-600 ml-3 text-[11px] font-semibold bg-sky-50 border border-sky-100/60 px-2.5 py-1 rounded-full drop-shadow-sm">{cls.time}</span>}
                       </td>
                       <td className="px-8 py-5 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold backdrop-blur-md border border-white dark:border-slate-700 shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-transform group-hover:scale-105 duration-300 ${getStudentColor(cls.studentId)}`}>
+                        <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold backdrop-blur-md border border-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-transform group-hover:scale-105 duration-300 ${getStudentColor(cls.studentId)}`}>
                           {getStudentName(cls.studentId)}
                         </span>
                       </td>
-                      <td className="px-8 py-5 text-sm text-sky-800 dark:text-sky-200 font-semibold max-w-xs truncate">
+                      <td className="px-8 py-5 text-sm text-sky-800 font-semibold max-w-xs truncate">
                         {cls.topic}
                       </td>
                       <td className="px-8 py-5 whitespace-nowrap text-sm text-sky-600 font-semibold">
@@ -544,7 +544,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                             variant="ghost"
                             size="icon"
                             onClick={() => editClass(cls)} 
-                            className="h-9 w-9 text-sky-500 hover:text-sky-600 hover:bg-sky-50 bg-white/50 backdrop-blur-sm border border-white dark:border-slate-700 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-all duration-300 rounded-[14px]"
+                            className="h-9 w-9 text-sky-500 hover:text-sky-600 hover:bg-sky-50 bg-white/50 backdrop-blur-sm border border-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-all duration-300 rounded-[14px]"
                             title="Sửa"
                           >
                             <Edit2 className="w-4 h-4" />
@@ -553,7 +553,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
                             variant="ghost"
                             size="icon"
                             onClick={() => handleDelete(cls.id)} 
-                            className="h-9 w-9 text-rose-500 hover:text-rose-600 hover:bg-rose-50 bg-white/50 backdrop-blur-sm border border-white dark:border-slate-700 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-all duration-300 rounded-[14px]"
+                            className="h-9 w-9 text-rose-500 hover:text-rose-600 hover:bg-rose-50 bg-white/50 backdrop-blur-sm border border-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-all duration-300 rounded-[14px]"
                             title="Xóa"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -569,7 +569,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
           
           {totalPages > 1 && (
             <div className="px-8 py-4 border-t border-sky-50 flex items-center justify-between bg-white/50 backdrop-blur-sm rounded-b-3xl">
-              <span className="text-sm font-medium text-sky-900 dark:text-sky-100/60">
+              <span className="text-sm font-medium text-sky-900/60">
                 Hiển thị {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, sortedClasses.length)} trong số {sortedClasses.length}
               </span>
               <div className="flex items-center gap-2">
@@ -631,11 +631,11 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
         }
       >
         <div className="flex flex-col items-center pt-2 pb-6">
-          <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-rose-50 to-red-50 border border-white dark:border-slate-700 shadow-[0_4px_16px_rgba(244,63,94,0.1)] ring-1 ring-rose-100 mb-6 relative">
+          <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-rose-50 to-red-50 border border-white shadow-[0_4px_16px_rgba(244,63,94,0.1)] ring-1 ring-rose-100 mb-6 relative">
             <div className="absolute inset-0 bg-rose-400/20 rounded-full animate-ping opacity-50"></div>
             <AlertTriangle className="w-8 h-8 text-rose-500 relative z-10" />
           </div>
-          <p className="text-sky-800 dark:text-sky-200/90 text-center text-[15px] leading-relaxed max-w-[260px]">
+          <p className="text-sky-800/90 text-center text-[15px] leading-relaxed max-w-[260px]">
             Bạn có chắc chắn muốn xóa lớp học này? Hành động này <span className="font-bold text-rose-600">không thể hoàn tác</span>.
           </p>
         </div>

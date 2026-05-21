@@ -10,9 +10,9 @@ const buttonVariants = cva(
         default: 'bg-gradient-to-r from-sky-500 to-blue-600 text-white hover:from-sky-600 hover:to-blue-700 shadow-[0_4px_16px_rgba(14,165,233,0.3)] hover:shadow-[0_8px_24px_rgba(14,165,233,0.4)]',
         danger: 'bg-gradient-to-r from-rose-500 to-rose-600 text-white hover:from-rose-600 hover:to-rose-700 shadow-[0_4px_16px_rgba(244,63,94,0.3)] hover:shadow-[0_8px_24px_rgba(244,63,94,0.4)]',
         success: 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 shadow-[0_4px_16px_rgba(16,185,129,0.3)] hover:shadow-[0_8px_24px_rgba(16,185,129,0.4)]',
-        outline: 'border border-sky-200 bg-white/60 dark:bg-slate-900/60 hover:bg-white text-sky-900 dark:text-sky-100 shadow-sm backdrop-blur-sm',
-        secondary: 'bg-sky-100/80 text-sky-900 dark:text-sky-100 hover:bg-sky-200 backdrop-blur-sm',
-        ghost: 'hover:bg-sky-50 hover:text-sky-900 dark:text-sky-100 text-slate-600',
+        outline: 'border border-sky-200 bg-white/60 hover:bg-white text-sky-900 shadow-sm backdrop-blur-sm',
+        secondary: 'bg-sky-100/80 text-sky-900 hover:bg-sky-200 backdrop-blur-sm',
+        ghost: 'hover:bg-sky-50 hover:text-sky-900 text-slate-600',
         link: 'text-sky-600 underline-offset-4 hover:underline',
       },
       size: {

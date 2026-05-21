@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MessageCircle, X, Send, Bot, User, FileText, Download } from 'lucide-react';
-import { getGenerativeModel } from 'firebase/ai';
-import { ai } from '../firebase';
+import { GoogleGenAI } from '@google/genai';
+import OpenAI from 'openai';
 import { Transaction, Goal, TransactionType, Student, ClassSession } from '../types';
 import { formatNumber } from './PersonalFinance';
 import { Button } from './ui/Button';
@@ -140,8 +140,8 @@ Bạn là trợ lý AI thông minh, quản lý cả học viên, lịch dạy h�
 Dữ liệu hiện tại của người dùng:
 - Giao dịch gần đây: ${JSON.stringify(transactions.slice(0, 50))}
 - Mục tiêu tiết kiệm: ${JSON.stringify(goals)}
-- Học viên hiện tại: ${JSON.stringify(students.map(s => ({id: s.id, name: s.name, currentLevel: s.currentLevel, goal: s.goal})))}
-- Lịch học: ${JSON.stringify(classes.slice(0, 20).map(c => ({id: c.id, studentId: c.studentId, date: c.date, time: c.time, isPaid: c.isPaid})))}
+- Học viên hiện tại: ${JSON.stringify(students.map(s => ({id: s.id, name: s.name, phone: s.phone, currentSubject: s.currentSubject})))}
+- Lịch học: ${JSON.stringify(classes.slice(0, 20).map(c => ({id: c.id, studentId: c.studentId, date: c.date, time: c.time, status: c.status})))}
 
 QUY TẮC QUAN TRỌNG:
 1. NẾU người dùng yêu cầu thực hiện thao tác Thêm/Sửa/Xóa (Học viên, Lịch học, Giao dịch, Mục tiêu), bạn PHẢI phân tích và trả về DUY NHẤT một chuỗi JSON hợp lệ, KHÔNG có markdown hay văn bản nào khác.
@@ -149,9 +149,9 @@ Cấu trúc JSON: {"action": "<tên_hành_động>", "data": { <dữ liệu tư�
 
 Các action hỗ trợ:
 - "add_transaction": {"type": "expense" | "income", "source": "cash" | "banking", "amount": number, "description": "string", "category": "string"}
-- "add_student": {"name": "string", "occupation": "string", "currentLevel": "string", "goal": "string", "fee": number, "feeCycle": number, "schedule": "string", "notes": "string"}
-- "add_class": {"studentId": "string", "date": "YYYY-MM-DD", "time": "HH:MM", "duration": number, "topic": "string", "isPaid": boolean}
-- "update_class": {"id": "string", "isPaid": boolean}
+- "add_student": {"name": "string", "phone": "string", "email": "string", "fee": number, "currentSubject": "string", "parentDetails": "string"}
+- "add_class": {"studentId": "string", "date": "YYYY-MM-DD", "time": "HH:MM", "duration": number, "status": "scheduled" | "completed" | "cancelled", "notes": "string"}
+- "update_class": {"id": "string", "status": "scheduled" | "completed" | "cancelled"}
 
 * Chú ý: NẾU thông tin chưa đủ (ví dụ thiếu mã học viên, số tiền), KHÔNG trả về JSON. Thay vào đó hãy đặt câu hỏi văn bản để hỏi người dùng lấy thêm chi tiết. Để tìm studentId, hãy dựa vào tên trong danh sách.
 
@@ -159,24 +159,62 @@ Các action hỗ trợ:
 Hãy trả lời như một người trợ lý đắc lực, dựa vào phân tích từ dữ liệu JSON được cung cấp. Trả lời chi tiết nhưng súc tích, dễ hiểu, dùng emoji để sinh động. KHÔNG trả về JSON.
       `;
 
-      const callFirebaseAI = async () => {
-        const model = getGenerativeModel(ai, {
-          model: 'gemini-1.5-flash',
-          systemInstruction: systemInstruction,
+      const callGemini = async () => {
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) throw new Error("Missing_GEMINI_API_KEY");
+        const ai = new GoogleGenAI({ apiKey });
+        const response = await ai.models.generateContent({
+          model: 'gemini-2.5-flash',
+          contents: text,
+          config: {
+            systemInstruction: systemInstruction,
+            temperature: 0.7,
+          }
         });
-        const result = await model.generateContent(text);
-        return result.response.text() || '';
+        return response.text || '';
+      };
+
+      const callOpenAI = async () => {
+        const apiKey = process.env.OPENAI_API_KEY;
+        if (!apiKey) throw new Error("Missing_OPENAI_API_KEY");
+        const openai = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
+        const response = await openai.chat.completions.create({
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: systemInstruction },
+            { role: 'user', content: text }
+          ],
+          temperature: 0.7,
+        });
+        return response.choices[0].message.content || '';
       };
 
       let reply = '';
-      let usedModel = 'Firebase Vertex AI';
+      let usedModel = '';
 
       try {
-        reply = await callFirebaseAI();
-      } catch (error: any) {
-        console.error("AI Error:", error);
-        setMessages(prev => [...prev, { id: Date.now().toString(), sender: 'ai', text: 'Xin lỗi, đã có lỗi kết nối tới AI. Vui lòng kiểm tra lại quyền truy cập hoặc thử lại sau.' }]);
-        return;
+        // Try Gemini first
+        reply = await callGemini();
+        usedModel = 'Gemini';
+      } catch (geminiError: any) {
+        const errStr = geminiError?.message || String(geminiError);
+        const isQuotaOrMissing = errStr.includes('429') || errStr.includes('Quota') || errStr.includes('RESOURCE_EXHAUSTED') || errStr.includes('503') || errStr.includes('Missing_GEMINI_API_KEY');
+        
+        if (isQuotaOrMissing) {
+          console.warn('Gemini failed or missing, falling back to OpenAI...', errStr);
+          try {
+            reply = await callOpenAI();
+            usedModel = 'ChatGPT';
+          } catch (openAiError: any) {
+            const oaErrStr = openAiError?.message || String(openAiError);
+            if (errStr.includes('Missing_GEMINI_API_KEY') && oaErrStr.includes('Missing_OPENAI_API_KEY')) {
+                throw new Error("Chưa cấu hình GEMINI_API_KEY hoặc OPENAI_API_KEY. Vui lòng thêm biến môi trường.");
+            }
+            throw new Error(`Cả Gemini và ChatGPT đều gặp lỗi hoặc hết lượt.\nGemini: ${errStr}\nChatGPT: ${oaErrStr}`);
+          }
+        } else {
+          throw geminiError;
+        }
       }
       
       // Clean up potential markdown if AI accidentally includes it for JSON
@@ -213,15 +251,12 @@ Hãy trả lời như một người trợ lý đắc lực, dựa vào phân t�
              const newStudent: Student = {
                 id: Date.now().toString(),
                 name: data.name,
-                birthYear: '',
-                occupation: data.occupation || '',
-                currentLevel: data.currentLevel || '',
-                goal: data.goal || '',
+                phone: data.phone || '',
+                email: data.email || '',
                 fee: data.fee,
-                feeCycle: data.feeCycle || 8,
-                schedule: data.schedule || '',
-                notes: data.notes || '',
-                status: 'active'
+                currentSubject: data.currentSubject || '',
+                parentDetails: data.parentDetails || '',
+                joinDate: new Date().toISOString().split('T')[0]
              };
              addStudent(newStudent);
              aiResponseText = `Đã thêm học viên mới: ${data.name} (Học phí: ${formatNumber(data.fee)}đ). (${usedModel})`;
@@ -232,8 +267,9 @@ Hãy trả lời như một người trợ lý đắc lực, dựa vào phân t�
                 date: data.date,
                 time: data.time || '18:00',
                 duration: data.duration || 60,
-                topic: data.topic || '',
-                isPaid: data.isPaid || false
+                status: data.status || 'scheduled',
+                notes: data.notes || '',
+                isPaid: false
              };
              await addClass(newClass);
              const sName = students.find((s: Student) => s.id === data.studentId)?.name || 'Học viên';
@@ -241,8 +277,8 @@ Hãy trả lời như một người trợ lý đắc lực, dựa vào phân t�
           } else if (action === 'update_class') {
              const cls = classes.find((c: ClassSession) => c.id === data.id);
              if (cls) {
-                await updateClass({...cls, isPaid: data.isPaid !== undefined ? data.isPaid : true});
-                aiResponseText = `Đã cập nhật trạng thái lớp học. (${usedModel})`;
+                await updateClass({...cls, status: data.status || 'completed'});
+                aiResponseText = `Đã cập nhật trạng thái lớp học thành ${data.status}. (${usedModel})`;
              } else {
                 aiResponseText = `Không tìm thấy lớp học yêu cầu cập nhật. (${usedModel})`;
              }
@@ -369,7 +405,7 @@ Hãy trả lời như một người trợ lý đắc lực, dựa vào phân t�
             </div>
 
             {/* Input */}
-            <div className="p-3 bg-white dark:bg-slate-900 border-t border-sky-100 rounded-b-3xl">
+            <div className="p-3 bg-white border-t border-sky-100 rounded-b-3xl">
               <form onSubmit={(e) => { e.preventDefault(); handleSend(); }} className="flex gap-2">
                 <Input
                   type="text"

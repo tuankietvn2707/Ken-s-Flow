@@ -54,7 +54,7 @@ export function Modal({
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className={cn(
-              "bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-[32px] w-full flex flex-col border border-white dark:border-slate-700/60 relative max-h-[90vh] shadow-[0_24px_64px_rgba(14,165,233,0.12)] ring-1 ring-sky-100 dark:ring-slate-700/50 object-contain z-10",
+              "bg-white/80 backdrop-blur-md rounded-[32px] w-full flex flex-col border border-white/60 relative max-h-[90vh] shadow-[0_24px_64px_rgba(14,165,233,0.12)] ring-1 ring-sky-100/50 object-contain z-10",
               maxWidthClasses[maxWidth],
               className
             )}
@@ -62,7 +62,7 @@ export function Modal({
             {(title || description) && (
               <div className="px-8 py-6 border-b border-sky-100/50 flex justify-between items-start bg-gradient-to-b from-white/60 to-transparent rounded-t-[32px]">
                 <div>
-                  {title && <h2 className="text-[22px] font-extrabold text-sky-950 dark:text-sky-50 tracking-tight">{title}</h2>}
+                  {title && <h2 className="text-[22px] font-extrabold text-sky-950 tracking-tight">{title}</h2>}
                   {description && <p className="text-[15px] font-medium text-sky-700/70 mt-1.5">{description}</p>}
                 </div>
                 <button
