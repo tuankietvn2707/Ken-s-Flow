@@ -1,6 +1,9 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { BookOpen, Plus, Trash2, Edit2, Search, Filter, X, CheckCircle2, BookMarked, Sparkles, TrendingUp, Users, ChevronDown } from 'lucide-react';
+import { BookOpen, Plus, Trash2, Edit2, Search, Filter, X, CheckCircle2, BookMarked, Sparkles, TrendingUp, Users, ChevronDown, Wand2, Loader2 } from 'lucide-react';
+import { getGenerativeModel } from 'firebase/ai';
+import { ai, vocabDb } from '../firebase';
+import { collection, query, where, getDocs, doc, setDoc } from 'firebase/firestore';
 import { Student, VocabWord } from '../types';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
@@ -159,6 +162,77 @@ function VocabFormModal({
     initial ?? { level: 'B1', status: 'new', category: '' }
   );
   const [saving, setSaving] = useState(false);
+  const [isAutoFilling, setIsAutoFilling] = useState(false);
+
+  const handleAutoFill = async () => {
+    if (!form.word?.trim()) return;
+    const word = form.word.trim().toLowerCase();
+    setIsAutoFilling(true);
+    
+    try {
+      let foundInGlobal = false;
+      try {
+        const globalRef = collection(vocabDb, 'global_dictionary');
+        const q = query(globalRef, where('word', '==', word));
+        const snapshot = await getDocs(q);
+        
+        if (!snapshot.empty) {
+          const data = snapshot.docs[0].data();
+          setForm(prev => ({
+            ...prev,
+            meaning: data.meaning || prev.meaning,
+            level: data.level || prev.level,
+            category: data.category || prev.category,
+            notes: data.notes || prev.notes,
+          }));
+          foundInGlobal = true;
+        }
+      } catch (err) {
+        console.error("Error reading global dictionary:", err);
+      }
+
+      if (!foundInGlobal) {
+        const model = getGenerativeModel(ai, {
+          model: 'gemini-1.5-flash',
+          systemInstruction: `Bạn là một chuyên gia ngôn ngữ tiếng Anh. Trả về ĐÚNG MỘT chuỗi JSON hợp lệ, không giải thích gì thêm. Format:
+{"meaning": "nghĩa tiếng Việt ngắn gọn, dễ hiểu", "level": "B1" (chỉ chọn A1/A2/B1/B2/C1/C2), "category": "Khác" (chọn Giao tiếp/Học thuật/Công việc/Du lịch/Gia đình/Thực phẩm/Thể thao/Công nghệ/Khác), "notes": "một ví dụ đặt câu ngắn"}`
+        });
+        
+        const result = await model.generateContent(`Từ vựng cần phân tích: "${word}"`);
+        let reply = result.response.text() || '';
+        
+        if (reply.startsWith('```json')) reply = reply.replace(/^```json\n/, '').replace(/\n```$/, '');
+        else if (reply.startsWith('```')) reply = reply.replace(/^```\n/, '').replace(/\n```$/, '');
+        
+        const parsed = JSON.parse(reply.trim());
+        setForm(prev => ({
+          ...prev,
+          meaning: parsed.meaning || prev.meaning,
+          level: parsed.level || prev.level,
+          category: parsed.category || prev.category,
+          notes: parsed.notes || prev.notes,
+        }));
+
+        try {
+          const newDocRef = doc(collection(vocabDb, 'global_dictionary'));
+          await setDoc(newDocRef, {
+            word: word,
+            meaning: parsed.meaning || '',
+            level: parsed.level || 'B1',
+            category: parsed.category || '',
+            notes: parsed.notes || '',
+            createdAt: new Date().toISOString()
+          });
+        } catch (err) {
+          console.error("Error saving to global dictionary:", err);
+        }
+      }
+    } catch (err) {
+      console.error("Auto fill error:", err);
+    } finally {
+      setIsAutoFilling(false);
+    }
+  };
 
   // Reset when opening/closing
   React.useEffect(() => {
@@ -223,11 +297,25 @@ function VocabFormModal({
         {/* Word */}
         <div>
           <label className="block text-sm font-semibold text-sky-900 mb-1.5">Từ vựng *</label>
-          <Input
-            placeholder="e.g. ubiquitous"
-            value={form.word ?? ''}
-            onChange={e => set('word', e.target.value)}
-          />
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <Input
+                placeholder="e.g. ubiquitous"
+                value={form.word ?? ''}
+                onChange={e => set('word', e.target.value)}
+              />
+            </div>
+            <Button 
+              type="button"
+              variant="secondary" 
+              onClick={handleAutoFill} 
+              disabled={!form.word?.trim() || isAutoFilling}
+              className="px-3 border-sky-200 bg-sky-50 hover:bg-sky-100 text-sky-600 rounded-2xl"
+              title="Tự động điền bằng AI"
+            >
+              {isAutoFilling ? <Loader2 className="w-5 h-5 animate-spin" /> : <Wand2 className="w-5 h-5" />}
+            </Button>
+          </div>
         </div>
 
         {/* Meaning */}
