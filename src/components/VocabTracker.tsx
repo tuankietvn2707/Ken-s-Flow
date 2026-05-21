@@ -380,21 +380,24 @@ export default function VocabTracker({ students, vocab, addVocab, updateVocab, d
   const activeStudents = students.filter(s => s.status !== 'inactive');
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 pb-10">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-extrabold text-sky-950 tracking-tight flex items-center gap-2">
-            <BookMarked className="w-7 h-7 text-sky-500" />
-            Từ vựng học viên
-          </h1>
-          <p className="text-sm text-sky-600/70 mt-0.5">Quản lý và theo dõi từ vựng của từng học viên</p>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+        className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+      >
+        <div className="flex flex-col gap-1 items-start">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-sky-950 dark:text-sky-50 tracking-tight">Từ vựng Học viên</h1>
+          <p className="text-sky-700/80 font-medium text-lg">Quản lý và theo dõi từ vựng của từng học viên</p>
         </div>
-        <Button onClick={openAdd} className="shrink-0">
-          <Plus className="w-4 h-4 mr-2" />
-          Thêm từ mới
+        <Button
+          onClick={openAdd}
+          className="bg-gradient-to-r from-sky-400 to-sky-500 hover:from-sky-500 hover:to-sky-600 text-white border border-white dark:border-slate-700/40 shadow-[0_4px_16px_rgba(56,189,248,0.3)] hover:shadow-[0_8px_24px_rgba(56,189,248,0.4)] hover:-translate-y-0.5 transition-all duration-300 rounded-[20px] h-12 px-6 backdrop-blur-md group shrink-0"
+        >
+          <Plus className="w-5 h-5 mr-2 group-hover:scale-110 group-hover:rotate-90 transition-all duration-300" />
+          <span className="font-semibold text-[15px]">Thêm từ mới</span>
         </Button>
-      </div>
+      </motion.div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -405,7 +408,10 @@ export default function VocabTracker({ students, vocab, addVocab, updateVocab, d
       </div>
 
       {/* Filters */}
-      <div className="bg-white/60 backdrop-blur-sm border border-sky-100 rounded-2xl p-4 space-y-3">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
+        className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-white dark:border-slate-700 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] overflow-hidden p-6 space-y-4"
+      >
         {/* Search */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sky-400" />
@@ -467,7 +473,7 @@ export default function VocabTracker({ students, vocab, addVocab, updateVocab, d
             </button>
           )}
         </div>
-      </div>
+      </motion.div>
 
       {/* Empty state */}
       {filtered.length === 0 && (
@@ -585,18 +591,32 @@ export default function VocabTracker({ students, vocab, addVocab, updateVocab, d
       <Modal
         isOpen={!!confirmDeleteId}
         onClose={() => setConfirmDeleteId(null)}
-        title="Xóa từ vựng?"
+        title="Xác nhận xóa từ vựng"
         maxWidth="sm"
         footer={
-          <div className="flex gap-3 w-full justify-end">
-            <Button variant="outline" onClick={() => setConfirmDeleteId(null)}>Hủy</Button>
-            <Button variant="danger" onClick={async () => { if (confirmDeleteId) { await deleteVocab(confirmDeleteId); setConfirmDeleteId(null); } }}>
+          <>
+            <Button variant="outline" onClick={() => setConfirmDeleteId(null)} className="flex-1 font-semibold rounded-[16px]">
+              Hủy
+            </Button>
+            <Button 
+              variant="danger" 
+              onClick={async () => { if (confirmDeleteId) { await deleteVocab(confirmDeleteId); setConfirmDeleteId(null); } }}
+              className="flex-1 font-semibold rounded-[16px]"
+            >
               Xóa
             </Button>
-          </div>
+          </>
         }
       >
-        <p className="text-sky-700">Từ vựng sẽ bị xóa vĩnh viễn và không thể khôi phục.</p>
+        <div className="flex flex-col items-center pt-2 pb-6">
+          <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-rose-50 to-red-50 border border-white dark:border-slate-700 shadow-[0_4px_16px_rgba(244,63,94,0.1)] ring-1 ring-rose-100 mb-6 relative">
+            <div className="absolute inset-0 bg-rose-400/20 rounded-full animate-ping opacity-50"></div>
+            <Trash2 className="w-8 h-8 text-rose-500 relative z-10" />
+          </div>
+          <p className="text-sky-800 dark:text-sky-200/90 text-center text-[15px] leading-relaxed max-w-[260px]">
+            Bạn có chắc chắn muốn xóa từ vựng này? Hành động này <span className="font-bold text-rose-600">không thể hoàn tác</span>.
+          </p>
+        </div>
       </Modal>
     </div>
   );

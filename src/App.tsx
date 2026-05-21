@@ -208,7 +208,10 @@ export default function App() {
     if (!user) return;
     try {
       await setDoc(doc(db, `users/${user.uid}/students`, student.id), student);
-      setStudents(prev => [...prev, student]);
+      setStudents(prev => {
+        if (prev.some(s => s.id === student.id)) return prev;
+        return [...prev, student];
+      });
       toast.success('Thêm học viên thành công');
     } catch (error) {
       console.error("Error adding student:", error);
@@ -245,7 +248,10 @@ export default function App() {
     if (!user) return;
     try {
       await setDoc(doc(db, `users/${user.uid}/classes`, cls.id), cls);
-      setClasses(prev => [cls, ...prev]);
+      setClasses(prev => {
+        if (prev.some(c => c.id === cls.id)) return prev;
+        return [cls, ...prev];
+      });
       toast.success('Thêm lớp học thành công');
     } catch (error) {
       console.error("Error adding class:", error);
@@ -304,7 +310,10 @@ export default function App() {
 
       await batch.commit();
       setClasses(prev => prev.map(c => classIds.includes(c.id) ? { ...c, isPaid: true, paymentBatchId: batchId } : c));
-      setFinanceHistory(prev => [newHistoryRecord, ...prev].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()));
+      setFinanceHistory(prev => {
+        if (prev.some(h => h.id === newHistoryRecord.id)) return prev;
+        return [newHistoryRecord, ...prev].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      });
       toast.success('Đã xác nhận thanh toán');
     } catch (error) {
       console.error("Error marking classes as paid:", error);
@@ -384,7 +393,10 @@ export default function App() {
     if (!user) return;
     try {
       await setDoc(doc(db, `users/${user.uid}/vocab`, word.id), word);
-      setVocab(prev => [word, ...prev]);
+      setVocab(prev => {
+        if (prev.some(v => v.id === word.id)) return prev;
+        return [word, ...prev];
+      });
       toast.success('Thêm từ vựng thành công');
     } catch (error) {
       console.error("Error adding vocab:", error);
@@ -421,7 +433,10 @@ export default function App() {
     if (!user) return;
     try {
       await setDoc(doc(db, `users/${user.uid}/transactions`, tx.id), tx);
-      setTransactions(prev => [tx, ...prev]);
+      setTransactions(prev => {
+        if (prev.some(t => t.id === tx.id)) return prev;
+        return [tx, ...prev];
+      });
       toast.success('Thêm giao dịch thành công');
     } catch (error) {
       console.error("Error adding transaction:", error);
@@ -445,7 +460,10 @@ export default function App() {
     if (!user) return;
     try {
       await setDoc(doc(db, `users/${user.uid}/goals`, goal.id), goal);
-      setGoals(prev => [...prev, goal]);
+      setGoals(prev => {
+        if (prev.some(g => g.id === goal.id)) return prev;
+        return [...prev, goal];
+      });
       toast.success('Thêm mục tiêu thành công');
     } catch (error) {
       console.error("Error adding goal:", error);
