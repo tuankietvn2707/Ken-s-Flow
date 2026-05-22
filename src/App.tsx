@@ -498,14 +498,14 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen text-slate-900 font-sans relative overflow-x-hidden bg-slate-50">
+    <div className="min-h-screen text-slate-900 font-sans relative overflow-x-clip bg-slate-50">
       {/* Animated Mesh Gradients & Floating Elements */}
-      <div className="absolute top-0 -left-4 w-72 h-72 bg-sky-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob"></div>
-      <div className="absolute top-0 -right-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob animation-delay-2000"></div>
-      <div className="absolute -bottom-8 left-20 w-72 h-72 bg-emerald-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob animation-delay-4000"></div>
+      <div className="absolute top-0 -left-4 w-72 h-72 bg-sky-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob pointer-events-none"></div>
+      <div className="absolute top-0 -right-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob animation-delay-2000 pointer-events-none"></div>
+      <div className="absolute -bottom-8 left-20 w-72 h-72 bg-emerald-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob animation-delay-4000 pointer-events-none"></div>
 
       {/* 3D Decorative Floating Elements */}
-      <div className="absolute top-[15%] left-[5%] animate-float-slow opacity-60">
+      <div className="absolute top-[15%] left-[5%] animate-float-slow opacity-60 pointer-events-none">
         <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="20" cy="20" r="18" stroke="url(#paint0_linear)" strokeWidth="4" strokeDasharray="4 4" />
           <defs>
@@ -517,7 +517,7 @@ export default function App() {
         </svg>
       </div>
 
-      <div className="absolute top-[40%] right-[8%] animate-float opacity-50">
+      <div className="absolute top-[40%] right-[8%] animate-float opacity-50 pointer-events-none">
         <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M16 0V32M0 16H32" stroke="url(#paint1_linear)" strokeWidth="6" strokeLinecap="round" />
           <defs>
@@ -529,7 +529,7 @@ export default function App() {
         </svg>
       </div>
 
-      <div className="absolute bottom-[20%] right-[15%] animate-float-fast opacity-40">
+      <div className="absolute bottom-[20%] right-[15%] animate-float-fast opacity-40 pointer-events-none">
         <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="3" y="3" width="54" height="54" rx="16" stroke="url(#paint2_linear)" strokeWidth="3" transform="rotate(15 30 30)" />
           <defs>

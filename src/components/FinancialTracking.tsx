@@ -121,7 +121,7 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
         className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
       >
         <div className="flex flex-col gap-1 items-start">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-sky-950 tracking-tight">Quản lý Tài chính</h1>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 animate-gradient-x tracking-tight drop-shadow-sm pb-1">Quản lý Tài chính</h1>
           <p className="text-sky-700/80 font-medium text-lg">Theo dõi công nợ và thu học phí</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-2 sm:mt-0">
@@ -138,10 +138,10 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-        className="bg-white/40 backdrop-blur-md rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white/60 overflow-hidden"
-        
+        className="bg-white/40 backdrop-blur-md rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white/60 overflow-hidden relative"
       >
-        <div className="overflow-x-auto">
+        <div className="bg-noise rounded-[32px]"></div>
+        <div className="overflow-x-auto relative z-10">
           <table className="min-w-full border-collapse">
             <thead className="bg-white/40 border-b border-sky-100/50 backdrop-blur-md sticky top-0 z-10">
               <tr>

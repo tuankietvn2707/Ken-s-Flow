@@ -266,7 +266,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
         className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
       >
         <div className="flex flex-col gap-1 items-start">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">Theo dõi Lớp học</h1>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 animate-gradient-x tracking-tight drop-shadow-sm pb-1">Theo dõi Lớp học</h1>
           <p className="text-slate-600 font-medium text-lg">Quản lý lịch học và trạng thái thanh toán học viên</p>
         </div>
         <Button
@@ -453,9 +453,10 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-        className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] overflow-hidden"
+        className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] overflow-hidden relative"
       >
-        <div className="flex flex-col">
+        <div className="bg-noise rounded-[32px]"></div>
+        <div className="flex flex-col relative z-10">
           <div className="px-8 py-6 border-b border-sky-100/60 bg-gradient-to-b from-white/40 to-transparent flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <h3 className="text-xl font-extrabold text-sky-950 tracking-tight">Các buổi học gần đây</h3>
             <div className="flex items-center gap-3 bg-white/50 backdrop-blur-md rounded-[20px] p-1.5 border border-white shadow-[0_4px_16px_rgba(14,165,233,0.03)] focus-within:ring-2 focus-within:ring-sky-200 focus-within:shadow-[0_8px_24px_rgba(14,165,233,0.08)] transition-all duration-300">

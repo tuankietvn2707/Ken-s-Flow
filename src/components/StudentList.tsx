@@ -414,9 +414,10 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
             <motion.div 
               key="list"
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="bg-white/40 backdrop-blur-md rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white/60 overflow-hidden"
+              className="bg-white/40 backdrop-blur-md rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white/60 overflow-hidden relative"
             >
-              <div className="overflow-x-auto">
+              <div className="bg-noise rounded-[32px]"></div>
+              <div className="overflow-x-auto relative z-10">
                 <table className="min-w-full border-collapse">
                   <thead className="bg-white/40 border-b border-sky-100/50 backdrop-blur-md sticky top-0 z-10">
                     <tr>
