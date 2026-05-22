@@ -98,7 +98,7 @@ export default function Login() {
             <Wallet className="w-8 h-8" />
           </div>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-600 to-indigo-600 tracking-tight">
+        <h2 className="mt-6 text-center text-3xl font-extrabold animate-rainbow-text tracking-tight">
           TutorFlow
         </h2>
         <p className="mt-2 text-center text-sm text-slate-500 font-medium">

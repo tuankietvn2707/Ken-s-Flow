@@ -235,7 +235,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
       <div className="flex flex-col gap-1 items-start">
         <motion.h1 
           initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, ease: 'easeOut' }}
-          className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 animate-gradient-x tracking-tight drop-shadow-sm pb-1"
+          className="text-3xl sm:text-4xl font-extrabold animate-rainbow-text tracking-tight drop-shadow-sm pb-1"
         >
           {getGreeting()}
         </motion.h1>

@@ -141,6 +141,30 @@ body::before {
   animation-delay: 1s;
 }
 
+@keyframes rainbow-text {
+  0% { background-position: 200% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-rainbow-text {
+  background: linear-gradient(
+    to right,
+    #ff0000,
+    #ff7f00,
+    #ffff00,
+    #00ff00,
+    #0000ff,
+    #4b0082,
+    #9400d3,
+    #ff0000
+  );
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: rainbow-text 4s linear infinite;
+}
+
 /* Glassmorphism Classes (Refined) */
 .glass {
   background: rgba(255, 255, 255, 0.75);
