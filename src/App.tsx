@@ -552,9 +552,7 @@ export default function App() {
                   className="cursor-pointer hover:opacity-80 transition-opacity flex bg-transparent outline-none border-none p-0"
                 >
                   <div className="flex items-center gap-2 m-0 p-2 px-3">
-                    <div className="bg-sky-500 text-white p-1.5 rounded-lg shadow-sm">
-                      <Wallet className="w-5 h-5" />
-                    </div>
+                    <img src="/logo.png" alt="TutorFlow Logo" className="w-10 h-10 object-contain drop-shadow-md scale-110" />
                     <span className="text-xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-sky-600 to-indigo-600 tracking-tight">
                       TutorFlow
                     </span>
