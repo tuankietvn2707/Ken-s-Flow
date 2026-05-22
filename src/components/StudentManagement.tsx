@@ -52,7 +52,7 @@ export default function StudentManagement({ students, addStudent, updateStudent,
         </div>
         <Button
           onClick={() => setIsFormOpen(true)}
-          className="bg-sky-600 hover:bg-sky-700 text-white shadow-md hover:shadow-[0_0_20px_rgba(2,132,199,0.4)] hover:-translate-y-0.5 transition-all duration-300 rounded-[16px] h-12 px-6 group border border-sky-500/50 relative overflow-hidden"
+          className="bg-sky-600 hover:bg-sky-700 text-white shadow-md hover:shadow-[0_0_20px_rgba(2,132,199,0.4)] transition-all duration-300 rounded-[16px] h-12 px-6 group border border-sky-500/50 relative overflow-hidden btn-magnetic"
         >
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
           <Plus className="w-5 h-5 mr-2 group-hover:scale-110 group-hover:rotate-90 transition-all duration-300 relative z-10" />

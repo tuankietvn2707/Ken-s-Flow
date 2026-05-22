@@ -56,6 +56,51 @@ body::before {
   animation: shimmer 3s infinite;
 }
 
+/* Skeleton Shimmer Loader */
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(226, 232, 240, 0.6) 0%,
+    rgba(241, 245, 249, 0.9) 40%,
+    rgba(226, 232, 240, 0.6) 80%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.8s ease-in-out infinite;
+  border-radius: 12px;
+}
+
+.skeleton-card {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0.8) 40%,
+    rgba(255, 255, 255, 0.5) 80%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.8s ease-in-out infinite;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+}
+
+/* Micro-interaction: Magnetic button effect */
+.btn-magnetic {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease;
+}
+
+.btn-magnetic:hover {
+  transform: translateY(-2px) scale(1.03);
+}
+
+.btn-magnetic:active {
+  transform: translateY(0) scale(0.98);
+}
+
 /* Neo-Glassmorphism Utilities */
 .bg-noise {
   position: absolute;

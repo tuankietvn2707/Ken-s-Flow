@@ -63,13 +63,20 @@ const CustomBarTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     const dayName = label === 'CN' ? 'Chủ Nhật' : `Thứ ${label.replace('T', '')}`;
     return (
-      <div className="glass-panel p-3 border border-sky-300/30 text-sky-950 rounded-xl">
-        <p className="font-semibold text-sky-950 mb-1">{dayName}</p>
-        <p className="text-sm text-sky-700/80">
-          <span className="font-medium text-sky-600">{payload[0].value} buổi học</span>
-          {' '}
-          ({payload[1].value} giờ)
-        </p>
+      <div className="bg-white/90 backdrop-blur-2xl p-4 border border-white/60 shadow-[0_8px_32px_rgba(14,165,233,0.15)] rounded-2xl min-w-[160px]">
+        <p className="font-bold text-slate-800 mb-2 text-sm tracking-tight">{dayName}</p>
+        <div className="space-y-1.5">
+          <p className="text-sm flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_6px_rgba(56,189,248,0.5)]"></span>
+            <span className="font-semibold text-sky-700">{payload[0].value} buổi học</span>
+          </p>
+          {payload[1] && (
+            <p className="text-sm flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-indigo-400 shadow-[0_0_6px_rgba(129,140,248,0.5)]"></span>
+              <span className="font-medium text-slate-600">{payload[1].value} giờ</span>
+            </p>
+          )}
+        </div>
       </div>
     );
   }
@@ -83,21 +90,30 @@ const CustomAreaTooltip = ({ active, payload, label }: any) => {
     const remaining = potential - actual;
 
     return (
-      <div className="bg-white/95 backdrop-blur-md p-4 border border-sky-100 shadow-xl rounded-2xl">
-        <p className="font-bold text-sky-950 mb-4">{`Tháng ${label.replace('T', '')}`}</p>
+      <div className="bg-white/90 backdrop-blur-2xl p-5 border border-white/60 shadow-[0_12px_40px_rgba(14,165,233,0.18)] rounded-2xl min-w-[220px]">
+        <p className="font-extrabold text-slate-800 mb-4 tracking-tight">{label}</p>
         <div className="space-y-3">
-          <p className="text-sm flex justify-between items-center gap-6">
-            <span className="text-sky-700 font-medium">Tổng thu kỳ vọng:</span>
-            <span className="font-bold text-sky-950">{formatVND(potential)}</span>
-          </p>
-          <p className="text-sm flex justify-between items-center gap-6">
-            <span className="text-emerald-600 font-medium tracking-wide">Đã thanh toán:</span>
-            <span className="font-bold text-emerald-600">{formatVND(actual)}</span>
-          </p>
-          <p className="text-sm flex justify-between items-center gap-6 pt-3 border-t border-sky-100">
-            <span className="text-amber-600 font-medium tracking-wide">Chờ thanh toán:</span>
-            <span className="font-bold text-amber-600">{formatVND(remaining)}</span>
-          </p>
+          <div className="flex justify-between items-center gap-6">
+            <span className="flex items-center gap-2 text-sm">
+              <span className="w-2.5 h-2.5 rounded-full bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.5)]"></span>
+              <span className="text-slate-600 font-medium">Kỳ vọng</span>
+            </span>
+            <span className="font-bold text-slate-800 tabular-nums">{formatVND(potential)}</span>
+          </div>
+          <div className="flex justify-between items-center gap-6">
+            <span className="flex items-center gap-2 text-sm">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"></span>
+              <span className="text-emerald-700 font-medium">Đã thu</span>
+            </span>
+            <span className="font-bold text-emerald-600 tabular-nums">{formatVND(actual)}</span>
+          </div>
+          <div className="flex justify-between items-center gap-6 pt-3 border-t border-slate-100/60">
+            <span className="flex items-center gap-2 text-sm">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)]"></span>
+              <span className="text-amber-700 font-medium">Chờ thu</span>
+            </span>
+            <span className="font-bold text-amber-600 tabular-nums">{formatVND(remaining)}</span>
+          </div>
         </div>
       </div>
     );
@@ -232,10 +248,12 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
       </div>
       
       <motion.div 
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, ease: 'easeOut' }}
+        initial="hidden" animate="visible"
+        variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.12 } } }}
         className="grid grid-cols-1 md:grid-cols-3 gap-6"
       >
-        <div 
+        <motion.div 
+          variants={{ hidden: { opacity: 0, y: 24, scale: 0.97 }, visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } } }}
           onClick={() => setActiveTab && setActiveTab('students')}
           className="bg-white/80 backdrop-blur-2xl border border-white/80 shadow-sm overflow-hidden rounded-[24px] cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_40px_-10px_rgba(56,189,248,0.3)] hover:bg-white group relative"
         >
@@ -256,9 +274,10 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div 
+        <motion.div 
+          variants={{ hidden: { opacity: 0, y: 24, scale: 0.97 }, visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } } }}
           onClick={() => setActiveTab && setActiveTab('classes')}
           className="bg-white/80 backdrop-blur-2xl border border-white/80 shadow-sm overflow-hidden rounded-[24px] cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_40px_-10px_rgba(16,185,129,0.3)] hover:bg-white group relative"
         >
@@ -279,9 +298,10 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div 
+        <motion.div 
+          variants={{ hidden: { opacity: 0, y: 24, scale: 0.97 }, visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } } }}
           onClick={() => setActiveTab && setActiveTab('finances')}
           className="bg-white/80 backdrop-blur-2xl border border-white/80 shadow-sm overflow-hidden rounded-[24px] cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_40px_-10px_rgba(245,158,11,0.3)] hover:bg-white group relative"
         >
@@ -302,7 +322,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </motion.div>
 
       <motion.div 
@@ -319,26 +339,33 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
                 <BarChart data={dynamicRevenueTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorPotential" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#bae6fd" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="#bae6fd" stopOpacity={0.3}/>
+                      <stop offset="0%" stopColor="#7dd3fc" stopOpacity={0.95}/>
+                      <stop offset="100%" stopColor="#bae6fd" stopOpacity={0.4}/>
                     </linearGradient>
                     <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0.3}/>
+                      <stop offset="0%" stopColor="#34d399" stopOpacity={0.95}/>
+                      <stop offset="100%" stopColor="#6ee7b7" stopOpacity={0.4}/>
                     </linearGradient>
                     <linearGradient id="colorRemaining" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="#f59e0b" stopOpacity={0.3}/>
+                      <stop offset="0%" stopColor="#fbbf24" stopOpacity={0.95}/>
+                      <stop offset="100%" stopColor="#fde68a" stopOpacity={0.4}/>
                     </linearGradient>
+                    <filter id="barGlow">
+                      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                      <feMerge>
+                        <feMergeNode in="coloredBlur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                      </feMerge>
+                    </filter>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" opacity={0.5} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" opacity={0.4} />
                   <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 13, fontWeight: 500 }} dy={15} />
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 13, fontWeight: 500 }} tickFormatter={formatYAxisCurrency} dx={-10} />
-                  <RechartsTooltip content={<CustomAreaTooltip />} cursor={{ fill: '#f8fafc', opacity: 0.6 }} />
+                  <RechartsTooltip content={<CustomAreaTooltip />} cursor={{ fill: '#f0f9ff', opacity: 0.5, radius: 8 }} />
                   <Legend verticalAlign="top" height={40} iconType="circle" wrapperStyle={{ paddingBottom: '24px', fontSize: '13px', fontWeight: 600, color: '#475569' }} />
-                  <Bar dataKey="potential" name="Tổng thu kỳ vọng" fill="url(#colorPotential)" radius={[6, 6, 0, 0]} maxBarSize={45} isAnimationActive={false} />
-                  <Bar dataKey="actual" name="Đã thanh toán" fill="url(#colorActual)" radius={[6, 6, 0, 0]} maxBarSize={45} isAnimationActive={false} />
-                  <Bar dataKey="remaining" name="Chờ thanh toán" fill="url(#colorRemaining)" radius={[6, 6, 0, 0]} maxBarSize={45} isAnimationActive={false} />
+                  <Bar dataKey="potential" name="Tổng thu kỳ vọng" fill="url(#colorPotential)" radius={[8, 8, 0, 0]} maxBarSize={42} isAnimationActive={true} animationDuration={800} animationEasing="ease-out" filter="url(#barGlow)" />
+                  <Bar dataKey="actual" name="Đã thanh toán" fill="url(#colorActual)" radius={[8, 8, 0, 0]} maxBarSize={42} isAnimationActive={true} animationDuration={1000} animationEasing="ease-out" filter="url(#barGlow)" />
+                  <Bar dataKey="remaining" name="Chờ thanh toán" fill="url(#colorRemaining)" radius={[8, 8, 0, 0]} maxBarSize={42} isAnimationActive={true} animationDuration={1200} animationEasing="ease-out" filter="url(#barGlow)" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -391,7 +418,10 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
                       stroke="none"
                       cornerRadius={6}
                       className="drop-shadow-sm"
-                      isAnimationActive={false}
+                      isAnimationActive={true}
+                      animationBegin={200}
+                      animationDuration={900}
+                      animationEasing="ease-out"
                     >
                       {donutData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.fill} />

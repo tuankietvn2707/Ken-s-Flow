@@ -168,63 +168,77 @@ export default function StudentList({ students, classes = [], onUpdate, onDelete
     </div>
   );
 
-  const renderGridItem = (student: Student) => (
-    <motion.div 
-      key={student.id}
-      layout
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      className={`bg-white border rounded-2xl p-5 shadow-sm hover:shadow-md transition-all cursor-pointer group ${student.status === 'inactive' ? 'opacity-70 border-gray-200' : 'border-sky-100 ring-inset hover:ring-1 hover:ring-sky-300'}`}
-      onClick={() => onSelect(student)}
-    >
-      <div className="flex justify-between items-start mb-4">
-        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-xl shadow-sm ${getAvatarColor(student.id)}`}>
-          {student.firstName ? student.firstName.charAt(0).toUpperCase() : student.name.charAt(0).toUpperCase()}
-        </div>
-        <div className="flex items-center gap-2">
-          <StatusBadgeItem student={student} />
-        </div>
-      </div>
-      <div>
-        <h3 className="font-bold text-sky-950 text-lg line-clamp-1 group-hover:text-sky-700 transition-colors">
-          {student.lastName} {student.firstName}
-        </h3>
-        <p className="text-sm text-sky-700/70 mb-3">{student.occupation || 'Chưa cập nhật nghề nghiệp'}</p>
+  const renderGridItem = (student: Student) => {
+    // Extract a color from getAvatarColor for the ribbon (e.g., from "bg-sky-50 text-sky-600" to "bg-sky-500")
+    const avatarColorStr = getAvatarColor(student.id);
+    const colorMatch = avatarColorStr.match(/text-([a-z]+)-600/);
+    const themeColor = colorMatch ? colorMatch[1] : 'sky';
+
+    return (
+      <motion.div 
+        key={student.id}
+        layout
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className={`bg-white/80 backdrop-blur-xl border border-white shadow-[0_4px_16px_rgba(14,165,233,0.06)] rounded-2xl p-5 hover:shadow-[0_12px_32px_rgba(14,165,233,0.12)] hover:-translate-y-1 transition-all duration-300 cursor-pointer group relative overflow-hidden ${student.status === 'inactive' ? 'opacity-70' : ''}`}
+        onClick={() => onSelect(student)}
+      >
+        {/* Left Ribbon */}
+        <div className={`absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-${themeColor}-400 to-${themeColor}-600 opacity-80`}></div>
         
-        <div className="space-y-2 mt-4">
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-sky-700/60 flex items-center gap-1.5"><BookOpen className="w-4 h-4"/> Mục tiêu</span>
-            <span className="font-semibold text-sky-900 px-2 py-0.5 rounded-md" style={{ backgroundColor: student.targetColor || '#f1f5f9' }}>
-              {student.goal || 'N/A'}
-            </span>
+        <div className="flex justify-between items-start mb-4 relative z-10 pl-2">
+          <div className="relative">
+            <div className={`absolute -inset-1 rounded-2xl bg-gradient-to-br from-${themeColor}-300 to-${themeColor}-100 opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-300`}></div>
+            <div className={`relative w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-xl shadow-sm border border-white/60 ${avatarColorStr} transition-transform duration-300 group-hover:scale-105`}>
+              {student.firstName ? student.firstName.charAt(0).toUpperCase() : student.name.charAt(0).toUpperCase()}
+            </div>
           </div>
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-sky-700/60 flex items-center gap-1.5"><Wallet className="w-4 h-4"/> Học phí</span>
-            <span className="font-semibold text-sky-900">{formatVND(student.fee)}</span>
+          <div className="flex items-center gap-2">
+            <StatusBadgeItem student={student} />
           </div>
         </div>
-        
-        <div className="mt-5 pt-4 border-t border-sky-50 flex items-center justify-between">
-          <Button 
-            variant="secondary"
-            size="sm"
-            onClick={(e) => { e.stopPropagation(); onEdit(student); }}
-          >
-            Chỉnh sửa
-          </Button>
-          <Button 
-            variant="danger"
-            size="icon"
-            onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(student.id); }}
-            className="w-8 h-8 rounded-lg"
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button>
+        <div className="pl-2 relative z-10">
+          <h3 className={`font-extrabold text-slate-800 text-lg line-clamp-1 group-hover:text-${themeColor}-600 transition-colors tracking-tight`}>
+            {student.lastName} {student.firstName}
+          </h3>
+          <p className="text-sm font-medium text-slate-500 mb-4">{student.occupation || 'Chưa cập nhật nghề nghiệp'}</p>
+          
+          <div className="space-y-3 mt-4">
+            <div className="flex justify-between items-center text-sm bg-slate-50/50 p-2 rounded-xl border border-slate-100/50">
+              <span className="text-slate-500 font-semibold flex items-center gap-1.5"><BookOpen className="w-4 h-4 text-slate-400"/> Mục tiêu</span>
+              <span className="font-bold text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200/50 shadow-sm" style={{ backgroundColor: student.targetColor || '#f8fafc' }}>
+                {student.goal || 'N/A'}
+              </span>
+            </div>
+            <div className="flex justify-between items-center text-sm px-2">
+              <span className="text-slate-500 font-semibold flex items-center gap-1.5"><Wallet className="w-4 h-4 text-emerald-400"/> Học phí</span>
+              <span className="font-extrabold text-emerald-600">{formatVND(student.fee)}</span>
+            </div>
+          </div>
+          
+          <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between">
+            <Button 
+              variant="secondary"
+              size="sm"
+              onClick={(e) => { e.stopPropagation(); onEdit(student); }}
+              className="bg-white/80 hover:bg-white shadow-sm border-slate-200 text-slate-600 font-semibold rounded-xl"
+            >
+              Chỉnh sửa
+            </Button>
+            <Button 
+              variant="danger"
+              size="icon"
+              onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(student.id); }}
+              className="w-8 h-8 rounded-xl opacity-50 hover:opacity-100 transition-opacity"
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
-      </div>
-    </motion.div>
-  );
+      </motion.div>
+    );
+  };
 
   const renderListItem = (student: Student, index: number, provided?: any, snapshot?: any) => {
     const isInactive = student.status === 'inactive';

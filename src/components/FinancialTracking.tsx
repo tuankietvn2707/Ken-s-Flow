@@ -4,6 +4,7 @@ import { CheckCircle, RotateCcw } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Button } from './ui/Button';
 import ReceiptModal from './ReceiptModal';
+import SuccessAnimation from './SuccessAnimation';
 
 interface Props {
   students: Student[];
@@ -22,6 +23,7 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
     unpaidClassIds: string[];
     unpaidClasses: ClassSession[];
   } | null>(null);
+  const [showSuccessAnim, setShowSuccessAnim] = useState(false);
 
   const getPronoun = (birthYear: number | '', gender?: string) => {
     if (!birthYear) return 'bạn';
@@ -99,7 +101,7 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
     // 1. Cập nhật dữ liệu Firestore
     markClassesAsPaid(student.id, unpaidClassIds, student.name, totalOwed, totalUnpaidSessions);
 
-    // 2. Mở Modal Biên lai
+    // 2. Prepare receipt data but don't show modal yet
     setReceiptData({
       student,
       totalUnpaidSessions,
@@ -108,7 +110,9 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
       unpaidClassIds,
       unpaidClasses
     });
-    setIsReceiptModalOpen(true);
+
+    // 3. Show Celebration Animation
+    setShowSuccessAnim(true);
   };
 
   const totalOutstanding = allFinancials.reduce((sum, f) => sum + f.totalOwed, 0);
@@ -170,12 +174,31 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
                       {formatVND(student.fee)}
                     </td>
                     <td className="px-6 py-5 whitespace-nowrap border-b border-sky-50/50">
-                      <span 
-                        className="inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold border shadow-sm backdrop-blur-sm transition-all duration-300"
-                        style={getDynamicSessionStyle(totalUnpaidSessions, student.feeCycle || 8)}
-                      >
-                        {totalUnpaidSessions} / {student.feeCycle || 8} buổi
-                      </span>
+                      <div className="flex flex-col gap-2">
+                        <span 
+                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold border shadow-sm backdrop-blur-sm transition-all duration-300 w-fit"
+                          style={getDynamicSessionStyle(totalUnpaidSessions, student.feeCycle || 8)}
+                        >
+                          {totalUnpaidSessions} / {student.feeCycle || 8} buổi
+                        </span>
+                        {/* Gradient Progress Bar */}
+                        <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${Math.min((totalUnpaidSessions / (student.feeCycle || 8)) * 100, 100)}%` }}
+                            transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.2 }}
+                            className="h-full rounded-full transition-all duration-300"
+                            style={{
+                              background: totalUnpaidSessions >= (student.feeCycle || 8)
+                                ? 'linear-gradient(90deg, #38bdf8, #06b6d4, #2dd4bf)'
+                                : `linear-gradient(90deg, hsl(${Math.floor(Math.min(totalUnpaidSessions / (student.feeCycle || 8), 1) * 220)}, 85%, 55%), hsl(${Math.floor(Math.min(totalUnpaidSessions / (student.feeCycle || 8), 1) * 220 + 20)}, 80%, 60%))`,
+                              boxShadow: totalUnpaidSessions >= (student.feeCycle || 8)
+                                ? '0 0 12px rgba(56,189,248,0.5)'
+                                : 'none'
+                            }}
+                          />
+                        </div>
+                      </div>
                     </td>
                     <td className="px-6 py-5 whitespace-nowrap border-b border-sky-50/50">
                       <div className="bg-emerald-50 text-emerald-700 border-emerald-200/50 border px-3 py-1 rounded-full text-xs font-bold shadow-sm inline-flex items-center">
@@ -236,6 +259,14 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
         onClose={() => setIsReceiptModalOpen(false)}
         receiptData={receiptData}
         getPronoun={getPronoun}
+      />
+
+      <SuccessAnimation 
+        isVisible={showSuccessAnim} 
+        onComplete={() => {
+          setShowSuccessAnim(false);
+          setIsReceiptModalOpen(true);
+        }} 
       />
     </div>
   );

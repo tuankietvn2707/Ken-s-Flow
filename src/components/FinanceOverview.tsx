@@ -204,17 +204,29 @@ export default function FinanceOverview({
             {pieData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <RePieChart>
-                  <Pie data={pieData} cx="50%" cy="50%" innerRadius={70} outerRadius={100} paddingAngle={5} dataKey="value" stroke="none" isAnimationActive={false}>
+                  <Pie 
+                    data={pieData} 
+                    cx="50%" cy="50%" 
+                    innerRadius={70} outerRadius={100} 
+                    paddingAngle={5} 
+                    dataKey="value" 
+                    stroke="none" 
+                    isAnimationActive={true}
+                    animationBegin={100}
+                    animationDuration={1000}
+                    animationEasing="ease-out"
+                    className="drop-shadow-md"
+                  >
                     {pieData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip 
                     formatter={(value: number) => [`${formatNumber(value)} đ`, undefined]} 
-                    contentStyle={{ borderRadius: '16px', border: '1px solid rgba(255,255,255,0.8)', boxShadow: '0 10px 25px -5px rgb(0 0 0 / 0.1)', backgroundColor: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(8px)', fontWeight: 600, color: '#0c4a6e' }}
+                    contentStyle={{ borderRadius: '16px', border: '1px solid rgba(255,255,255,0.6)', boxShadow: '0 12px 40px rgba(14,165,233,0.18)', backgroundColor: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(16px)', fontWeight: 600, color: '#0f172a' }}
                     itemStyle={{ color: '#0ea5e9' }}
                   />
-                  <Legend iconType="circle" wrapperStyle={{ fontSize: '13px', fontWeight: 600, color: '#0c4a6e' }} />
+                  <Legend iconType="circle" wrapperStyle={{ fontSize: '13px', fontWeight: 600, color: '#334155' }} />
                 </RePieChart>
               </ResponsiveContainer>
             ) : (
@@ -240,7 +252,24 @@ export default function FinanceOverview({
             {barData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <ReBarChart data={barData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} barSize={32}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                  <defs>
+                    <linearGradient id="incomeGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#34d399" stopOpacity={0.95}/>
+                      <stop offset="100%" stopColor="#6ee7b7" stopOpacity={0.4}/>
+                    </linearGradient>
+                    <linearGradient id="expenseGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#fb7185" stopOpacity={0.95}/>
+                      <stop offset="100%" stopColor="#fda4af" stopOpacity={0.4}/>
+                    </linearGradient>
+                    <filter id="barGlow2">
+                      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                      <feMerge>
+                        <feMergeNode in="coloredBlur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                      </feMerge>
+                    </filter>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.5} />
                   <XAxis dataKey="name" fontSize={12} fontWeight={600} tickLine={false} axisLine={false} tick={{ fill: '#64748b' }} dy={10} />
                   <YAxis 
                     fontSize={12} 
@@ -253,11 +282,11 @@ export default function FinanceOverview({
                   <Tooltip 
                     formatter={(value: number) => [`${formatNumber(value)} đ`, undefined]} 
                     cursor={{fill: 'rgba(241, 245, 249, 0.5)', radius: 8}}
-                    contentStyle={{ borderRadius: '16px', border: '1px solid rgba(255,255,255,0.8)', boxShadow: '0 10px 25px -5px rgb(0 0 0 / 0.1)', backgroundColor: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(8px)', fontWeight: 600, color: '#0c4a6e' }}
+                    contentStyle={{ borderRadius: '16px', border: '1px solid rgba(255,255,255,0.6)', boxShadow: '0 12px 40px rgba(14,165,233,0.18)', backgroundColor: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(16px)', fontWeight: 600, color: '#0f172a' }}
                   />
-                  <Legend iconType="circle" wrapperStyle={{ fontSize: '13px', paddingTop: '10px', fontWeight: 600, color: '#0c4a6e' }} />
-                  <Bar dataKey="income" name="Thu nhập" fill="#34d399" radius={[8, 8, 8, 8]} isAnimationActive={false} />
-                  <Bar dataKey="expense" name="Chi tiêu" fill="#fb7185" radius={[8, 8, 8, 8]} isAnimationActive={false} />
+                  <Legend iconType="circle" wrapperStyle={{ fontSize: '13px', paddingTop: '10px', fontWeight: 600, color: '#334155' }} />
+                  <Bar dataKey="income" name="Thu nhập" fill="url(#incomeGrad)" radius={[8, 8, 8, 8]} filter="url(#barGlow2)" isAnimationActive={true} animationDuration={1000} animationEasing="ease-out" />
+                  <Bar dataKey="expense" name="Chi tiêu" fill="url(#expenseGrad)" radius={[8, 8, 8, 8]} filter="url(#barGlow2)" isAnimationActive={true} animationDuration={1000} animationEasing="ease-out" />
                 </ReBarChart>
               </ResponsiveContainer>
             ) : (

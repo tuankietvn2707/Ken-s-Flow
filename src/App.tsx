@@ -23,6 +23,7 @@ import { Modal } from './components/ui/Modal';
 import FinanceHistory from './components/FinanceHistory';
 
 
+
 const DongSign = ({ className }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -150,7 +151,7 @@ export default function App() {
               const balance = Number(localBalance);
               if (!isNaN(balance)) {
                 batch.set(doc(db, `users/${uid}/settings/finance`), { initialBalance: balance });
-                setInitialBalance(balance);
+                setInitialBalance({ cash: balance, banking: 0 });
                 hasData = true;
               }
             }
@@ -552,7 +553,9 @@ export default function App() {
                   className="cursor-pointer hover:opacity-80 transition-opacity flex bg-transparent outline-none border-none p-0"
                 >
                   <div className="flex items-center gap-2 m-0 p-2 px-3">
-                    <img src="/logo.png" alt="TutorFlow Logo" className="w-10 h-10 object-contain drop-shadow-md scale-110" />
+                    <div className="bg-sky-500 text-white p-1.5 rounded-lg shadow-sm">
+                      <Wallet className="w-5 h-5" />
+                    </div>
                     <span className="text-xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-sky-600 to-indigo-600 tracking-tight">
                       TutorFlow
                     </span>
@@ -645,54 +648,68 @@ export default function App() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8">
         {loadingData ? (
-          <div className="py-20 animate-pulse">
+          <div className="py-10">
             <div className="max-w-4xl mx-auto space-y-6">
-              <div className="h-10 bg-sky-100 rounded-xl w-1/3"></div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                <div className="h-32 bg-sky-50 rounded-2xl border border-sky-100"></div>
-                <div className="h-32 bg-sky-50 rounded-2xl border border-sky-100"></div>
-                <div className="h-32 bg-sky-50 rounded-2xl border border-sky-100"></div>
+              {/* Skeleton header */}
+              <div className="skeleton h-10 w-1/3"></div>
+              <div className="skeleton h-5 w-1/2 opacity-60"></div>
+              {/* Skeleton stat cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4">
+                <div className="skeleton-card h-40"></div>
+                <div className="skeleton-card h-40" style={{ animationDelay: '0.15s' }}></div>
+                <div className="skeleton-card h-40" style={{ animationDelay: '0.3s' }}></div>
               </div>
+              {/* Skeleton chart panels */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
-                <div className="h-96 bg-sky-50 rounded-2xl border border-sky-100"></div>
-                <div className="h-96 bg-sky-50 rounded-2xl border border-sky-100"></div>
+                <div className="skeleton-card h-96"></div>
+                <div className="skeleton-card h-96" style={{ animationDelay: '0.2s' }}></div>
               </div>
             </div>
           </div>
         ) : (
-          <Suspense fallback={
-            <div className="py-20 animate-pulse">
-              <div className="max-w-4xl mx-auto space-y-6">
-                <div className="h-10 bg-sky-100 rounded-xl w-1/3"></div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                  <div className="h-32 bg-sky-50 rounded-2xl border border-sky-100"></div>
-                  <div className="h-32 bg-sky-50 rounded-2xl border border-sky-100"></div>
-                  <div className="h-32 bg-sky-50 rounded-2xl border border-sky-100"></div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+            >
+              <Suspense fallback={
+                <div className="py-10">
+                  <div className="max-w-4xl mx-auto space-y-6">
+                    <div className="skeleton h-10 w-1/3"></div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2">
+                      <div className="skeleton-card h-40"></div>
+                      <div className="skeleton-card h-40" style={{ animationDelay: '0.15s' }}></div>
+                      <div className="skeleton-card h-40" style={{ animationDelay: '0.3s' }}></div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          }>
-            {activeTab === 'dashboard' && <Dashboard students={students} classes={classes} setActiveTab={setActiveTab} displayName={displayName} />}
-            {activeTab === 'students' && <StudentManagement students={students} addStudent={addStudent} updateStudent={updateStudent} deleteStudent={deleteStudent} classes={classes} markClassesAsPaid={markClassesAsPaid} />}
-            {activeTab === 'classes' && <ClassTracker students={students} classes={classes} addClass={addClass} updateClass={updateClass} deleteClass={deleteClass} />}
-            {activeTab === 'finances' && <FinancialTracking students={students} classes={classes} markClassesAsPaid={markClassesAsPaid} undoLastPayment={undoLastPayment} />}
-            {activeTab === 'personal_finance' && (
-              <PersonalFinance 
-                transactions={transactions}
-                financeHistory={financeHistory}
-                goals={goals}
-                initialBalance={initialBalance}
-                addTransaction={addTransaction}
-                deleteTransaction={deleteTransaction}
-                addGoal={addGoal}
-                updateGoal={updateGoal}
-                deleteGoal={deleteGoal}
-                updateInitialBalance={updateInitialBalance}
-                consolidateAndResetBalance={consolidateAndResetBalance}
-                deleteFinanceHistory={deleteFinanceHistory}
-              />
-            )}
-          </Suspense>
+              }>
+                {activeTab === 'dashboard' && <Dashboard students={students} classes={classes} setActiveTab={setActiveTab} displayName={displayName} />}
+                {activeTab === 'students' && <StudentManagement students={students} addStudent={addStudent} updateStudent={updateStudent} deleteStudent={deleteStudent} classes={classes} markClassesAsPaid={markClassesAsPaid} />}
+                {activeTab === 'classes' && <ClassTracker students={students} classes={classes} addClass={addClass} updateClass={updateClass} deleteClass={deleteClass} />}
+                {activeTab === 'finances' && <FinancialTracking students={students} classes={classes} markClassesAsPaid={markClassesAsPaid} undoLastPayment={undoLastPayment} />}
+                {activeTab === 'personal_finance' && (
+                  <PersonalFinance 
+                    transactions={transactions}
+                    financeHistory={financeHistory}
+                    goals={goals}
+                    initialBalance={initialBalance}
+                    addTransaction={addTransaction}
+                    deleteTransaction={deleteTransaction}
+                    addGoal={addGoal}
+                    updateGoal={updateGoal}
+                    deleteGoal={deleteGoal}
+                    updateInitialBalance={updateInitialBalance}
+                    consolidateAndResetBalance={consolidateAndResetBalance}
+                    deleteFinanceHistory={deleteFinanceHistory}
+                  />
+                )}
+              </Suspense>
+            </motion.div>
+          </AnimatePresence>
         )}
       </main>
 
@@ -750,34 +767,48 @@ export default function App() {
 
 const TabButton = React.memo(function TabButton({ active, onClick, icon, label, colorClass, hoverClass }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string, colorClass: string, hoverClass: string }) {
   return (
-    <Button
-      variant="ghost"
+    <button
       onClick={onClick}
-      className={`inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 border h-auto ${
+      className={`relative inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold transition-colors duration-200 h-auto cursor-pointer outline-none border-none bg-transparent ${
         active 
-          ? `${colorClass} shadow-sm` 
-          : `border-transparent text-slate-600 ${hoverClass}`
+          ? 'text-sky-700' 
+          : `text-slate-500 ${hoverClass}`
       }`}
     >
-      {icon}
-      {label}
-    </Button>
+      {active && (
+        <motion.div
+          layoutId="activeTabPill"
+          className="absolute inset-0 bg-gradient-to-r from-sky-50 to-indigo-50 rounded-xl border border-sky-200/60 shadow-[0_2px_12px_rgba(14,165,233,0.12)]"
+          transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+        />
+      )}
+      <span className="relative z-10 flex items-center">
+        {icon}
+        {label}
+      </span>
+    </button>
   );
 });
 
 const MobileTabButton = React.memo(function MobileTabButton({ active, onClick, label, colorClass }: { active: boolean, onClick: () => void, label: string, colorClass: string }) {
   return (
-    <Button
-      variant="ghost"
+    <button
       onClick={onClick}
-      className={`whitespace-nowrap py-2 px-4 rounded-xl text-sm font-semibold flex-1 text-center transition-all duration-300 border ${
+      className={`relative whitespace-nowrap py-2 px-4 rounded-xl text-sm font-semibold flex-1 text-center transition-colors duration-200 cursor-pointer outline-none border-none bg-transparent ${
         active 
-          ? `${colorClass} shadow-sm` 
-          : `border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900`
+          ? 'text-sky-700' 
+          : 'text-slate-500 hover:text-slate-700'
       }`}
     >
-      {label}
-    </Button>
+      {active && (
+        <motion.div
+          layoutId="activeMobileTabPill"
+          className="absolute inset-0 bg-gradient-to-r from-sky-50 to-indigo-50 rounded-xl border border-sky-200/60 shadow-[0_2px_12px_rgba(14,165,233,0.12)]"
+          transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+        />
+      )}
+      <span className="relative z-10">{label}</span>
+    </button>
   );
 });
 
