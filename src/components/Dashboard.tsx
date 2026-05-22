@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Student, ClassSession, formatVND, parseDateSafe } from '../types';
-import { Users, Calendar, Plus, UserPlus, CalendarPlus, CreditCard } from 'lucide-react';
+import { Users, Calendar, Plus, UserPlus, CalendarPlus, CreditCard, ArrowUpRight, Banknote } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Input } from './ui/Input';
 import {
@@ -219,13 +219,13 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
       <div className="flex flex-col gap-1 items-start">
         <motion.h1 
           initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, ease: 'easeOut' }}
-          className="text-3xl sm:text-4xl font-extrabold text-sky-950 tracking-tight"
+          className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 animate-gradient-x tracking-tight drop-shadow-sm pb-1"
         >
           {getGreeting()}
         </motion.h1>
         <motion.p
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
-          className="text-sky-700/80 font-medium text-lg"
+          className="text-slate-600 font-medium text-lg"
         >
           Dưới đây là tình hình hoạt động trung tâm của bạn
         </motion.p>
@@ -237,19 +237,22 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
       >
         <div 
           onClick={() => setActiveTab && setActiveTab('students')}
-          className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] overflow-hidden rounded-[32px] cursor-pointer transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(14,165,233,0.12)] group relative"
+          className="bg-white/80 backdrop-blur-2xl border border-white/80 shadow-sm overflow-hidden rounded-[24px] cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_40px_-10px_rgba(56,189,248,0.3)] hover:bg-white group relative"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="bg-noise rounded-[24px]"></div>
+          <div className="absolute top-0 right-0 p-4 opacity-50 group-hover:opacity-100 transition-opacity z-10">
+             <ArrowUpRight className="w-5 h-5 text-slate-400 group-hover:text-sky-500" />
+          </div>
           <div className="p-8 relative z-10">
             <div className="flex flex-col gap-6">
               <div className="flex justify-between items-start">
-                <div className="bg-gradient-to-br from-sky-50 to-white text-sky-500 rounded-[20px] p-4 shadow-sm ring-1 ring-white/80 group-hover:scale-110 group-hover:shadow-md group-hover:text-sky-600 transition-all duration-300">
-                  <Users className="h-7 w-7" />
+                <div className="bg-gradient-to-br from-sky-100 to-sky-50 p-3 rounded-2xl shadow-inner border border-white/50 group-hover:scale-110 transition-transform duration-300">
+                  <Users className="h-7 w-7 text-sky-500" />
                 </div>
               </div>
               <div>
-                <dt className="text-xs font-bold text-sky-600/80 uppercase tracking-[0.15em] mb-2">Học viên hoạt động</dt>
-                <dd className="text-5xl font-black text-sky-950 tracking-tighter drop-shadow-sm">{students.filter(s => s.status !== 'inactive').length}</dd>
+                <dt className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Học viên hoạt động</dt>
+                <dd className="text-5xl font-extrabold text-slate-800 tracking-tight">{students.filter(s => s.status !== 'inactive').length}</dd>
               </div>
             </div>
           </div>
@@ -257,19 +260,22 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
 
         <div 
           onClick={() => setActiveTab && setActiveTab('classes')}
-          className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] overflow-hidden rounded-[32px] cursor-pointer transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(16,185,129,0.12)] group relative"
+          className="bg-white/80 backdrop-blur-2xl border border-white/80 shadow-sm overflow-hidden rounded-[24px] cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_40px_-10px_rgba(16,185,129,0.3)] hover:bg-white group relative"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="bg-noise rounded-[24px]"></div>
+          <div className="absolute top-0 right-0 p-4 opacity-50 group-hover:opacity-100 transition-opacity z-10">
+             <ArrowUpRight className="w-5 h-5 text-slate-400 group-hover:text-emerald-500" />
+          </div>
           <div className="p-8 relative z-10">
             <div className="flex flex-col gap-6">
               <div className="flex justify-between items-start">
-                <div className="bg-gradient-to-br from-emerald-50 to-white text-emerald-500 rounded-[20px] p-4 shadow-sm ring-1 ring-white/80 group-hover:scale-110 group-hover:shadow-md group-hover:text-emerald-600 transition-all duration-300">
-                  <Calendar className="h-7 w-7" />
+                <div className="bg-gradient-to-br from-emerald-100 to-emerald-50 p-3 rounded-2xl shadow-inner border border-white/50 group-hover:scale-110 transition-transform duration-300">
+                  <Calendar className="h-7 w-7 text-emerald-600" />
                 </div>
               </div>
               <div>
-                <dt className="text-xs font-bold text-emerald-600/80 uppercase tracking-[0.15em] mb-2">Lớp học tuần này</dt>
-                <dd className="text-5xl font-black text-sky-950 tracking-tighter drop-shadow-sm">{classesThisWeek}</dd>
+                <dt className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Lớp học tuần này</dt>
+                <dd className="text-5xl font-extrabold text-slate-800 tracking-tight">{classesThisWeek}</dd>
               </div>
             </div>
           </div>
@@ -277,19 +283,22 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
 
         <div 
           onClick={() => setActiveTab && setActiveTab('finances')}
-          className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] overflow-hidden rounded-[32px] cursor-pointer transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(245,158,11,0.12)] group relative"
+          className="bg-white/80 backdrop-blur-2xl border border-white/80 shadow-sm overflow-hidden rounded-[24px] cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_40px_-10px_rgba(245,158,11,0.3)] hover:bg-white group relative"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="bg-noise rounded-[24px]"></div>
+          <div className="absolute top-0 right-0 p-4 opacity-50 group-hover:opacity-100 transition-opacity z-10">
+             <ArrowUpRight className="w-5 h-5 text-slate-400 group-hover:text-amber-500" />
+          </div>
           <div className="p-8 relative z-10">
             <div className="flex flex-col gap-6">
               <div className="flex justify-between items-start">
-                <div className="bg-gradient-to-br from-amber-50 to-white text-amber-500 rounded-[20px] p-4 shadow-sm ring-1 ring-white/80 group-hover:scale-110 group-hover:shadow-md group-hover:text-amber-600 transition-all duration-300">
-                  <DongSign className="h-7 w-7" />
+                <div className="bg-gradient-to-br from-amber-100 to-amber-50 p-3 rounded-2xl shadow-inner border border-white/50 group-hover:scale-110 transition-transform duration-300">
+                  <Banknote className="h-7 w-7 text-amber-600" />
                 </div>
               </div>
               <div>
-                <dt className="text-xs font-bold text-amber-600/80 uppercase tracking-[0.15em] mb-2">Chờ thanh toán</dt>
-                <dd className="text-4xl font-black text-sky-950 tracking-tight leading-tight mt-1 truncate drop-shadow-sm">{formatVND(choThanhToan)}</dd>
+                <dt className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Chờ thanh toán</dt>
+                <dd className="text-4xl font-extrabold text-slate-800 tracking-tight leading-tight mt-1 truncate">{formatVND(choThanhToan)}</dd>
               </div>
             </div>
           </div>
@@ -301,20 +310,35 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
         className="grid grid-cols-1 lg:grid-cols-2 gap-8"
       >
         {/* Revenue Trend Chart (50%) */}
-        <div className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] lg:col-span-1 flex flex-col hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(14,165,233,0.1)] transition-all duration-300">
-          <div className="p-8 flex flex-col h-full min-h-[500px]">
-            <h3 className="text-xl font-extrabold text-sky-950 tracking-tight mb-8">Xu hướng doanh thu</h3>
+        <div className="bg-white/90 backdrop-blur-2xl border border-white/60 shadow-sm rounded-[24px] lg:col-span-1 flex flex-col hover:-translate-y-1 hover:shadow-lg transition-all duration-300 relative overflow-hidden">
+          <div className="bg-noise rounded-[24px]"></div>
+          <div className="p-8 flex flex-col h-full min-h-[500px] relative z-10">
+            <h3 className="text-xl font-bold text-slate-800 tracking-tight mb-8">Xu hướng doanh thu</h3>
             <div className="flex-1 w-full min-h-0">
               <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                 <BarChart data={dynamicRevenueTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorPotential" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#bae6fd" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#bae6fd" stopOpacity={0.3}/>
+                    </linearGradient>
+                    <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0.3}/>
+                    </linearGradient>
+                    <linearGradient id="colorRemaining" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#f59e0b" stopOpacity={0.3}/>
+                    </linearGradient>
+                  </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" opacity={0.5} />
                   <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 13, fontWeight: 500 }} dy={15} />
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 13, fontWeight: 500 }} tickFormatter={formatYAxisCurrency} dx={-10} />
                   <RechartsTooltip content={<CustomAreaTooltip />} cursor={{ fill: '#f8fafc', opacity: 0.6 }} />
                   <Legend verticalAlign="top" height={40} iconType="circle" wrapperStyle={{ paddingBottom: '24px', fontSize: '13px', fontWeight: 600, color: '#475569' }} />
-                  <Bar dataKey="potential" name="Tổng thu kỳ vọng" fill="#bae6fd" radius={[6, 6, 0, 0]} maxBarSize={45} isAnimationActive={false} />
-                  <Bar dataKey="actual" name="Đã thanh toán" fill="#10b981" radius={[6, 6, 0, 0]} maxBarSize={45} isAnimationActive={false} />
-                  <Bar dataKey="remaining" name="Chờ thanh toán" fill="#f59e0b" radius={[6, 6, 0, 0]} maxBarSize={45} isAnimationActive={false} />
+                  <Bar dataKey="potential" name="Tổng thu kỳ vọng" fill="url(#colorPotential)" radius={[6, 6, 0, 0]} maxBarSize={45} isAnimationActive={false} />
+                  <Bar dataKey="actual" name="Đã thanh toán" fill="url(#colorActual)" radius={[6, 6, 0, 0]} maxBarSize={45} isAnimationActive={false} />
+                  <Bar dataKey="remaining" name="Chờ thanh toán" fill="url(#colorRemaining)" radius={[6, 6, 0, 0]} maxBarSize={45} isAnimationActive={false} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -322,13 +346,14 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
         </div>
 
         {/* Tỷ lệ thu hồi học phí (Donut Chart) (50%) */}
-        <div className="bg-white/60 backdrop-blur-md border border-white shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-[32px] lg:col-span-1 flex flex-col hover:-translate-y-1.5 hover:shadow-[0_12px_48px_rgba(14,165,233,0.1)] transition-all duration-300">
-          <div className="p-8 flex-1 min-h-[500px] flex flex-col">
+        <div className="bg-white/90 backdrop-blur-2xl border border-white/60 shadow-sm rounded-[24px] lg:col-span-1 flex flex-col hover:-translate-y-1 hover:shadow-lg transition-all duration-300 relative overflow-hidden">
+          <div className="bg-noise rounded-[24px]"></div>
+          <div className="p-8 flex-1 min-h-[500px] flex flex-col relative z-10">
             <div className="flex justify-between items-center mb-8 gap-4">
-              <h3 className="text-xl font-extrabold text-sky-950 tracking-tight">Thu hồi học phí</h3>
+              <h3 className="text-xl font-bold text-slate-800 tracking-tight">Thu hồi học phí</h3>
               <div className="relative shrink-0 group">
-                <div className="flex items-center gap-2 bg-white/60 backdrop-blur-md border border-white shadow-[0_4px_16px_rgba(14,165,233,0.05)] hover:shadow-[0_8px_24px_rgba(14,165,233,0.1)] hover:bg-white/90 transition-all duration-300 rounded-[20px] px-4 py-2 ring-1 ring-sky-100/50 group-hover:ring-sky-200">
-                  <Calendar className="w-5 h-5 text-sky-500 group-hover:text-sky-600 transition-colors" />
+                <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 hover:border-slate-300 transition-all duration-300 rounded-[12px] px-4 py-2">
+                  <Calendar className="w-5 h-5 text-slate-500" />
                   <input
                     type="month"
                     id="financialMonthFilter"
@@ -338,7 +363,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
                         setSelectedMonth(e.target.value);
                       }
                     }}
-                    className="bg-transparent border-none p-0 text-sky-950 font-semibold focus:ring-0 cursor-pointer outline-none w-[110px] text-sm"
+                    className="bg-transparent border-none p-0 text-slate-700 font-semibold focus:ring-0 cursor-pointer outline-none w-[110px] text-sm"
                     style={{ WebkitAppearance: 'none' }}
                   />
                 </div>
@@ -380,38 +405,38 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                  <span className="text-5xl leading-none font-extrabold text-sky-950 tracking-tighter drop-shadow-sm">{(tongTienCoTheThu > 0 ? (soTienThanhToan / tongTienCoTheThu) * 100 : 0).toFixed(0)}%</span>
-                  <span className="text-[0.65rem] font-bold text-sky-500 uppercase tracking-[0.25em] mt-3 opacity-60">Hoàn thành</span>
+                  <span className="text-5xl leading-none font-extrabold text-slate-800 tracking-tighter drop-shadow-sm">{(tongTienCoTheThu > 0 ? (soTienThanhToan / tongTienCoTheThu) * 100 : 0).toFixed(0)}%</span>
+                  <span className="text-[0.65rem] font-bold text-slate-500 uppercase tracking-[0.25em] mt-3 opacity-60">Hoàn thành</span>
                 </div>
               </motion.div>
             </div>
             
-            <div className="mt-8 bg-white/40 backdrop-blur-md rounded-[24px] p-6 ring-1 ring-white/60 shadow-[0_4px_24px_rgba(14,165,233,0.03)] border border-sky-100/50">
-              <div className="flex justify-between items-center pb-5 border-b border-sky-100/60 mb-5">
-                <span className="text-[0.8rem] font-bold text-sky-900/80 uppercase tracking-widest">Tổng thu kỳ vọng</span>
-                <span className="font-extrabold text-xl text-sky-950 tracking-tight">{formatVND(tongTienCoTheThu)}</span>
+            <div className="mt-8 bg-white/60 backdrop-blur-md rounded-[24px] p-6 ring-1 ring-white/60 shadow-sm border border-slate-100/50">
+              <div className="flex justify-between items-center pb-5 border-b border-slate-100/60 mb-5">
+                <span className="text-[0.8rem] font-bold text-slate-600 uppercase tracking-widest">Tổng thu kỳ vọng</span>
+                <span className="font-extrabold text-xl text-slate-800 tracking-tight">{formatVND(tongTienCoTheThu)}</span>
               </div>
               <div className="space-y-4">
                 <div className="flex items-center justify-between group/item">
                   <div className="flex items-center gap-3 w-1/2">
                     <div className="w-3 h-3 rounded-full bg-[#10b981] shadow-[0_0_8px_rgba(16,185,129,0.4)]"></div>
-                    <span className="text-sm font-semibold text-sky-800/90 truncate">Đã thanh toán</span>
+                    <span className="text-sm font-semibold text-slate-700 truncate">Đã thanh toán</span>
                   </div>
-                  <span className="font-bold text-sky-950 text-right w-1/2">{formatVND(soTienThanhToan)}</span>
+                  <span className="font-bold text-slate-800 text-right w-1/2">{formatVND(soTienThanhToan)}</span>
                 </div>
                 <div className="flex items-center justify-between group/item">
                   <div className="flex items-center gap-3 w-1/2">
                     <div className="w-3 h-3 rounded-full bg-[#f59e0b] shadow-[0_0_8px_rgba(245,158,11,0.4)]"></div>
-                    <span className="text-sm font-semibold text-sky-800/90 truncate">Chờ thanh toán</span>
+                    <span className="text-sm font-semibold text-slate-700 truncate">Chờ thanh toán</span>
                   </div>
-                  <span className="font-bold text-sky-950 text-right w-1/2">{formatVND(choThanhToan)}</span>
+                  <span className="font-bold text-slate-800 text-right w-1/2">{formatVND(choThanhToan)}</span>
                 </div>
                 <div className="flex items-center justify-between group/item">
                   <div className="flex items-center gap-3 w-1/2">
                     <div className="w-3 h-3 rounded-full bg-[#38bdf8] shadow-[0_0_8px_rgba(56,189,248,0.4)]"></div>
-                    <span className="text-sm font-semibold text-sky-800/90 truncate">Có thể thu thêm</span>
+                    <span className="text-sm font-semibold text-slate-700 truncate">Có thể thu thêm</span>
                   </div>
-                  <span className="font-bold text-sky-950 text-right w-1/2">{formatVND(soTienCoTheThuConLai)}</span>
+                  <span className="font-bold text-slate-800 text-right w-1/2">{formatVND(soTienCoTheThuConLai)}</span>
                 </div>
               </div>
             </div>

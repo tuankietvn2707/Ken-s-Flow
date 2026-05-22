@@ -59,6 +59,31 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
     };
   });
 
+  const getDynamicSessionStyle = (unpaid: number, total: number) => {
+    if (!total || total <= 0) return {};
+    const ratio = Math.min(unpaid / total, 1);
+    
+    // Nếu đạt mức tối đa (8/8 hoặc 12/12) -> Xanh pastel tươi mới
+    if (ratio === 1) {
+      return {
+        backgroundColor: '#e0f2fe', // sky-100
+        color: '#0284c7', // sky-600
+        borderColor: '#7dd3fc', // sky-300
+        boxShadow: '0 0 12px rgba(56,189,248,0.5)'
+      };
+    }
+    
+    // Từ 0 (Đỏ) -> Xanh nước biển (220-240)
+    // Sử dụng HSL để chuyển màu mượt mà theo tỷ lệ
+    const hue = Math.floor(ratio * 220); 
+    
+    return {
+      backgroundColor: `hsl(${hue}, 100%, 96%)`,
+      color: `hsl(${hue}, 75%, 45%)`,
+      borderColor: `hsl(${hue}, 85%, 85%)`
+    };
+  };
+
   const handleMarkAsPaid = (
     student: Student, 
     unpaidClassIds: string[], 
@@ -145,10 +170,11 @@ export default function FinancialTracking({ students, classes, markClassesAsPaid
                       {formatVND(student.fee)}
                     </td>
                     <td className="px-6 py-5 whitespace-nowrap border-b border-sky-50/50">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border shadow-sm backdrop-blur-sm ${
-                        totalUnpaidSessions > 0 ? 'bg-rose-50 text-rose-700 border-rose-200/50' : 'bg-sky-50 text-sky-700 border-sky-200/50'
-                      }`}>
-                        {totalUnpaidSessions} / {student.feeCycle} buổi
+                      <span 
+                        className="inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold border shadow-sm backdrop-blur-sm transition-all duration-300"
+                        style={getDynamicSessionStyle(totalUnpaidSessions, student.feeCycle || 8)}
+                      >
+                        {totalUnpaidSessions} / {student.feeCycle || 8} buổi
                       </span>
                     </td>
                     <td className="px-6 py-5 whitespace-nowrap border-b border-sky-50/50">

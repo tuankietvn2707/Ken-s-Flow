@@ -498,27 +498,64 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen text-sky-950 font-sans relative overflow-x-hidden">
-      {/* Premium Glassmorphism Background */}
-      <div className="fixed inset-0 z-[-1] bg-gradient-to-br from-[#f8fafc] via-[#e8f4fd] to-[#f0f9ff]">
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-sky-200/40 blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-blue-200/30 blur-[120px]" />
-        <div className="absolute top-[40%] left-[20%] w-[30%] h-[30%] rounded-full bg-indigo-100/30 blur-[100px]" />
+    <div className="min-h-screen text-slate-900 font-sans relative overflow-x-hidden bg-slate-50">
+      {/* Animated Mesh Gradients & Floating Elements */}
+      <div className="absolute top-0 -left-4 w-72 h-72 bg-sky-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob"></div>
+      <div className="absolute top-0 -right-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob animation-delay-2000"></div>
+      <div className="absolute -bottom-8 left-20 w-72 h-72 bg-emerald-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob animation-delay-4000"></div>
+
+      {/* 3D Decorative Floating Elements */}
+      <div className="absolute top-[15%] left-[5%] animate-float-slow opacity-60">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="20" r="18" stroke="url(#paint0_linear)" strokeWidth="4" strokeDasharray="4 4" />
+          <defs>
+            <linearGradient id="paint0_linear" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#38BDF8" stopOpacity="0.8" />
+              <stop offset="1" stopColor="#818CF8" stopOpacity="0.2" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+
+      <div className="absolute top-[40%] right-[8%] animate-float opacity-50">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M16 0V32M0 16H32" stroke="url(#paint1_linear)" strokeWidth="6" strokeLinecap="round" />
+          <defs>
+            <linearGradient id="paint1_linear" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#A78BFA" stopOpacity="0.8" />
+              <stop offset="1" stopColor="#34D399" stopOpacity="0.2" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+
+      <div className="absolute bottom-[20%] right-[15%] animate-float-fast opacity-40">
+        <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="3" width="54" height="54" rx="16" stroke="url(#paint2_linear)" strokeWidth="3" transform="rotate(15 30 30)" />
+          <defs>
+            <linearGradient id="paint2_linear" x1="0" y1="0" x2="60" y2="60" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#F472B6" stopOpacity="0.6" />
+              <stop offset="1" stopColor="#38BDF8" stopOpacity="0.1" />
+            </linearGradient>
+          </defs>
+        </svg>
       </div>
 
       <Toaster position="top-center" richColors theme="light" />
-      <nav className="bg-white/80 backdrop-blur-3xl border-b border-white fixed w-full top-0 z-50 shadow-[0_12px_40px_rgba(14,165,233,0.12)] transition-all">
+      <nav className="bg-white/70 backdrop-blur-2xl border-b border-white/50 fixed w-full top-0 z-50 shadow-sm transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex">
               <div className="flex-shrink-0 flex items-center">
                 <button 
                   onClick={() => window.location.reload()}
-                  className="animated-border-box cursor-pointer hover:opacity-80 transition-opacity flex bg-transparent outline-none border-none p-0"
+                  className="cursor-pointer hover:opacity-80 transition-opacity flex bg-transparent outline-none border-none p-0"
                 >
-                  <div className="animated-border-inner flex items-center gap-2 m-0 p-2 px-3 bg-white/80 rounded-[10px]">
-                    <Wallet className="w-6 h-6 text-sky-600" />
-                    <span className="text-xl font-bold text-sky-600">
+                  <div className="flex items-center gap-2 m-0 p-2 px-3">
+                    <div className="bg-sky-500 text-white p-1.5 rounded-lg shadow-sm">
+                      <Wallet className="w-5 h-5" />
+                    </div>
+                    <span className="text-xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-sky-600 to-indigo-600 tracking-tight">
                       TutorFlow
                     </span>
                   </div>
@@ -530,40 +567,40 @@ export default function App() {
                   onClick={() => setActiveTab('dashboard')}
                   icon={<LayoutDashboard className="w-4 h-4 mr-2" />}
                   label="Tổng quan"
-                  colorClass="glass-active text-sky-900 border-sky-300/30"
-                  hoverClass="hover:bg-sky-50 hover:text-sky-800"
+                  colorClass="glass-active text-slate-900 border-sky-200/50"
+                  hoverClass="hover:bg-slate-50/50 hover:text-slate-800"
                 />
                 <TabButton 
                   active={activeTab === 'students'} 
                   onClick={() => setActiveTab('students')}
                   icon={<Users className="w-4 h-4 mr-2" />}
                   label="Học viên"
-                  colorClass="glass-active text-sky-900 border-sky-300/30"
-                  hoverClass="hover:bg-sky-50 hover:text-sky-800"
+                  colorClass="glass-active text-slate-900 border-sky-200/50"
+                  hoverClass="hover:bg-slate-50/50 hover:text-slate-800"
                 />
                 <TabButton 
                   active={activeTab === 'classes'} 
                   onClick={() => setActiveTab('classes')}
                   icon={<BookOpen className="w-4 h-4 mr-2" />}
                   label="Lớp học"
-                  colorClass="glass-active text-sky-900 border-sky-300/30"
-                  hoverClass="hover:bg-sky-50 hover:text-sky-800"
+                  colorClass="glass-active text-slate-900 border-sky-200/50"
+                  hoverClass="hover:bg-slate-50/50 hover:text-slate-800"
                 />
                 <TabButton 
                   active={activeTab === 'finances'} 
                   onClick={() => setActiveTab('finances')}
                   icon={<DongSign className="w-4 h-4 mr-2" />}
                   label="Tài chính"
-                  colorClass="glass-active text-sky-900 border-sky-300/30"
-                  hoverClass="hover:bg-sky-50 hover:text-sky-800"
+                  colorClass="glass-active text-slate-900 border-sky-200/50"
+                  hoverClass="hover:bg-slate-50/50 hover:text-slate-800"
                 />
                 <TabButton 
                   active={activeTab === 'personal_finance'} 
                   onClick={() => setActiveTab('personal_finance')}
                   icon={<Wallet className="w-4 h-4 mr-2" />}
                   label="Thu - Chi"
-                  colorClass="glass-active text-sky-900 border-sky-300/30"
-                  hoverClass="hover:bg-sky-50 hover:text-sky-800"
+                  colorClass="glass-active text-slate-900 border-sky-200/50"
+                  hoverClass="hover:bg-slate-50/50 hover:text-slate-800"
                 />
               </div>
             </div>
@@ -574,36 +611,36 @@ export default function App() {
         </div>
         
         {/* Mobile menu */}
-        <div className="sm:hidden border-t border-sky-300/30 flex overflow-x-auto p-2 gap-2">
+        <div className="sm:hidden border-t border-slate-200/50 flex overflow-x-auto p-2 gap-2">
            <MobileTabButton 
               active={activeTab === 'dashboard'} 
               onClick={() => setActiveTab('dashboard')}
               label="Tổng quan"
-              colorClass="glass-active text-sky-900 border-sky-300/30"
+              colorClass="glass-active text-slate-900 border-sky-200/50"
             />
             <MobileTabButton 
               active={activeTab === 'students'} 
               onClick={() => setActiveTab('students')}
               label="Học viên"
-              colorClass="glass-active text-sky-900 border-sky-300/30"
+              colorClass="glass-active text-slate-900 border-sky-200/50"
             />
             <MobileTabButton 
               active={activeTab === 'classes'} 
               onClick={() => setActiveTab('classes')}
               label="Lớp học"
-              colorClass="glass-active text-sky-900 border-sky-300/30"
+              colorClass="glass-active text-slate-900 border-sky-200/50"
             />
             <MobileTabButton 
               active={activeTab === 'finances'} 
               onClick={() => setActiveTab('finances')}
               label="Tài chính"
-              colorClass="glass-active text-sky-900 border-sky-300/30"
+              colorClass="glass-active text-slate-900 border-sky-200/50"
             />
             <MobileTabButton 
               active={activeTab === 'personal_finance'} 
               onClick={() => setActiveTab('personal_finance')}
               label="Thu - Chi"
-              colorClass="glass-active text-sky-900 border-sky-300/30"
+              colorClass="glass-active text-slate-900 border-sky-200/50"
             />
         </div>
       </nav>
@@ -718,10 +755,10 @@ const TabButton = React.memo(function TabButton({ active, onClick, icon, label, 
     <Button
       variant="ghost"
       onClick={onClick}
-      className={`inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 border h-auto ${
+      className={`inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 border h-auto ${
         active 
-          ? `${colorClass} shadow-md transform -translate-y-0.5` 
-          : `border-transparent text-sky-700/80 ${hoverClass} hover:shadow-md hover:-translate-y-0.5`
+          ? `${colorClass} shadow-sm` 
+          : `border-transparent text-slate-600 ${hoverClass}`
       }`}
     >
       {icon}
@@ -735,10 +772,10 @@ const MobileTabButton = React.memo(function MobileTabButton({ active, onClick, l
     <Button
       variant="ghost"
       onClick={onClick}
-      className={`whitespace-nowrap py-2 px-4 rounded-xl text-sm font-medium flex-1 text-center transition-all duration-300 border ${
+      className={`whitespace-nowrap py-2 px-4 rounded-xl text-sm font-semibold flex-1 text-center transition-all duration-300 border ${
         active 
           ? `${colorClass} shadow-sm` 
-          : `border-transparent text-sky-700/80 hover:bg-white/10 hover:text-sky-900 hover:shadow-sm`
+          : `border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900`
       }`}
     >
       {label}

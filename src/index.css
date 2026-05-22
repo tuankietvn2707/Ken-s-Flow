@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -6,103 +6,157 @@
 }
 
 body {
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 40%, #eff6ff 100%);
-  background-attachment: fixed;
-  min-height: 100vh;
-  color: #0c4a6e;
+  /* Vibrant & Premium: Animated Mesh Gradient Base */
+  background-color: #f8fafc;
+  color: #0f172a;
+  position: relative;
+  overflow-x: hidden;
 }
 
-/* Glass Panel — dùng cho cards, form, modal */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(125, 211, 252, 0.3);
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: 
+    radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.15), transparent 50%),
+    radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.12), transparent 50%),
+    radial-gradient(circle at 50% 80%, rgba(16, 185, 129, 0.1), transparent 50%);
+  z-index: -1;
+  pointer-events: none;
 }
 
-/* Glass — dùng cho các container lớn hơn */
+/* Animations */
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
+}
+
+/* Neo-Glassmorphism Utilities */
+.bg-noise {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+@keyframes gradient-x {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.animate-gradient-x {
+  animation: gradient-x 8s ease infinite;
+  background-size: 200% 200%;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-20px) rotate(5deg); }
+}
+
+.animate-float {
+  animation: float 8s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: float 12s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+.animate-float-fast {
+  animation: float 6s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+/* Glassmorphism Classes (Refined) */
 .glass {
-  background: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(125, 211, 252, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
 }
 
-/* Glass Active — dùng cho nav item đang active */
+/* Premium Glass Container */
+.glass {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 32px rgba(14, 165, 233, 0.08);
+}
+
+/* Premium Glass Active Tab */
 .glass-active {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(125, 211, 252, 0.4);
+  background: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.1);
 }
 
-/* Logo Animation */
-@keyframes spin-slow {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
+/* Tinh gọn lại Logo Animation */
 .animated-border-box {
   position: relative;
-  border-radius: 0.75rem;
-  padding: 2px;
-  overflow: hidden;
   display: inline-flex;
 }
 
-.animated-border-box::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: conic-gradient(
-    from 0deg,
-    transparent 0%,
-    #7dd3fc 25%,
-    #38bdf8 50%,
-    #0ea5e9 75%,
-    transparent 100%
-  );
-  animation: spin-slow 3s linear infinite;
-}
-
 .animated-border-inner {
-  position: relative;
-  background: white;
-  border-radius: 0.65rem;
-  padding: 0.35rem 0.75rem;
+  background: transparent;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  z-index: 1;
 }
 
-/* Badge UI Styles */
+/* Badge UI Styles - Sang trọng hơn */
 .badge-danger {
-  background-color: #FEE2E2;
+  background-color: #FEF2F2;
   color: #991B1B;
+  border: 1px solid #FECACA;
   padding: 4px 10px;
   border-radius: 12px;
   font-weight: 600;
 }
 
 .badge-neutral {
-  background-color: #F3F4F6;
-  color: #4B5563;
+  background-color: #F8FAFC;
+  color: #475569;
+  border: 1px solid #E2E8F0;
   padding: 4px 10px;
   border-radius: 12px;
   font-weight: 600;
 }
 
 .badge-success {
-  background-color: #DCFCE7;
+  background-color: #F0FDF4;
   color: #166534;
+  border: 1px solid #BBF7D0;
   padding: 4px 10px;
   border-radius: 12px;
   font-weight: 600;
@@ -113,36 +167,41 @@ body {
   background-color: #FFFFFF;
   border: 1px solid #22C55E;
   color: #166534;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.1);
 }
 
 .btn-modern-success:hover {
-  background-color: #DCFCE7;
+  background-color: #F0FDF4;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15);
 }
 
 .btn-modern-disabled {
-  background-color: #F3F4F6;
-  color: #9CA3AF;
-  border: 1px solid #E5E7EB;
+  background-color: #F8FAFC;
+  color: #94A3B8;
+  border: 1px solid #E2E8F0;
   cursor: not-allowed;
 }
 
 /* Flatpickr Custom Overrides */
 .flatpickr-calendar {
-  border-radius: 12px !important;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
-  border: 1px solid #e2e8f0 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(12px) !important;
   font-family: 'Inter', sans-serif !important;
 }
 
 .flatpickr-monthSelect-month.selected {
-  background-color: #2563EB !important;
-  border-color: #2563EB !important;
+  background-color: #0ea5e9 !important;
+  border-color: #0ea5e9 !important;
 }
 
 .flatpickr-monthSelect-month:hover {
-  background-color: #eff6ff !important;
-  color: #2563EB !important;
+  background-color: #f0f9ff !important;
+  color: #0ea5e9 !important;
 }
 
 @media print {
@@ -156,7 +215,6 @@ body {
     display: none !important;
   }
 
-  /* When printing, make sure modal content takes full page */
   body.printing-modal .fixed.inset-0.z-50 {
     position: absolute !important;
     top: 0 !important;
@@ -165,4 +223,3 @@ body {
     background: none !important;
   }
 }
-
