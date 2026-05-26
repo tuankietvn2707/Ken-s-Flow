@@ -266,11 +266,7 @@ export default function ClassTracker({ students, classes, addClass, updateClass,
         className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
       >
         <div className="flex flex-col gap-1 items-start">
-<<<<<<< HEAD
           <h1 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 animate-gradient-x tracking-tight drop-shadow-sm pb-1">Theo dõi Lớp học</h1>
-=======
-          <h1 className="text-3xl sm:text-4xl font-extrabold animate-rainbow-text tracking-tight drop-shadow-sm pb-1">Theo dõi Lớp học</h1>
->>>>>>> parent of b9bb995 (feat: update data models and clean up project)
           <p className="text-slate-600 font-medium text-lg">Quản lý lịch học và trạng thái thanh toán học viên</p>
         </div>
         <Button
