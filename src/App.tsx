@@ -1,0 +1,957 @@
+import React, { useState, useEffect, useRef, useCallback, Suspense, lazy } from 'react';
+import { Student, ClassSession, Transaction, Goal, FinanceHistoryRecord } from './types';
+import { Users, BookOpen, LayoutDashboard, LogOut, Wallet, History } from 'lucide-react';
+import { auth, db } from './firebase';
+import { onAuthStateChanged, signOut, User } from 'firebase/auth';
+import { collection, getDocs, doc, setDoc, deleteDoc, writeBatch, deleteField, getDoc } from 'firebase/firestore';
+import { Toaster, toast } from 'sonner';
+import { motion, AnimatePresence } from 'motion/react';
+
+// Lazy loaded components
+const Dashboard = lazy(() => import('./components/Dashboard'));
+const StudentManagement = lazy(() => import('./components/StudentManagement'));
+const ClassTracker = lazy(() => import('./components/ClassTracker'));
+const FinancialTracking = lazy(() => import('./components/FinancialTracking'));
+const PersonalFinance = lazy(() => import('./components/PersonalFinance'));
+const GlobalChatbot = lazy(() => import('./components/GlobalChatbot'));
+
+import Login from './components/Login';
+
+import { Button } from './components/ui/Button';
+import { Input } from './components/ui/Input';
+import { Modal } from './components/ui/Modal';
+import FinanceHistory from './components/FinanceHistory';
+
+
+
+const DongSign = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M15 4v12" />
+    <circle cx="11" cy="12" r="4" />
+    <path d="M11 8h8" />
+    <path d="M7 20h12" />
+  </svg>
+);
+
+export default function App() {
+  const [user, setUser] = useState<User | null>(null);
+  const [displayName, setDisplayName] = useState<string>('');
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [loadingAuth, setLoadingAuth] = useState(true);
+  
+  const [students, setStudents] = useState<Student[]>([]);
+  const [classes, setClasses] = useState<ClassSession[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [financeHistory, setFinanceHistory] = useState<FinanceHistoryRecord[]>([]);
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [initialBalance, setInitialBalance] = useState<{ cash: number; banking: number }>({ cash: 0, banking: 0 });
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [isGlobalHistoryOpen, setIsGlobalHistoryOpen] = useState(false);
+  const [loadingData, setLoadingData] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const showLoading = () => setIsProcessing(true);
+  const hideLoading = () => setIsProcessing(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoadingAuth(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      fetchData(user.uid);
+    } else {
+      setStudents([]);
+      setClasses([]);
+    }
+  }, [user]);
+
+  const fetchData = async (uid: string) => {
+    setLoadingData(true);
+    try {
+      const [studentsSnap, classesSnap, transactionsSnap, historySnap, goalsSnap, settingsSnap, profileSnap] = await Promise.all([
+        getDocs(collection(db, `users/${uid}/students`)),
+        getDocs(collection(db, `users/${uid}/classes`)),
+        getDocs(collection(db, `users/${uid}/transactions`)),
+        getDocs(collection(db, `users/${uid}/financeHistory`)),
+        getDocs(collection(db, `users/${uid}/goals`)),
+        getDoc(doc(db, `users/${uid}/settings/finance`)),
+        getDoc(doc(db, `users/${uid}/profile/info`))
+      ]);
+      
+      if (profileSnap.exists()) {
+        setDisplayName(profileSnap.data().displayName || '');
+        setShowOnboarding(false);
+      } else {
+        setShowOnboarding(true);
+      }
+      const studentsData = studentsSnap.docs.map(doc => doc.data() as Student);
+      const classesData = classesSnap.docs.map(doc => doc.data() as ClassSession);
+      const transactionsData = transactionsSnap.docs.map(doc => doc.data() as Transaction);
+      const historyData = historySnap.docs.map(doc => doc.data() as FinanceHistoryRecord);
+      const goalsData = goalsSnap.docs.map(doc => doc.data() as Goal);
+      const settingsData = settingsSnap.exists() ? settingsSnap.data() : { initialBalance: { cash: 0, banking: 0 } };
+      
+      setStudents(studentsData);
+      setClasses(classesData);
+      setTransactions(transactionsData);
+      setFinanceHistory(historyData);
+      setGoals(goalsData);
+      setInitialBalance(settingsData.initialBalance || { cash: 0, banking: 0 });
+
+      // Migration logic from localStorage to Firestore
+      if (transactionsData.length === 0 && goalsData.length === 0 && !settingsSnap.exists()) {
+        try {
+          const localTxs = localStorage.getItem('pf_transactions');
+          const localGoals = localStorage.getItem('pf_goals');
+          const localBalance = localStorage.getItem('pf_initial_balance');
+
+          if (localTxs || localGoals || localBalance) {
+            const batch = writeBatch(db);
+            let hasData = false;
+
+            if (localTxs) {
+              const txs = JSON.parse(localTxs) as Transaction[];
+              if (Array.isArray(txs)) {
+                txs.forEach(tx => {
+                  batch.set(doc(db, `users/${uid}/transactions`, tx.id), tx);
+                });
+                setTransactions(txs);
+                hasData = true;
+              }
+            }
+
+            if (localGoals) {
+              const gs = JSON.parse(localGoals) as Goal[];
+              if (Array.isArray(gs)) {
+                gs.forEach(g => {
+                  batch.set(doc(db, `users/${uid}/goals`, g.id), g);
+                });
+                setGoals(gs);
+                hasData = true;
+              }
+            }
+
+            if (localBalance) {
+              const balance = Number(localBalance);
+              if (!isNaN(balance)) {
+                batch.set(doc(db, `users/${uid}/settings/finance`), { initialBalance: balance });
+                setInitialBalance({ cash: balance, banking: 0 });
+                hasData = true;
+              }
+            }
+
+            if (hasData) {
+              await batch.commit();
+              console.log("Successfully migrated local data to Firestore.");
+            }
+          }
+        } catch (migrateError) {
+          console.error("Error during migration:", migrateError);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoadingData(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      toast.success('Đã đăng xuất');
+    } catch (error) {
+      console.error("Error signing out:", error);
+      toast.error('Có lỗi xảy ra khi đăng xuất');
+    }
+  };
+
+  // CRUD for Students
+  const addStudent = useCallback(async (student: Student) => {
+    if (!user) return;
+    try {
+      await setDoc(doc(db, `users/${user.uid}/students`, student.id), student);
+      setStudents(prev => [...prev, student]);
+      toast.success('Thêm học viên thành công');
+    } catch (error) {
+      console.error("Error adding student:", error);
+      toast.error('Có lỗi xảy ra khi thêm học viên');
+    }
+  }, [user]);
+
+  const updateStudent = useCallback(async (student: Student) => {
+    if (!user) return;
+    try {
+      await setDoc(doc(db, `users/${user.uid}/students`, student.id), student);
+      setStudents(prev => prev.map(s => s.id === student.id ? student : s));
+      toast.success('Cập nhật học viên thành công');
+    } catch (error) {
+      console.error("Error updating student:", error);
+      toast.error('Có lỗi xảy ra khi cập nhật học viên');
+    }
+  }, [user]);
+
+  const deleteStudent = useCallback(async (id: string) => {
+    if (!user) return;
+    try {
+      await deleteDoc(doc(db, `users/${user.uid}/students`, id));
+      setStudents(prev => prev.filter(s => s.id !== id));
+      toast.success('Đã xóa học viên');
+    } catch (error) {
+      console.error("Error deleting student:", error);
+      toast.error('Có lỗi xảy ra khi xóa học viên');
+    }
+  }, [user]);
+
+  // CRUD for Classes
+  const addClass = useCallback(async (cls: ClassSession) => {
+    if (!user) return;
+    try {
+      await setDoc(doc(db, `users/${user.uid}/classes`, cls.id), cls);
+      setClasses(prev => [cls, ...prev]);
+      toast.success('Thêm lớp học thành công');
+    } catch (error) {
+      console.error("Error adding class:", error);
+      toast.error('Có lỗi xảy ra khi thêm lớp học');
+      throw error;
+    }
+  }, [user]);
+
+  const updateClass = useCallback(async (cls: ClassSession) => {
+    if (!user) return;
+    try {
+      await setDoc(doc(db, `users/${user.uid}/classes`, cls.id), cls);
+      setClasses(prev => prev.map(c => c.id === cls.id ? cls : c));
+      toast.success('Cập nhật lớp học thành công');
+    } catch (error) {
+      console.error("Error updating class:", error);
+      toast.error('Có lỗi xảy ra khi cập nhật lớp học');
+      throw error;
+    }
+  }, [user]);
+
+  const deleteClass = useCallback(async (id: string) => {
+    if (!user) return;
+    try {
+      await deleteDoc(doc(db, `users/${user.uid}/classes`, id));
+      setClasses(prev => prev.filter(c => c.id !== id));
+      toast.success('Đã xóa lớp học');
+    } catch (error) {
+      console.error("Error deleting class:", error);
+      toast.error('Có lỗi xảy ra khi xóa lớp học');
+    }
+  }, [user]);
+
+  // Financial
+  const markClassesAsPaid = async (studentId: string, classIds: string[], studentName: string, amount: number, unpaidSessions: number) => {
+    if (!user || classIds.length === 0) return;
+    const batchId = Date.now();
+    try {
+      const batch = writeBatch(db);
+      classIds.forEach(id => {
+        const classRef = doc(db, `users/${user.uid}/classes`, id);
+        batch.update(classRef, { isPaid: true, paymentBatchId: batchId });
+      });
+
+      const newHistoryRecord: FinanceHistoryRecord = {
+        id: batchId.toString(),
+        timestamp: new Date().toISOString(),
+        studentId,
+        studentName,
+        amount,
+        unpaidSessions,
+        classIds
+      };
+      
+      batch.set(doc(db, `users/${user.uid}/financeHistory`, newHistoryRecord.id), newHistoryRecord);
+
+      await batch.commit();
+      setClasses(prev => prev.map(c => classIds.includes(c.id) ? { ...c, isPaid: true, paymentBatchId: batchId } : c));
+      setFinanceHistory(prev => [newHistoryRecord, ...prev].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()));
+      toast.success('Đã xác nhận thanh toán');
+    } catch (error) {
+      console.error("Error marking classes as paid:", error);
+      toast.error('Có lỗi xảy ra khi xác nhận thanh toán');
+    }
+  };
+
+  const deleteFinanceHistory = async (batchIdStr: string) => {
+    if (!user) return;
+    showLoading();
+    try {
+      const batchId = Number(batchIdStr);
+      const classesToUndo = classes.filter(c => c.paymentBatchId === batchId);
+
+      const batch = writeBatch(db);
+      classesToUndo.forEach(c => {
+        const classRef = doc(db, `users/${user.uid}/classes`, c.id);
+        batch.update(classRef, { isPaid: false, paymentBatchId: deleteField() });
+      });
+      
+      const historyRef = doc(db, `users/${user.uid}/financeHistory`, batchIdStr);
+      batch.delete(historyRef);
+
+      await batch.commit();
+
+      setClasses(prev => prev.map(c =>
+        c.paymentBatchId === batchId ? { ...c, isPaid: false, paymentBatchId: undefined } : c
+      ));
+      
+      setFinanceHistory(prev => prev.filter(h => h.id !== batchIdStr));
+      toast.success('Đã xóa lịch sử giao dịch và hoàn tác thanh toán liên quan');
+    } catch (error) {
+      console.error("Error deleting finance history:", error);
+      toast.error('Có lỗi xảy ra khi xóa lịch sử giao dịch');
+    } finally {
+      hideLoading();
+    }
+  };
+
+  const undoLastPayment = async (studentId: string) => {
+    if (!user) return;
+    showLoading();
+    try {
+      const studentClasses = classes.filter(c => c.studentId === studentId && c.isPaid && c.paymentBatchId);
+      if (studentClasses.length === 0) return;
+
+      const latestBatchId = Math.max(...studentClasses.map(c => c.paymentBatchId!));
+      const classesToUndo = studentClasses.filter(c => c.paymentBatchId === latestBatchId);
+
+      const batch = writeBatch(db);
+      classesToUndo.forEach(c => {
+        const classRef = doc(db, `users/${user.uid}/classes`, c.id);
+        batch.update(classRef, { isPaid: false, paymentBatchId: deleteField() });
+      });
+      
+      const historyRef = doc(db, `users/${user.uid}/financeHistory`, latestBatchId.toString());
+      batch.delete(historyRef);
+
+      await batch.commit();
+
+      setClasses(prev => prev.map(c =>
+        c.paymentBatchId === latestBatchId ? { ...c, isPaid: false, paymentBatchId: undefined } : c
+      ));
+      
+      setFinanceHistory(prev => prev.filter(h => h.id !== latestBatchId.toString()));
+      toast.success('Đã hoàn tác thanh toán gần nhất');
+    } catch (error) {
+      console.error("Error undoing payment:", error);
+      toast.error('Có lỗi xảy ra khi hoàn tác');
+    } finally {
+      hideLoading();
+    }
+  };
+
+  // Personal Finance CRUD
+  const addTransaction = async (tx: Transaction) => {
+    if (!user) return;
+    try {
+      await setDoc(doc(db, `users/${user.uid}/transactions`, tx.id), tx);
+      setTransactions(prev => [tx, ...prev]);
+      toast.success('Thêm giao dịch thành công');
+    } catch (error) {
+      console.error("Error adding transaction:", error);
+      toast.error('Có lỗi xảy ra khi thêm giao dịch');
+    }
+  };
+
+  const deleteTransaction = async (id: string) => {
+    if (!user) return;
+    try {
+      await deleteDoc(doc(db, `users/${user.uid}/transactions`, id));
+      setTransactions(prev => prev.filter(t => t.id !== id));
+      toast.success('Đã xóa giao dịch');
+    } catch (error) {
+      console.error("Error deleting transaction:", error);
+      toast.error('Có lỗi xảy ra khi xóa giao dịch');
+    }
+  };
+
+  const addGoal = async (goal: Goal) => {
+    if (!user) return;
+    try {
+      await setDoc(doc(db, `users/${user.uid}/goals`, goal.id), goal);
+      setGoals(prev => [...prev, goal]);
+      toast.success('Thêm mục tiêu thành công');
+    } catch (error) {
+      console.error("Error adding goal:", error);
+      toast.error('Có lỗi xảy ra khi thêm mục tiêu');
+    }
+  };
+
+  const updateGoal = async (goal: Goal) => {
+    if (!user) return;
+    try {
+      await setDoc(doc(db, `users/${user.uid}/goals`, goal.id), goal);
+      setGoals(prev => prev.map(g => g.id === goal.id ? goal : g));
+      toast.success('Cập nhật mục tiêu thành công');
+    } catch (error) {
+      console.error("Error updating goal:", error);
+      toast.error('Có lỗi xảy ra khi cập nhật mục tiêu');
+    }
+  };
+
+  const deleteGoal = async (id: string) => {
+    if (!user) return;
+    try {
+      await deleteDoc(doc(db, `users/${user.uid}/goals`, id));
+      setGoals(prev => prev.filter(g => g.id !== id));
+      toast.success('Đã xóa mục tiêu');
+    } catch (error) {
+      console.error("Error deleting goal:", error);
+      toast.error('Có lỗi xảy ra khi xóa mục tiêu');
+    }
+  };
+
+  const updateInitialBalance = async (balance: { cash: number; banking: number }) => {
+    if (!user) return;
+    try {
+      await setDoc(doc(db, `users/${user.uid}/settings/finance`), { initialBalance: balance });
+      setInitialBalance(balance);
+      toast.success('Cập nhật số dư thành công');
+    } catch (error) {
+      console.error("Error updating initial balance:", error);
+      toast.error('Có lỗi xảy ra khi cập nhật số dư');
+    }
+  };
+
+  const consolidateAndResetBalance = async (newBalances: { cash: number; banking: number }) => {
+    if (!user) return;
+    try {
+      showLoading();
+      const batch = writeBatch(db);
+      
+      transactions.forEach(tx => {
+        batch.delete(doc(db, `users/${user.uid}/transactions`, tx.id));
+      });
+      
+      batch.set(doc(db, `users/${user.uid}/settings/finance`), { initialBalance: newBalances }, { merge: true });
+      
+      await batch.commit();
+
+      setTransactions([]);
+      setInitialBalance(newBalances);
+      toast.success('Đã chốt sổ thành công');
+      
+    } catch (error) {
+      console.error("Error consolidating finance:", error);
+      toast.error('Có lỗi xảy ra khi chốt sổ');
+    } finally {
+      hideLoading();
+    }
+  };
+
+  const handleSaveProfile = async (name: string) => {
+    if (!user) return;
+    try {
+      await setDoc(doc(db, `users/${user.uid}/profile/info`), { displayName: name });
+      setDisplayName(name);
+      setShowOnboarding(false);
+    } catch (error) {
+      console.error("Error saving profile:", error);
+    }
+  };
+
+  useEffect(() => {
+    // Add global click listener to dismiss toasts
+    const handleGlobalClick = () => {
+      toast.dismiss();
+    };
+    
+    // Use capture phase to ensure it catches all clicks early
+    document.addEventListener('click', handleGlobalClick, { capture: true });
+    
+    return () => {
+      document.removeEventListener('click', handleGlobalClick, { capture: true });
+    };
+  }, []);
+
+  if (loadingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Login />;
+  }
+
+  if (showOnboarding) {
+    return <Onboarding onSave={handleSaveProfile} />;
+  }
+
+  return (
+    <div className="min-h-screen text-slate-900 font-sans relative overflow-x-clip bg-slate-50">
+      {/* Animated Mesh Gradients & Floating Elements */}
+      <div className="absolute top-0 -left-4 w-72 h-72 bg-sky-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob pointer-events-none"></div>
+      <div className="absolute top-0 -right-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob animation-delay-2000 pointer-events-none"></div>
+      <div className="absolute -bottom-8 left-20 w-72 h-72 bg-emerald-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob animation-delay-4000 pointer-events-none"></div>
+
+      {/* 3D Decorative Floating Elements */}
+      <div className="absolute top-[15%] left-[5%] animate-float-slow opacity-60 pointer-events-none">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="20" r="18" stroke="url(#paint0_linear)" strokeWidth="4" strokeDasharray="4 4" />
+          <defs>
+            <linearGradient id="paint0_linear" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#38BDF8" stopOpacity="0.8" />
+              <stop offset="1" stopColor="#818CF8" stopOpacity="0.2" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+
+      <div className="absolute top-[40%] right-[8%] animate-float opacity-50 pointer-events-none">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M16 0V32M0 16H32" stroke="url(#paint1_linear)" strokeWidth="6" strokeLinecap="round" />
+          <defs>
+            <linearGradient id="paint1_linear" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#A78BFA" stopOpacity="0.8" />
+              <stop offset="1" stopColor="#34D399" stopOpacity="0.2" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+
+      <div className="absolute bottom-[20%] right-[15%] animate-float-fast opacity-40 pointer-events-none">
+        <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="3" width="54" height="54" rx="16" stroke="url(#paint2_linear)" strokeWidth="3" transform="rotate(15 30 30)" />
+          <defs>
+            <linearGradient id="paint2_linear" x1="0" y1="0" x2="60" y2="60" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#F472B6" stopOpacity="0.6" />
+              <stop offset="1" stopColor="#38BDF8" stopOpacity="0.1" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+
+      <Toaster position="top-center" richColors theme="light" />
+      <nav className="bg-white/70 backdrop-blur-2xl border-b border-white/50 fixed w-full top-0 z-50 shadow-sm transition-all">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex">
+              <div className="flex-shrink-0 flex items-center">
+                <button 
+                  onClick={() => window.location.reload()}
+                  className="cursor-pointer hover:opacity-80 transition-opacity flex bg-transparent outline-none border-none p-0"
+                >
+                  <div className="flex items-center gap-2 m-0 p-2 px-3">
+                    <div className="bg-sky-500 text-white p-1.5 rounded-lg shadow-sm">
+                      <Wallet className="w-5 h-5" />
+                    </div>
+                    <span className="text-xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-sky-600 to-indigo-600 tracking-tight">
+                      TutorFlow
+                    </span>
+                  </div>
+                </button>
+              </div>
+              <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-2">
+                <TabButton 
+                  active={activeTab === 'dashboard'} 
+                  onClick={() => setActiveTab('dashboard')}
+                  icon={<LayoutDashboard className="w-4 h-4 mr-2" />}
+                  label="Tổng quan"
+                  colorClass="glass-active text-slate-900 border-sky-200/50"
+                  hoverClass="hover:bg-slate-50/50 hover:text-slate-800"
+                />
+                <TabButton 
+                  active={activeTab === 'students'} 
+                  onClick={() => setActiveTab('students')}
+                  icon={<Users className="w-4 h-4 mr-2" />}
+                  label="Học viên"
+                  colorClass="glass-active text-slate-900 border-sky-200/50"
+                  hoverClass="hover:bg-slate-50/50 hover:text-slate-800"
+                />
+                <TabButton 
+                  active={activeTab === 'classes'} 
+                  onClick={() => setActiveTab('classes')}
+                  icon={<BookOpen className="w-4 h-4 mr-2" />}
+                  label="Lớp học"
+                  colorClass="glass-active text-slate-900 border-sky-200/50"
+                  hoverClass="hover:bg-slate-50/50 hover:text-slate-800"
+                />
+                <TabButton 
+                  active={activeTab === 'finances'} 
+                  onClick={() => setActiveTab('finances')}
+                  icon={<DongSign className="w-4 h-4 mr-2" />}
+                  label="Tài chính"
+                  colorClass="glass-active text-slate-900 border-sky-200/50"
+                  hoverClass="hover:bg-slate-50/50 hover:text-slate-800"
+                />
+                <TabButton 
+                  active={activeTab === 'personal_finance'} 
+                  onClick={() => setActiveTab('personal_finance')}
+                  icon={<Wallet className="w-4 h-4 mr-2" />}
+                  label="Thu - Chi"
+                  colorClass="glass-active text-slate-900 border-sky-200/50"
+                  hoverClass="hover:bg-slate-50/50 hover:text-slate-800"
+                />
+              </div>
+            </div>
+            <div className="flex items-center">
+              <UserMenu user={user} handleLogout={handleLogout} onViewHistory={() => setIsGlobalHistoryOpen(true)} />
+            </div>
+          </div>
+        </div>
+        
+        {/* Mobile menu */}
+        <div className="sm:hidden border-t border-slate-200/50 flex overflow-x-auto p-2 gap-2">
+           <MobileTabButton 
+              active={activeTab === 'dashboard'} 
+              onClick={() => setActiveTab('dashboard')}
+              label="Tổng quan"
+              colorClass="glass-active text-slate-900 border-sky-200/50"
+            />
+            <MobileTabButton 
+              active={activeTab === 'students'} 
+              onClick={() => setActiveTab('students')}
+              label="Học viên"
+              colorClass="glass-active text-slate-900 border-sky-200/50"
+            />
+            <MobileTabButton 
+              active={activeTab === 'classes'} 
+              onClick={() => setActiveTab('classes')}
+              label="Lớp học"
+              colorClass="glass-active text-slate-900 border-sky-200/50"
+            />
+            <MobileTabButton 
+              active={activeTab === 'finances'} 
+              onClick={() => setActiveTab('finances')}
+              label="Tài chính"
+              colorClass="glass-active text-slate-900 border-sky-200/50"
+            />
+            <MobileTabButton 
+              active={activeTab === 'personal_finance'} 
+              onClick={() => setActiveTab('personal_finance')}
+              label="Thu - Chi"
+              colorClass="glass-active text-slate-900 border-sky-200/50"
+            />
+        </div>
+      </nav>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8">
+        {loadingData ? (
+          <div className="py-10">
+            <div className="max-w-4xl mx-auto space-y-6">
+              {/* Skeleton header */}
+              <div className="skeleton h-10 w-1/3"></div>
+              <div className="skeleton h-5 w-1/2 opacity-60"></div>
+              {/* Skeleton stat cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4">
+                <div className="skeleton-card h-40"></div>
+                <div className="skeleton-card h-40" style={{ animationDelay: '0.15s' }}></div>
+                <div className="skeleton-card h-40" style={{ animationDelay: '0.3s' }}></div>
+              </div>
+              {/* Skeleton chart panels */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
+                <div className="skeleton-card h-96"></div>
+                <div className="skeleton-card h-96" style={{ animationDelay: '0.2s' }}></div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+            >
+              <Suspense fallback={
+                <div className="py-10">
+                  <div className="max-w-4xl mx-auto space-y-6">
+                    <div className="skeleton h-10 w-1/3"></div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2">
+                      <div className="skeleton-card h-40"></div>
+                      <div className="skeleton-card h-40" style={{ animationDelay: '0.15s' }}></div>
+                      <div className="skeleton-card h-40" style={{ animationDelay: '0.3s' }}></div>
+                    </div>
+                  </div>
+                </div>
+              }>
+                {activeTab === 'dashboard' && <Dashboard students={students} classes={classes} setActiveTab={setActiveTab} displayName={displayName} />}
+                {activeTab === 'students' && <StudentManagement students={students} addStudent={addStudent} updateStudent={updateStudent} deleteStudent={deleteStudent} classes={classes} markClassesAsPaid={markClassesAsPaid} />}
+                {activeTab === 'classes' && <ClassTracker students={students} classes={classes} addClass={addClass} updateClass={updateClass} deleteClass={deleteClass} />}
+                {activeTab === 'finances' && <FinancialTracking students={students} classes={classes} markClassesAsPaid={markClassesAsPaid} undoLastPayment={undoLastPayment} />}
+                {activeTab === 'personal_finance' && (
+                  <PersonalFinance 
+                    transactions={transactions}
+                    financeHistory={financeHistory}
+                    goals={goals}
+                    initialBalance={initialBalance}
+                    addTransaction={addTransaction}
+                    deleteTransaction={deleteTransaction}
+                    addGoal={addGoal}
+                    updateGoal={updateGoal}
+                    deleteGoal={deleteGoal}
+                    updateInitialBalance={updateInitialBalance}
+                    consolidateAndResetBalance={consolidateAndResetBalance}
+                    deleteFinanceHistory={deleteFinanceHistory}
+                  />
+                )}
+              </Suspense>
+            </motion.div>
+          </AnimatePresence>
+        )}
+      </main>
+
+      <Modal 
+        isOpen={isGlobalHistoryOpen} 
+        onClose={() => setIsGlobalHistoryOpen(false)} 
+        maxWidth="5xl" 
+        title="Lịch sử giao dịch"
+      >
+        <div className="mb-4">
+          {financeHistory.length > 0 ? (
+            <FinanceHistory financeHistory={financeHistory} deleteFinanceHistory={deleteFinanceHistory} />
+          ) : (
+            <div className="text-center py-20 bg-sky-50/50 rounded-[32px] border border-sky-100/50 shadow-inner">
+              <History className="w-16 h-16 text-sky-200 mx-auto mb-4" />
+              <p className="text-sky-800 font-medium text-lg">Chưa có lịch sử giao dịch nào.</p>
+              <p className="text-sky-600/70 mt-1">Lịch sử sẽ xuất hiện khi bạn xác nhận thu học phí của học viên.</p>
+            </div>
+          )}
+        </div>
+      </Modal>
+
+
+      
+      <GlobalChatbot 
+        transactions={transactions} 
+        goals={goals} 
+        students={students}
+        classes={classes}
+        addTransaction={addTransaction}
+        addStudent={addStudent}
+        updateStudent={updateStudent}
+        deleteStudent={deleteStudent}
+        addClass={addClass}
+        updateClass={updateClass}
+        deleteClass={deleteClass}
+        deleteTransaction={deleteTransaction}
+        addGoal={addGoal}
+        updateGoal={updateGoal}
+        deleteGoal={deleteGoal}
+      />
+
+      {/* Global Loading Overlay */}
+      {isProcessing && (
+        <div id="loading-overlay" className="fixed inset-0 z-[120] flex items-center justify-center bg-sky-900/20 backdrop-blur-md">
+          <div className="flex flex-col items-center bg-white/80 p-8 rounded-3xl shadow-2xl border border-white/60 backdrop-blur-xl">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-sky-200 border-b-sky-600 mb-4"></div>
+            <span className="text-sky-950 font-bold tracking-tight">Đang xử lý...</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const TabButton = React.memo(function TabButton({ active, onClick, icon, label, colorClass, hoverClass }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string, colorClass: string, hoverClass: string }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`relative inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold transition-colors duration-200 h-auto cursor-pointer outline-none border-none bg-transparent ${
+        active 
+          ? 'text-sky-700' 
+          : `text-slate-500 ${hoverClass}`
+      }`}
+    >
+      {active && (
+        <motion.div
+          layoutId="activeTabPill"
+          className="absolute inset-0 bg-gradient-to-r from-sky-50 to-indigo-50 rounded-xl border border-sky-200/60 shadow-[0_2px_12px_rgba(14,165,233,0.12)]"
+          transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+        />
+      )}
+      <span className="relative z-10 flex items-center">
+        {icon}
+        {label}
+      </span>
+    </button>
+  );
+});
+
+const MobileTabButton = React.memo(function MobileTabButton({ active, onClick, label, colorClass }: { active: boolean, onClick: () => void, label: string, colorClass: string }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`relative whitespace-nowrap py-2 px-4 rounded-xl text-sm font-semibold flex-1 text-center transition-colors duration-200 cursor-pointer outline-none border-none bg-transparent ${
+        active 
+          ? 'text-sky-700' 
+          : 'text-slate-500 hover:text-slate-700'
+      }`}
+    >
+      {active && (
+        <motion.div
+          layoutId="activeMobileTabPill"
+          className="absolute inset-0 bg-gradient-to-r from-sky-50 to-indigo-50 rounded-xl border border-sky-200/60 shadow-[0_2px_12px_rgba(14,165,233,0.12)]"
+          transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+        />
+      )}
+      <span className="relative z-10">{label}</span>
+    </button>
+  );
+});
+
+function Onboarding({ onSave }: { onSave: (name: string) => void }) {
+  const [name, setName] = useState('');
+  const [step, setStep] = useState(1);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (name.trim()) {
+      setStep(2);
+      setTimeout(() => {
+        onSave(name.trim());
+      }, 2500);
+    }
+  };
+
+  if (step === 2) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="text-center space-y-4">
+          <div className="text-4xl animate-bounce">👋</div>
+          <h1 className="text-2xl font-bold text-sky-950">
+            Chào mừng <span className="text-sky-600">{name}</span> đến với WebApp!
+          </h1>
+          <p className="text-sky-700/80 animate-pulse">Đang chuẩn bị không gian làm việc cho bạn...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="max-w-md w-full glass rounded-3xl shadow-xl p-8 space-y-6">
+        <div className="text-center space-y-2">
+          <div className="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <BookOpen className="w-8 h-8 text-sky-600" />
+          </div>
+          <h1 className="text-2xl font-bold text-sky-950">Chào mừng bạn!</h1>
+          <p className="text-sky-700/80">Chúng tôi rất vui khi có bạn đồng hành.</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-sky-900 mb-2">Bạn là_______?</label>
+            <Input
+              type="text"
+              required
+              autoFocus
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Nhập tên của bạn..."
+              className="bg-white/70"
+            />
+          </div>
+          <Button
+            type="submit"
+            className="w-full py-6 text-base"
+          >
+            Bắt đầu ngay
+          </Button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function UserMenu({ user, handleLogout, onViewHistory }: { user: User, handleLogout: () => void, onViewHistory: () => void }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const firstLetter = user.email ? user.email.charAt(0).toUpperCase() : 'U';
+
+  return (
+    <div className="relative" ref={menuRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-10 h-10 rounded-full bg-sky-100 text-sky-700 font-bold flex items-center justify-center hover:bg-sky-200 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 overflow-hidden"
+        title={user.email || ''}
+      >
+        {user.photoURL ? (
+          <img src={user.photoURL} alt="Avatar" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+        ) : (
+          firstLetter
+        )}
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
+            className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-sky-100 overflow-hidden z-50 flex flex-col origin-top-right transform"
+          >
+            <div className="px-4 py-4 border-b border-sky-100 bg-sky-50/50 text-center">
+              <div className="w-14 h-14 rounded-full bg-sky-100 text-sky-700 font-bold flex items-center justify-center text-2xl mx-auto mb-3 shadow-inner overflow-hidden">
+                {user.photoURL ? (
+                  <img src={user.photoURL} alt="Avatar" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                ) : (
+                  firstLetter
+                )}
+              </div>
+              <p className="text-sm font-semibold text-sky-900 truncate px-2" title={user.email || ''}>
+                {user.email}
+              </p>
+            </div>
+            
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                onViewHistory();
+              }}
+              className="flex items-center w-full px-5 py-3.5 text-sm text-sky-700 hover:bg-sky-50 transition-colors gap-3 font-medium border-b border-sky-50"
+            >
+              <History className="w-4 h-4 text-sky-500" />
+              Lịch sử giao dịch
+            </button>
+
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                handleLogout();
+              }}
+              className="flex items-center w-full px-5 py-3.5 text-sm text-rose-600 hover:bg-rose-50 transition-colors gap-3 justify-center font-medium"
+            >
+              <LogOut className="w-4 h-4" />
+              Đăng xuất
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}

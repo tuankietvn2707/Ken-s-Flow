@@ -15,11 +15,6 @@ export interface Student {
   notes: string;
   targetColor?: string;
   status?: 'active' | 'inactive';
-  phone?: string;
-  email?: string;
-  currentSubject?: string;
-  parentDetails?: string;
-  joinDate?: string;
   // Legacy fields for backward compatibility
   background?: string;
 }
@@ -38,8 +33,6 @@ export interface ClassSession {
   mistakes?: string;
   remedies?: string;
   nextLessonPrep?: string;
-  status?: 'scheduled' | 'completed' | 'cancelled';
-  notes?: string;
 }
 
 export const formatVND = (amount: number | string | undefined | null) => {
