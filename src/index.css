@@ -141,6 +141,8 @@ body::before {
   animation-delay: 1s;
 }
 
+<<<<<<< HEAD
+=======
 @keyframes rainbow-text {
   0% { background-position: 200% 50%; }
   100% { background-position: 0% 50%; }
@@ -165,6 +167,7 @@ body::before {
   animation: rainbow-text 4s linear infinite;
 }
 
+>>>>>>> parent of b9bb995 (feat: update data models and clean up project)
 /* Glassmorphism Classes (Refined) */
 .glass {
   background: rgba(255, 255, 255, 0.75);
