@@ -1,0 +1,559 @@
+import React, { useState, useMemo, useEffect, useDeferredValue } from 'react';
+import { Student, ClassSession, formatVND } from '../types';
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import { GripVertical, Edit2, Trash2, Search, Filter, LayoutGrid, List, AlertTriangle, MoreVertical, Calendar, DollarSign, BookOpen, Wallet, ChevronLeft, ChevronRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { getAvatarColor } from './StudentManagementUtils';
+import { Select } from './ui/Select';
+import { Input } from './ui/Input';
+import { Button } from './ui/Button';
+import { Modal } from './ui/Modal';
+import { Badge } from './ui/Badge';
+import { Card } from './ui/Card';
+
+interface Props {
+  students: Student[];
+  classes?: ClassSession[];
+  onUpdate: (student: Student) => void;
+  onDelete: (id: string) => void;
+  onSelect: (student: Student) => void;
+  onEdit: (student: Student) => void;
+}
+
+export default function StudentList({ students, classes = [], onUpdate, onDelete, onSelect, onEdit }: Props) {
+  const [searchQueryRaw, setSearchQueryRaw] = useState('');
+  const searchQuery = useDeferredValue(searchQueryRaw);
+  const [filter, setFilter] = useState<'all' | 'active' | 'unpaid' | 'upcoming' | 'inactive'>('all');
+  
+  const [sortBy, setSortBy] = useState<'order' | 'nameAsc' | 'nameDesc' | 'feeDesc'>(() => {
+    const saved = localStorage.getItem('tutorflow_sortBy');
+    return (saved as any) || 'order';
+  });
+  
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>(() => {
+    const saved = localStorage.getItem('tutorflow_viewMode');
+    return (saved as any) || 'list';
+  });
+
+  // Pagination states for high performance UI
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
+  useEffect(() => {
+    localStorage.setItem('tutorflow_sortBy', sortBy);
+  }, [sortBy]);
+
+  useEffect(() => {
+    localStorage.setItem('tutorflow_viewMode', viewMode);
+  }, [viewMode]);
+
+  // Reset to first page when search filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filter, sortBy]);
+
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+
+  const studentStats = useMemo(() => {
+    const stats: Record<string, { unpaidCount: number, hasUpcoming: boolean }> = {};
+    const today = new Date().toISOString().split('T')[0];
+    
+    students.forEach(s => {
+      const studentClasses = classes.filter(c => c.studentId === s.id);
+      const unpaidCount = studentClasses.filter(c => !c.isPaid).length;
+      const hasUpcoming = studentClasses.some(c => c.date >= today);
+      stats[s.id] = { unpaidCount, hasUpcoming };
+    });
+    return stats;
+  }, [students, classes]);
+
+  const filteredAndSortedStudents = useMemo(() => {
+    let result = [...students];
+
+    // Search
+    if (searchQuery) {
+      const lowerQ = searchQuery.toLowerCase();
+      result = result.filter(s => 
+        s.name?.toLowerCase().includes(lowerQ) || 
+        s.firstName?.toLowerCase().includes(lowerQ) || 
+        s.lastName?.toLowerCase().includes(lowerQ) ||
+        s.occupation?.toLowerCase().includes(lowerQ) ||
+        s.goal?.toLowerCase().includes(lowerQ)
+      );
+    }
+
+    // Filter
+    if (filter === 'active') {
+      result = result.filter(s => s.status !== 'inactive');
+    } else if (filter === 'inactive') {
+      result = result.filter(s => s.status === 'inactive');
+    } else if (filter === 'unpaid') {
+      result = result.filter(s => s.status !== 'inactive' && studentStats[s.id]?.unpaidCount > 0);
+    } else if (filter === 'upcoming') {
+      result = result.filter(s => s.status !== 'inactive' && studentStats[s.id]?.hasUpcoming);
+    }
+
+    // Sort
+    result.sort((a, b) => {
+      if (sortBy === 'nameAsc') {
+        const nameA = a.firstName || a.name || '';
+        const nameB = b.firstName || b.name || '';
+        return nameA.localeCompare(nameB, 'vi-VN');
+      } else if (sortBy === 'nameDesc') {
+        const nameA = a.firstName || a.name || '';
+        const nameB = b.firstName || b.name || '';
+        return nameB.localeCompare(nameA, 'vi-VN');
+      } else if (sortBy === 'feeDesc') {
+        return (b.fee || 0) - (a.fee || 0);
+      }
+      // order
+      if (a.order !== undefined && b.order !== undefined) {
+        return a.order - b.order;
+      }
+      return 0;
+    });
+
+    return result;
+  }, [students, studentStats, searchQuery, filter, sortBy]);
+
+  const paginatedStudents = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredAndSortedStudents.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredAndSortedStudents, currentPage, itemsPerPage]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredAndSortedStudents.length / itemsPerPage));
+
+  const toggleStudentStatus = (student: Student) => {
+    const newStatus = student.status === 'inactive' ? 'active' : 'inactive';
+    onUpdate({ ...student, status: newStatus });
+  };
+
+  const onDragEnd = (result: DropResult) => {
+    if (!result.destination || filter !== 'active' || sortBy !== 'order' || searchQuery) return;
+
+    const sourceIndex = result.source.index;
+    const destinationIndex = result.destination.index;
+    if (sourceIndex === destinationIndex) return;
+
+    const offset = (currentPage - 1) * itemsPerPage;
+    const globalSourceIndex = sourceIndex + offset;
+    const globalDestinationIndex = destinationIndex + offset;
+
+    const newStudents = [...filteredAndSortedStudents];
+    const [reorderedItem] = newStudents.splice(globalSourceIndex, 1);
+    newStudents.splice(globalDestinationIndex, 0, reorderedItem);
+
+    newStudents.forEach((student, index) => {
+      if (student.order !== index) {
+        onUpdate({ ...student, order: index });
+      }
+    });
+  };
+
+  // Status editable badge wrapper
+  const StatusBadgeItem = ({ student }: { student: Student }) => (
+    <div onClick={(e) => e.stopPropagation()}>
+      <Select
+        value={student.status || 'active'}
+        onChange={(e) => onUpdate({ ...student, status: e.target.value as 'active' | 'inactive' })}
+        className={`text-xs font-semibold rounded-full px-3 py-1 cursor-pointer border-0 ring-1 focus:ring-2 focus:ring-sky-500 text-center h-auto pr-6 ${
+          student.status === 'inactive' 
+          ? 'bg-gray-100 text-gray-600 ring-gray-200 hover:bg-gray-200' 
+          : 'bg-emerald-50 text-emerald-700 ring-emerald-200 hover:bg-emerald-100'
+        }`}
+      >
+        <option value="active">Hoạt động</option>
+        <option value="inactive">Ngưng</option>
+      </Select>
+    </div>
+  );
+
+  const renderGridItem = (student: Student) => {
+    // Extract a color from getAvatarColor for the ribbon (e.g., from "bg-sky-50 text-sky-600" to "bg-sky-500")
+    const avatarColorStr = getAvatarColor(student.id);
+    const colorMatch = avatarColorStr.match(/text-([a-z]+)-600/);
+    const themeColor = colorMatch ? colorMatch[1] : 'sky';
+
+    return (
+      <motion.div 
+        key={student.id}
+        layout
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className={`bg-white/80 backdrop-blur-xl border border-white shadow-[0_4px_16px_rgba(14,165,233,0.06)] rounded-2xl p-5 hover:shadow-[0_12px_32px_rgba(14,165,233,0.12)] hover:-translate-y-1 transition-all duration-300 cursor-pointer group relative overflow-hidden ${student.status === 'inactive' ? 'opacity-70' : ''}`}
+        onClick={() => onSelect(student)}
+      >
+        {/* Left Ribbon */}
+        <div className={`absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-${themeColor}-400 to-${themeColor}-600 opacity-80`}></div>
+        
+        <div className="flex justify-between items-start mb-4 relative z-10 pl-2">
+          <div className="relative">
+            <div className={`absolute -inset-1 rounded-2xl bg-gradient-to-br from-${themeColor}-300 to-${themeColor}-100 opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-300`}></div>
+            <div className={`relative w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-xl shadow-sm border border-white/60 ${avatarColorStr} transition-transform duration-300 group-hover:scale-105`}>
+              {student.firstName ? student.firstName.charAt(0).toUpperCase() : student.name.charAt(0).toUpperCase()}
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <StatusBadgeItem student={student} />
+          </div>
+        </div>
+        <div className="pl-2 relative z-10">
+          <h3 className={`font-extrabold text-slate-800 text-lg line-clamp-1 group-hover:text-${themeColor}-600 transition-colors tracking-tight`}>
+            {student.lastName} {student.firstName}
+          </h3>
+          <p className="text-sm font-medium text-slate-500 mb-4">{student.occupation || 'Chưa cập nhật nghề nghiệp'}</p>
+          
+          <div className="space-y-3 mt-4">
+            <div className="flex justify-between items-center text-sm bg-slate-50/50 p-2 rounded-xl border border-slate-100/50">
+              <span className="text-slate-500 font-semibold flex items-center gap-1.5"><BookOpen className="w-4 h-4 text-slate-400"/> Mục tiêu</span>
+              <span className="font-bold text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200/50 shadow-sm" style={{ backgroundColor: student.targetColor || '#f8fafc' }}>
+                {student.goal || 'N/A'}
+              </span>
+            </div>
+            <div className="flex justify-between items-center text-sm px-2">
+              <span className="text-slate-500 font-semibold flex items-center gap-1.5"><Wallet className="w-4 h-4 text-emerald-400"/> Học phí</span>
+              <span className="font-extrabold text-emerald-600">{formatVND(student.fee)}</span>
+            </div>
+          </div>
+          
+          <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between">
+            <Button 
+              variant="secondary"
+              size="sm"
+              onClick={(e) => { e.stopPropagation(); onEdit(student); }}
+              className="bg-white/80 hover:bg-white shadow-sm border-slate-200 text-slate-600 font-semibold rounded-xl"
+            >
+              Chỉnh sửa
+            </Button>
+            <Button 
+              variant="danger"
+              size="icon"
+              onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(student.id); }}
+              className="w-8 h-8 rounded-xl opacity-50 hover:opacity-100 transition-opacity"
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </motion.div>
+    );
+  };
+
+  const renderListItem = (student: Student, index: number, provided?: any, snapshot?: any) => {
+    const isInactive = student.status === 'inactive';
+    const rowClass = `group hover:bg-white/80 hover:shadow-[0_4px_24px_rgba(14,165,233,0.06)] transition-all duration-300 relative z-0 hover:z-10 bg-transparent
+      ${snapshot && snapshot.isDragging ? 'shadow-lg ring-1 ring-sky-300 bg-white/90' : ''}
+      ${isInactive ? 'opacity-70 bg-gray-50/30' : ''}
+    `;
+
+    return (
+      <tr 
+        ref={provided?.innerRef}
+        {...provided?.draggableProps}
+        className={rowClass}
+        onClick={() => onSelect(student)}
+      >
+        <td className="px-6 py-5 whitespace-nowrap w-12 border-b border-sky-50/50">
+          {provided && filter === 'active' && sortBy === 'order' && !searchQuery ? (
+            <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing p-1.5 hover:bg-sky-100/80 text-sky-300 hover:text-sky-600 rounded-xl transition-colors inline-flex">
+              <GripVertical className="w-5 h-5" />
+            </div>
+          ) : (
+            <div className="w-8"></div> // spacer
+          )}
+        </td>
+        <td className="px-6 py-5 whitespace-nowrap border-b border-sky-50/50">
+          <div className="flex items-center gap-4">
+            <div className={`w-11 h-11 rounded-[16px] flex items-center justify-center font-bold text-sm shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-white/60 backdrop-blur-sm transition-transform group-hover:scale-105 duration-300 ${getAvatarColor(student.id)}`}>
+              {student.firstName ? student.firstName.charAt(0).toUpperCase() : student.name.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <div className="font-extrabold text-sky-950 group-hover:text-sky-700 transition-colors tracking-tight text-[15px]">
+                {student.lastName} {student.firstName}
+              </div>
+              <div className="text-[13px] font-medium text-sky-600/70 mt-0.5">
+                {student.occupation || 'Chưa cập nhật'}
+              </div>
+            </div>
+          </div>
+        </td>
+        <td className="px-6 py-5 whitespace-nowrap border-b border-sky-50/50">
+          <div className="flex items-center gap-2">
+            <StatusBadgeItem student={student} />
+          </div>
+        </td>
+        <td className="px-6 py-5 whitespace-nowrap border-b border-sky-50/50">
+          <span 
+            className="px-3 py-1.5 inline-flex text-[11px] leading-5 font-bold rounded-full text-sky-900 border border-white shadow-sm backdrop-blur-sm"
+            style={{ backgroundColor: student.targetColor || '#f1f5f9' }}
+          >
+            {student.goal || 'Chưa cập nhật'}
+          </span>
+        </td>
+        <td className="px-6 py-5 whitespace-nowrap text-sm text-sky-950 font-bold border-b border-sky-50/50">
+          {formatVND(student.fee)}
+        </td>
+        <td className="px-6 py-5 whitespace-nowrap text-right border-b border-sky-50/50">
+          <div className="flex items-center justify-end gap-2 opacity-100 transition-opacity duration-300">
+            <Button 
+              variant="ghost"
+              size="icon"
+              onClick={(e) => { e.stopPropagation(); onEdit(student); }} 
+              className="h-9 w-9 text-sky-500 hover:text-sky-600 hover:bg-sky-50 bg-white/50 backdrop-blur-sm border border-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-all duration-300 rounded-[14px]"
+              title="Sửa"
+            >
+              <Edit2 className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon" 
+              onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(student.id); }} 
+              className="h-9 w-9 text-rose-500 hover:text-rose-600 hover:bg-rose-50 bg-white/50 backdrop-blur-sm border border-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-all duration-300 rounded-[14px]"
+              title="Xóa"
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
+        </td>
+      </tr>
+    );
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Action Bar */}
+      <Card className="p-4 flex flex-col lg:flex-row gap-4 items-center justify-between">
+        <div className="flex w-full lg:w-1/3 relative">
+          <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-sky-400" />
+          <Input 
+            type="text" 
+            placeholder="Tìm kiếm học viên..." 
+            value={searchQueryRaw}
+            onChange={(e) => setSearchQueryRaw(e.target.value)}
+            className="w-full pl-10 pr-4 bg-sky-50/50"
+          />
+        </div>
+        
+        <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+          <div className="flex items-center bg-sky-50/50 p-1 rounded-xl border border-sky-100">
+            <Button 
+              variant="ghost"
+              size="sm"
+              onClick={() => setFilter('all')} 
+              className={`px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors h-auto ${filter === 'all' ? 'bg-white shadow-sm text-sky-900 border border-sky-200/50 hover:bg-white' : 'text-sky-600 hover:text-sky-900'}`}
+            >
+              Tất cả
+            </Button>
+            <Button 
+              variant="ghost"
+              size="sm"
+              onClick={() => setFilter('active')} 
+              className={`px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors h-auto ${filter === 'active' ? 'bg-white shadow-sm text-sky-900 border border-sky-200/50 hover:bg-white' : 'text-sky-600 hover:text-sky-900'}`}
+            >
+              Hoạt động
+            </Button>
+            <Button 
+              variant="ghost"
+              size="sm"
+              onClick={() => setFilter('unpaid')} 
+              className={`px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors h-auto ${filter === 'unpaid' ? 'bg-white shadow-sm text-sky-900 border border-sky-200/50 hover:bg-white' : 'text-sky-600 hover:text-sky-900'}`}
+            >
+              Chưa đóng phí
+            </Button>
+          </div>
+
+          <div className="h-6 w-px bg-sky-200 hidden sm:block"></div>
+
+          <Select 
+            value={sortBy} 
+            onChange={(e) => setSortBy(e.target.value as any)}
+            className="w-auto truncate"
+          >
+            <option value="order">Sắp xếp tùy chỉnh</option>
+            <option value="nameAsc">Tên (A-Z)</option>
+            <option value="nameDesc">Tên (Z-A)</option>
+            <option value="feeDesc">Học phí (Cao-Thấp)</option>
+          </Select>
+
+          <div className="flex items-center bg-sky-50/50 p-1 rounded-xl border border-sky-100 hidden sm:flex">
+            <Button 
+              variant="ghost"
+              size="icon"
+              onClick={() => setViewMode('list')} 
+              className={`p-1.5 rounded-lg transition-colors h-8 w-8 ${viewMode === 'list' ? 'bg-white shadow-sm text-sky-700 hover:bg-white' : 'text-sky-400 hover:text-sky-700'}`}
+              title="Danh sách"
+            >
+              <List className="w-5 h-5" />
+            </Button>
+            <Button 
+              variant="ghost"
+              size="icon"
+              onClick={() => setViewMode('grid')} 
+              className={`p-1.5 rounded-lg transition-colors h-8 w-8 ${viewMode === 'grid' ? 'bg-white shadow-sm text-sky-700 hover:bg-white' : 'text-sky-400 hover:text-sky-700'}`}
+              title="Lưới"
+            >
+              <LayoutGrid className="w-5 h-5" />
+            </Button>
+          </div>
+        </div>
+      </Card>
+
+      {/* Main Content */}
+      <AnimatePresence mode="wait">
+        {filteredAndSortedStudents.length === 0 ? (
+          <motion.div 
+            key="empty"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="bg-white rounded-3xl border border-sky-100 p-12 flex flex-col items-center justify-center text-center shadow-sm"
+          >
+            <div className="w-24 h-24 bg-sky-50 rounded-full flex items-center justify-center mb-6">
+              <Search className="w-10 h-10 text-sky-300" />
+            </div>
+            <h3 className="text-xl font-bold text-sky-900 mb-2">Không tìm thấy học viên</h3>
+            <p className="text-sky-600 max-w-md">
+              Không có học viên nào khớp với điều kiện tìm kiếm/lọc hiện tại. Vui lòng thay đổi bộ lọc hoặc thêm học viên mới.
+            </p>
+          </motion.div>
+        ) : (
+          viewMode === 'grid' ? (
+            <motion.div 
+              key="grid"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+            >
+              {paginatedStudents.map(student => renderGridItem(student))}
+            </motion.div>
+          ) : (
+            <motion.div 
+              key="list"
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="bg-white/40 backdrop-blur-md rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-white/60 overflow-hidden relative"
+            >
+              <div className="bg-noise rounded-[32px]"></div>
+              <div className="overflow-x-auto relative z-10">
+                <table className="min-w-full border-collapse">
+                  <thead className="bg-white/40 border-b border-sky-100/50 backdrop-blur-md sticky top-0 z-10">
+                    <tr>
+                      <th scope="col" className="w-10 px-6 py-5"></th>
+                      <th scope="col" className="px-6 py-5 text-left text-[0.7rem] font-bold text-sky-600/80 uppercase tracking-widest">Học sinh</th>
+                      <th scope="col" className="px-6 py-5 text-left text-[0.7rem] font-bold text-sky-600/80 uppercase tracking-widest">Trạng thái</th>
+                      <th scope="col" className="px-6 py-5 text-left text-[0.7rem] font-bold text-sky-600/80 uppercase tracking-widest">Mục tiêu</th>
+                      <th scope="col" className="px-6 py-5 text-left text-[0.7rem] font-bold text-sky-600/80 uppercase tracking-widest">Học phí/buổi</th>
+                      <th scope="col" className="relative px-6 py-5"><span className="sr-only">Thao tác</span></th>
+                    </tr>
+                  </thead>
+                  {filter === 'active' && sortBy === 'order' && !searchQuery ? (
+                    <DragDropContext onDragEnd={onDragEnd}>
+                      <Droppable droppableId="student-list">
+                        {(provided) => (
+                          <tbody {...provided.droppableProps} ref={provided.innerRef}>
+                            {paginatedStudents.map((student, index) => {
+                              const DraggableComponent = Draggable as any;
+                              return (
+                                <DraggableComponent key={student.id} draggableId={student.id} index={index}>
+                                  {(p: any, s: any) => renderListItem(student, index, p, s)}
+                                </DraggableComponent>
+                              );
+                            })}
+                            {provided.placeholder}
+                          </tbody>
+                        )}
+                      </Droppable>
+                    </DragDropContext>
+                  ) : (
+                    <tbody>
+                      {paginatedStudents.map((student, index) => (
+                        <React.Fragment key={student.id}>
+                          {renderListItem(student, index)}
+                        </React.Fragment>
+                      ))}
+                    </tbody>
+                  )}
+                </table>
+              </div>
+            </motion.div>
+          )
+        )}
+      </AnimatePresence>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/60 backdrop-blur-md border border-white p-4 rounded-2xl shadow-sm mt-4">
+          <p className="text-sm font-medium text-sky-900/60">
+            Hiển thị <span className="font-semibold text-sky-900">{paginatedStudents.length}</span> / <span className="font-semibold text-sky-900">{filteredAndSortedStudents.length}</span> học viên
+          </p>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="h-9 w-9 p-0 rounded-xl"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </Button>
+            
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <Button
+                key={page}
+                variant={currentPage === page ? 'default' : 'ghost'}
+                onClick={() => setCurrentPage(page)}
+                className={`h-9 w-9 p-0 rounded-xl text-sm font-bold transition-all ${
+                  currentPage === page 
+                    ? 'bg-sky-500 text-white shadow-sm'
+                    : 'text-sky-700 hover:bg-sky-50'
+                }`}
+              >
+                {page}
+              </Button>
+            ))}
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className="h-9 w-9 p-0 rounded-xl"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <Modal
+        isOpen={!!confirmDeleteId}
+        onClose={() => setConfirmDeleteId(null)}
+        maxWidth="sm"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setConfirmDeleteId(null)} className="flex-1">
+              Hủy
+            </Button>
+            <Button 
+              variant="danger" 
+              onClick={() => {
+                if (confirmDeleteId) onDelete(confirmDeleteId);
+                setConfirmDeleteId(null);
+              }}
+              className="flex-1"
+            >
+              Xóa gốc rễ
+            </Button>
+          </>
+        }
+      >
+        <div className="flex flex-col items-center pt-2">
+          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-rose-100 mb-4">
+            <AlertTriangle className="w-6 h-6 text-rose-600" />
+          </div>
+          <h3 className="text-xl font-bold text-sky-950 text-center mb-2">Xác nhận xóa</h3>
+          <p className="text-sky-700/80 text-center text-sm">
+            Bạn có chắc chắn muốn xóa học viên này? Hành động này không thể hoàn tác và sẽ xóa toàn bộ lịch sử học tập, thanh toán liên quan.
+          </p>
+        </div>
+      </Modal>
+    </div>
+  );
+}
