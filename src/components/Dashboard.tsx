@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Student, ClassSession, formatVND, parseDateSafe } from '../types';
-import { Users, Calendar, Plus, UserPlus, CalendarPlus, CreditCard, ArrowUpRight, Banknote } from 'lucide-react';
+import { Users, Calendar, Plus, UserPlus, CalendarPlus, CreditCard, ArrowUpRight, Banknote, TrendingUp } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Input } from './ui/Input';
+import { SalarySlip } from '../types';
 import {
   BarChart,
   Bar,
@@ -124,11 +125,12 @@ const CustomAreaTooltip = ({ active, payload, label }: any) => {
 interface DashboardProps {
   students: Student[];
   classes: ClassSession[];
+  salarySlips?: SalarySlip[];
   setActiveTab?: (tab: string) => void;
   displayName?: string;
 }
 
-export default function Dashboard({ students, classes, setActiveTab, displayName }: DashboardProps) {
+export default function Dashboard({ students, classes, salarySlips = [], setActiveTab, displayName }: DashboardProps) {
   const [selectedMonth, setSelectedMonth] = useState(() => {
     const now = new Date();
     return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
@@ -222,6 +224,16 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
       remaining: potential - actual
     }));
 
+  // Salary calculations for selected month
+  const selectedMonthSlips = salarySlips.filter(s => s.month === selectedMonth);
+  const selectedMonthNetSalary = selectedMonthSlips.reduce((sum, slip) => {
+    const gross = slip.baseSalary + slip.bonus + (slip.allowances?.reduce((s, a) => s + a.amount, 0) || 0);
+    const deduct = slip.bhxh + slip.bhyt + slip.bhtn + slip.incomeTax + (slip.otherDeductions?.reduce((s, a) => s + a.amount, 0) || 0);
+    return sum + (gross - deduct);
+  }, 0);
+
+  const totalMonthlyIncome = selectedMonthNetSalary + soTienThanhToan;
+
   const getGreeting = () => {
     const hour = new Date().getHours();
     const name = displayName || 'bạn';
@@ -235,7 +247,7 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
       <div className="flex flex-col gap-1 items-start">
         <motion.h1 
           initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, ease: 'easeOut' }}
-          className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 animate-gradient-x tracking-tight drop-shadow-sm pb-1"
+          className="text-3xl sm:text-4xl font-extrabold animate-rainbow-text tracking-tight drop-shadow-sm pb-1"
         >
           {getGreeting()}
         </motion.h1>
@@ -318,8 +330,68 @@ export default function Dashboard({ students, classes, setActiveTab, displayName
               </div>
               <div>
                 <dt className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Chờ thanh toán</dt>
-                <dd className="text-4xl font-extrabold text-slate-800 tracking-tight leading-tight mt-1 truncate">{formatVND(choThanhToan)}</dd>
+                <dd className="text-3xl lg:text-4xl font-extrabold text-slate-800 tracking-tight leading-tight mt-1 truncate">{formatVND(choThanhToan)}</dd>
               </div>
+            </div>
+          </div>
+        </motion.div>
+
+         <motion.div 
+          variants={{ hidden: { opacity: 0, y: 24, scale: 0.97 }, visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } } }}
+          onClick={() => setActiveTab && setActiveTab('salary')}
+          className="bg-white/80 backdrop-blur-2xl border border-white/80 shadow-sm overflow-hidden rounded-[24px] cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_40px_-10px_rgba(14,165,233,0.3)] hover:bg-white group relative"
+        >
+          <div className="bg-noise rounded-[24px]"></div>
+          <div className="absolute top-0 right-0 p-4 opacity-50 group-hover:opacity-100 transition-opacity z-10">
+             <ArrowUpRight className="w-5 h-5 text-slate-400 group-hover:text-sky-500" />
+          </div>
+          <div className="p-8 relative z-10">
+            <div className="flex flex-col gap-6">
+              <div className="flex justify-between items-start">
+                <div className="bg-gradient-to-br from-indigo-100 to-indigo-50 p-3 rounded-2xl shadow-inner border border-white/50 group-hover:scale-110 transition-transform duration-300">
+                  <CreditCard className="h-7 w-7 text-indigo-600" />
+                </div>
+              </div>
+              <div>
+                <dt className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Lương Net tháng {selectedMonth.split('-')[1]}</dt>
+                <dd className="text-3xl lg:text-4xl font-extrabold text-indigo-700 tracking-tight leading-tight mt-1 truncate">{formatVND(selectedMonthNetSalary)}</dd>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div 
+          variants={{ hidden: { opacity: 0, y: 24, scale: 0.97 }, visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } } }}
+          className="bg-white/80 backdrop-blur-2xl border border-white/80 shadow-sm overflow-hidden rounded-[24px] hover:bg-white group relative md:col-span-2"
+        >
+          <div className="bg-noise rounded-[24px]"></div>
+          <div className="p-8 relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="flex flex-col gap-4">
+              <div className="flex justify-between items-start">
+                <div className="bg-gradient-to-br from-emerald-100 to-emerald-50 p-3 rounded-2xl shadow-inner border border-white/50 group-hover:scale-110 transition-transform duration-300">
+                   <TrendingUp className="h-7 w-7 text-emerald-600" />
+                </div>
+              </div>
+              <div>
+                <dt className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-2">
+                  Tổng thu nhập <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md text-[10px]">Tháng {selectedMonth.split('-')[1]}</span>
+                </dt>
+                <dd className="text-4xl lg:text-5xl font-extrabold text-emerald-600 tracking-tight leading-tight mt-1 truncate">{formatVND(totalMonthlyIncome)}</dd>
+              </div>
+            </div>
+            <div className="space-y-3 w-full md:w-1/2 p-4 bg-slate-50/50 rounded-xl border border-slate-100">
+               <div className="flex justify-between text-sm">
+                  <span className="text-slate-600 font-medium">Lương Net</span>
+                  <span className="font-bold text-slate-800">{formatVND(selectedMonthNetSalary)}</span>
+               </div>
+               <div className="flex justify-between text-sm">
+                  <span className="text-slate-600 font-medium">Gia sư (đã thu)</span>
+                  <span className="font-bold text-slate-800">{formatVND(soTienThanhToan)}</span>
+               </div>
+               <div className="pt-2 border-t border-slate-200/50 flex justify-between text-sm">
+                  <span className="text-emerald-700 font-bold uppercase tracking-wider text-[11px]">Tổng cộng</span>
+                  <span className="font-extrabold text-emerald-700">{formatVND(totalMonthlyIncome)}</span>
+               </div>
             </div>
           </div>
         </motion.div>

@@ -91,7 +91,7 @@ export default function FinanceOverview({
         className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8"
       >
         <div className="flex flex-col gap-1.5 items-start">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 animate-gradient-x tracking-tight drop-shadow-sm pb-1">Quản Lý Tài Chính</h1>
+          <h1 className="text-3xl sm:text-4xl font-extrabold animate-rainbow-text tracking-tight drop-shadow-sm pb-1">Quản Lý Tài Chính</h1>
           <p className="text-sky-700/80 font-medium text-lg">Theo dõi dòng tiền và mục tiêu cá nhân</p>
         </div>
         <div className="flex flex-col items-start md:items-end w-full md:w-auto">

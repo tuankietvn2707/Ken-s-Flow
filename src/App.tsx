@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, Suspense, lazy } from 'react';
-import { Student, ClassSession, Transaction, Goal, FinanceHistoryRecord } from './types';
-import { Users, BookOpen, LayoutDashboard, LogOut, Wallet, History } from 'lucide-react';
+import { Student, ClassSession, Transaction, Goal, FinanceHistoryRecord, SalarySlip } from './types';
+import { Users, BookOpen, LayoutDashboard, LogOut, Wallet, History, Banknote } from 'lucide-react';
 import { auth, db } from './firebase';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { collection, getDocs, doc, setDoc, deleteDoc, writeBatch, deleteField, getDoc } from 'firebase/firestore';
@@ -12,6 +12,7 @@ const Dashboard = lazy(() => import('./components/Dashboard'));
 const StudentManagement = lazy(() => import('./components/StudentManagement'));
 const ClassTracker = lazy(() => import('./components/ClassTracker'));
 const FinancialTracking = lazy(() => import('./components/FinancialTracking'));
+const SalaryTracker = lazy(() => import('./components/SalaryTracker'));
 const PersonalFinance = lazy(() => import('./components/PersonalFinance'));
 const GlobalChatbot = lazy(() => import('./components/GlobalChatbot'));
 
@@ -55,6 +56,7 @@ export default function App() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [financeHistory, setFinanceHistory] = useState<FinanceHistoryRecord[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
+  const [salarySlips, setSalarySlips] = useState<SalarySlip[]>([]);
   const [initialBalance, setInitialBalance] = useState<{ cash: number; banking: number }>({ cash: 0, banking: 0 });
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isGlobalHistoryOpen, setIsGlobalHistoryOpen] = useState(false);
@@ -84,12 +86,13 @@ export default function App() {
   const fetchData = async (uid: string) => {
     setLoadingData(true);
     try {
-      const [studentsSnap, classesSnap, transactionsSnap, historySnap, goalsSnap, settingsSnap, profileSnap] = await Promise.all([
+      const [studentsSnap, classesSnap, transactionsSnap, historySnap, goalsSnap, salarySlipsSnap, settingsSnap, profileSnap] = await Promise.all([
         getDocs(collection(db, `users/${uid}/students`)),
         getDocs(collection(db, `users/${uid}/classes`)),
         getDocs(collection(db, `users/${uid}/transactions`)),
         getDocs(collection(db, `users/${uid}/financeHistory`)),
         getDocs(collection(db, `users/${uid}/goals`)),
+        getDocs(collection(db, `users/${uid}/salarySlips`)),
         getDoc(doc(db, `users/${uid}/settings/finance`)),
         getDoc(doc(db, `users/${uid}/profile/info`))
       ]);
@@ -105,6 +108,7 @@ export default function App() {
       const transactionsData = transactionsSnap.docs.map(doc => doc.data() as Transaction);
       const historyData = historySnap.docs.map(doc => doc.data() as FinanceHistoryRecord);
       const goalsData = goalsSnap.docs.map(doc => doc.data() as Goal);
+      const salarySlipsData = salarySlipsSnap.docs.map(doc => doc.data() as SalarySlip);
       const settingsData = settingsSnap.exists() ? settingsSnap.data() : { initialBalance: { cash: 0, banking: 0 } };
       
       setStudents(studentsData);
@@ -112,6 +116,7 @@ export default function App() {
       setTransactions(transactionsData);
       setFinanceHistory(historyData);
       setGoals(goalsData);
+      setSalarySlips(salarySlipsData);
       setInitialBalance(settingsData.initialBalance || { cash: 0, banking: 0 });
 
       // Migration logic from localStorage to Firestore
@@ -419,6 +424,42 @@ export default function App() {
     }
   };
 
+  const addSalarySlip = async (slip: SalarySlip) => {
+    if (!user) return;
+    try {
+      await setDoc(doc(db, `users/${user.uid}/salarySlips`, slip.id), slip);
+      setSalarySlips(prev => [...prev, slip]);
+      toast.success('Thêm phiếu lương thành công');
+    } catch (error) {
+      console.error("Error adding salary slip:", error);
+      toast.error('Có lỗi xảy ra khi thêm phiếu lương');
+    }
+  };
+
+  const updateSalarySlip = async (slip: SalarySlip) => {
+    if (!user) return;
+    try {
+      await setDoc(doc(db, `users/${user.uid}/salarySlips`, slip.id), slip);
+      setSalarySlips(prev => prev.map(s => s.id === slip.id ? slip : s));
+      toast.success('Cập nhật phiếu lương thành công');
+    } catch (error) {
+      console.error("Error updating salary slip:", error);
+      toast.error('Có lỗi xảy ra khi cập nhật phiếu lương');
+    }
+  };
+
+  const deleteSalarySlip = async (id: string) => {
+    if (!user) return;
+    try {
+      await deleteDoc(doc(db, `users/${user.uid}/salarySlips`, id));
+      setSalarySlips(prev => prev.filter(s => s.id !== id));
+      toast.success('Đã xóa phiếu lương');
+    } catch (error) {
+      console.error("Error deleting salary slip:", error);
+      toast.error('Có lỗi xảy ra khi xóa phiếu lương');
+    }
+  };
+
   const updateInitialBalance = async (balance: { cash: number; banking: number }) => {
     if (!user) return;
     try {
@@ -596,6 +637,14 @@ export default function App() {
                   hoverClass="hover:bg-slate-50/50 hover:text-slate-800"
                 />
                 <TabButton 
+                  active={activeTab === 'salary'} 
+                  onClick={() => setActiveTab('salary')}
+                  icon={<Banknote className="w-4 h-4 mr-2" />}
+                  label="Lương"
+                  colorClass="glass-active text-slate-900 border-sky-200/50"
+                  hoverClass="hover:bg-slate-50/50 hover:text-slate-800"
+                />
+                <TabButton 
                   active={activeTab === 'personal_finance'} 
                   onClick={() => setActiveTab('personal_finance')}
                   icon={<Wallet className="w-4 h-4 mr-2" />}
@@ -635,6 +684,12 @@ export default function App() {
               active={activeTab === 'finances'} 
               onClick={() => setActiveTab('finances')}
               label="Tài chính"
+              colorClass="glass-active text-slate-900 border-sky-200/50"
+            />
+            <MobileTabButton 
+              active={activeTab === 'salary'} 
+              onClick={() => setActiveTab('salary')}
+              label="Lương"
               colorClass="glass-active text-slate-900 border-sky-200/50"
             />
             <MobileTabButton 
@@ -687,10 +742,11 @@ export default function App() {
                   </div>
                 </div>
               }>
-                {activeTab === 'dashboard' && <Dashboard students={students} classes={classes} setActiveTab={setActiveTab} displayName={displayName} />}
+                {activeTab === 'dashboard' && <Dashboard students={students} classes={classes} salarySlips={salarySlips} setActiveTab={setActiveTab} displayName={displayName} />}
                 {activeTab === 'students' && <StudentManagement students={students} addStudent={addStudent} updateStudent={updateStudent} deleteStudent={deleteStudent} classes={classes} markClassesAsPaid={markClassesAsPaid} />}
                 {activeTab === 'classes' && <ClassTracker students={students} classes={classes} addClass={addClass} updateClass={updateClass} deleteClass={deleteClass} />}
                 {activeTab === 'finances' && <FinancialTracking students={students} classes={classes} markClassesAsPaid={markClassesAsPaid} undoLastPayment={undoLastPayment} />}
+                {activeTab === 'salary' && <SalaryTracker salarySlips={salarySlips} addSalarySlip={addSalarySlip} updateSalarySlip={updateSalarySlip} deleteSalarySlip={deleteSalarySlip} />}
                 {activeTab === 'personal_finance' && (
                   <PersonalFinance 
                     transactions={transactions}

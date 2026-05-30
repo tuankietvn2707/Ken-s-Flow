@@ -149,20 +149,20 @@ body::before {
 .animate-rainbow-text {
   background: linear-gradient(
     to right,
-    #ff0000,
-    #ff7f00,
-    #ffff00,
-    #00ff00,
-    #0000ff,
-    #4b0082,
-    #9400d3,
-    #ff0000
+    #3b82f6,
+    #8b5cf6,
+    #ec4899,
+    #ef4444,
+    #eab308,
+    #10b981,
+    #06b6d4,
+    #3b82f6
   );
   background-size: 200% auto;
   color: transparent;
   -webkit-background-clip: text;
   background-clip: text;
-  animation: rainbow-text 4s linear infinite;
+  animation: rainbow-text 3s linear infinite;
 }
 /* Glassmorphism Classes (Refined) */
 .glass {

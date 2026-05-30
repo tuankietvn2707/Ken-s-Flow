@@ -88,6 +88,30 @@ export interface FinanceHistoryRecord {
   classIds: string[];
 }
 
+export interface SalarySlip {
+  id: string;
+  month: string;        // "2026-05"
+  receivedDate: string; // "2026-05-15"
+  paymentMethod: 'banking' | 'cash';
+  status: 'received' | 'pending';
+  companyName?: string;
+
+  // Các khoản cộng
+  baseSalary: number;
+  allowances: { label: string; amount: number }[];  // phụ cấp linh hoạt
+  bonus: number;        // thưởng tháng này (0 nếu không có)
+  bonusNote?: string;   // ghi chú thưởng, vd "Thưởng Q1"
+
+  // Các khoản khấu trừ
+  bhxh: number;         // BHXH 8%
+  bhyt: number;         // BHYT 1.5%
+  bhtn: number;         // BHTN 1%
+  incomeTax: number;    // Thuế TNCN
+  otherDeductions: { label: string; amount: number }[];
+
+  notes?: string;
+}
+
 export interface Goal {
   id: string;
   name: string;

@@ -47,7 +47,7 @@ export default function StudentManagement({ students, addStudent, updateStudent,
         className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
       >
         <div className="flex flex-col gap-1 items-start">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 animate-gradient-x tracking-tight drop-shadow-sm pb-1">Quản lý Học viên</h1>
+          <h1 className="text-3xl sm:text-4xl font-extrabold animate-rainbow-text tracking-tight drop-shadow-sm pb-1">Quản lý Học viên</h1>
           <p className="text-slate-600 font-medium text-lg">Theo dõi thông tin, mục tiêu và trạng thái học viên</p>
         </div>
         <Button
